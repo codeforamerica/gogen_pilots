@@ -3,7 +3,6 @@ package data
 import (
 	"encoding/csv"
 	"errors"
-	"io"
 	"strconv"
 )
 
@@ -15,32 +14,24 @@ type WeightsInformation struct {
 }
 
 func NewWeightsInformation(sourceCSV *csv.Reader) (*WeightsInformation, error) {
-	wi := WeightsInformation{}
-	wi.cases = make(map[string]float64)
+	cases := make(map[string]float64)
 
-	//ignore headers
-	_, err := sourceCSV.Read()
+	records, err := sourceCSV.ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
-	for {
-		record, err := sourceCSV.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return nil, err
-		}
-
+	// Take slice from 1: because csv headers
+	for _, record := range records[1:] {
 		weight, err := strconv.ParseFloat(record[WEIGHT], 64)
 		if err != nil {
 			return nil, err
 		}
 
-		wi.cases[record[COURTNO]] = weight
+		cases[record[COURTNO]] = weight
 	}
 
-	return &wi, nil
+	return &WeightsInformation{cases}, nil
 }
 
 func (w WeightsInformation) Under1LB(courtNumber string) (bool, error) {
