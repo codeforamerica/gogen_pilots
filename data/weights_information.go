@@ -6,14 +6,14 @@ import (
 	"strconv"
 )
 
-const COURTNO int = 2
-const WEIGHT int = 3
-
 type WeightsInformation struct {
 	cases map[string]float64
 }
 
 func NewWeightsInformation(sourceCSV *csv.Reader) (*WeightsInformation, error) {
+	const COURTNO int = 2
+	const WEIGHT int = 3
+
 	cases := make(map[string]float64)
 
 	records, err := sourceCSV.ReadAll()
