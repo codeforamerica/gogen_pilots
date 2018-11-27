@@ -11,7 +11,6 @@ type CMSEntry struct {
 	IncidentNumber string
 	Name           string
 	CDL            string
-	FormattedName  string
 }
 
 func NewCMSEntry(record []string) CMSEntry {
@@ -36,4 +35,10 @@ func NewCMSEntry(record []string) CMSEntry {
 		Name:           strings.TrimSpace(record[NAME]),
 		CDL:            strings.SplitN(record[CDL], " ", 2)[0],
 	}
+}
+
+func (c CMSEntry) FormattedName() string {
+	nameParts := strings.Split(c.Name, "/")
+	lastCommaFirst := strings.Join(nameParts[0:2], ",")
+	return strings.Join(append([]string{lastCommaFirst}, nameParts[2:]...), " ")
 }

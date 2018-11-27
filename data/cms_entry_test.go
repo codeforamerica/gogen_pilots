@@ -7,7 +7,7 @@ import (
 	. "gogen/data"
 )
 
-var _ = FDescribe("CMSEntry", func() {
+var _ = Describe("CMSEntry", func() {
 	var (
 		record []string
 		ce     CMSEntry
@@ -32,6 +32,23 @@ var _ = FDescribe("CMSEntry", func() {
 
 		It("Parses states out of DL numbers", func() {
 			Expect(ce.CDL).To(Equal("F1234567"))
+		})
+
+		Describe("#FormattedName", func() {
+			It("Formats the name", func() {
+				Expect(ce.FormattedName()).To(Equal("BIRD,BIG"))
+			})
+
+			Context("There is a middle name", func() {
+				BeforeEach(func() {
+					record = []string{"305563", "", "A1567564", "BIRD/BIG/FLAPPY/YELLOW", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+					ce = NewCMSEntry(record)
+				})
+
+				It("Formats the name", func() {
+					Expect(ce.FormattedName()).To(Equal("BIRD,BIG FLAPPY YELLOW"))
+				})
+			})
 		})
 
 		Context("There is whitespace in the columns", func() {

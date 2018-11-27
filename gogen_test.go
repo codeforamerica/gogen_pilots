@@ -18,6 +18,7 @@ var _ = Describe("gogen", func() {
 		outputDir     string
 		pathToWeights string
 		pathToDOJ     string
+		pathToCMS     string
 		err           error
 	)
 
@@ -30,6 +31,9 @@ var _ = Describe("gogen", func() {
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "cadoj.csv"))
 		Expect(err).ToNot(HaveOccurred())
+
+		pathToCMS, err = path.Abs(path.Join("test_fixtures", "felonies_sf.csv"))
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("runs and has output", func() {
@@ -38,8 +42,9 @@ var _ = Describe("gogen", func() {
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		weightsFlag := fmt.Sprintf("--conviction-weights=%s", pathToWeights)
+		cmsFlag := fmt.Sprintf("--input-csv=%s", pathToCMS)
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
-		command := exec.Command(pathToGogen, outputsFlag, weightsFlag, dojFlag)
+		command := exec.Command(pathToGogen, outputsFlag, weightsFlag, dojFlag, cmsFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
