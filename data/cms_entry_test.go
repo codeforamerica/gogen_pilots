@@ -31,10 +31,19 @@ var _ = Describe("CMSEntry", func() {
 			Expect(ce.IncidentNumber).To(Equal("A1567564"))
 			Expect(ce.Name).To(Equal("BIRD/BIG"))
 			Expect(ce.DateOfBirth).To(Equal(time.Date(1965, time.September, 14, 0, 0, 0, 0, time.UTC)))
+			Expect(ce.DispositionDate).To(Equal(time.Date(1999, time.April, 20, 0, 0, 0, 0, time.UTC)))
 		})
 
 		It("Parses states out of DL numbers", func() {
 			Expect(ce.CDL).To(Equal("F1234567"))
+		})
+
+		Context("The DOB is invalid", func() {
+			It("Returns the error", func() {
+				record = []string{"305563", "", "A1567564", "BIRD/BIG", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "A BAD DATE 1994", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+				ce = NewCMSEntry(record)
+				Expect(ce.DateOfBirth).To(Equal(time.Time{}))
+			})
 		})
 
 		Describe("#FormattedName", func() {
@@ -50,6 +59,17 @@ var _ = Describe("CMSEntry", func() {
 
 				It("Formats the name", func() {
 					Expect(ce.FormattedName()).To(Equal("BIRD,BIG FLAPPY YELLOW"))
+				})
+			})
+
+			Context("There is only one name part", func() {
+				BeforeEach(func() {
+					record = []string{"305563", "", "A1567564", "BIRD", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+					ce = NewCMSEntry(record)
+				})
+
+				It("Formats the name", func() {
+					Expect(ce.FormattedName()).To(Equal("BIRD"))
 				})
 			})
 		})

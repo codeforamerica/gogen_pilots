@@ -12,7 +12,7 @@ import (
 )
 
 var _ = Describe("CMSInformation", func() {
-	Describe("NewCMSInformation", func() {
+	PDescribe("NewCMSInformation", func() {
 		var pathToCMSFile string
 		var expectedEntry CMSEntry
 		var err error
@@ -33,7 +33,7 @@ var _ = Describe("CMSInformation", func() {
 			Expect(ci).ToNot(BeNil())
 		})
 
-		PIt("parses the csv and creates entries", func() {
+		It("parses the csv and creates entries", func() {
 			CMSCSV, err := os.Open(pathToCMSFile)
 			Expect(err).ToNot(HaveOccurred())
 

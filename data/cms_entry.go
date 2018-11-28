@@ -6,15 +6,16 @@ import (
 )
 
 type CMSEntry struct {
-	CourtNumber    string
-	Level          string
-	SSN            string
-	CII            string
-	Charge         string
-	IncidentNumber string
-	Name           string
-	CDL            string
-	DateOfBirth    time.Time
+	CourtNumber     string
+	Level           string
+	SSN             string
+	CII             string
+	Charge          string
+	IncidentNumber  string
+	Name            string
+	CDL             string
+	DateOfBirth     time.Time
+	DispositionDate time.Time
 }
 
 func NewCMSEntry(record []string) CMSEntry {
@@ -28,31 +29,44 @@ func NewCMSEntry(record []string) CMSEntry {
 		CII        int = 22
 		CDL        int = 25
 		DOB        int = 20
+		DISPODATE  int = 7
 	)
 
-	dob, err := time.Parse("1/2/06", record[DOB])
-	if err != nil {
-		panic(err)
-	}
-	if time.Now().Before(dob) {
-		dob = dob.AddDate(-100, 0, 0)
-	}
+	dob := parseDate(record[DOB])
+	dispositionDate := parseDate(record[DISPODATE])
 
 	return CMSEntry{
-		CourtNumber:    record[COURTNO],
-		Level:          record[LEVEL],
-		SSN:            record[SSN],
-		CII:            record[CII],
-		Charge:         strings.TrimSpace(record[CHARGE]),
-		IncidentNumber: record[INCIDENTNO],
-		Name:           strings.TrimSpace(record[NAME]),
-		CDL:            strings.SplitN(record[CDL], " ", 2)[0],
-		DateOfBirth:    dob,
+		CourtNumber:     record[COURTNO],
+		Level:           record[LEVEL],
+		SSN:             record[SSN],
+		CII:             record[CII],
+		Charge:          strings.TrimSpace(record[CHARGE]),
+		IncidentNumber:  record[INCIDENTNO],
+		Name:            strings.TrimSpace(record[NAME]),
+		CDL:             strings.SplitN(record[CDL], " ", 2)[0],
+		DateOfBirth:     dob,
+		DispositionDate: dispositionDate,
 	}
 }
 
 func (c CMSEntry) FormattedName() string {
 	nameParts := strings.Split(c.Name, "/")
-	lastCommaFirst := strings.Join(nameParts[0:2], ",")
-	return strings.Join(append([]string{lastCommaFirst}, nameParts[2:]...), " ")
+
+	if len(nameParts) > 1 {
+		lastCommaFirst := strings.Join(nameParts[0:2], ",")
+		return strings.Join(append([]string{lastCommaFirst}, nameParts[2:]...), " ")
+	}
+
+	return nameParts[0]
+}
+
+func parseDate(s string) time.Time {
+	t, err := time.Parse("1/2/06", s)
+	if err != nil {
+		t = time.Time{}
+	}
+	if time.Now().Before(t) {
+		t = t.AddDate(-100, 0, 0)
+	}
+	return t
 }
