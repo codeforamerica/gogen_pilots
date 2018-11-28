@@ -1,6 +1,8 @@
 package data_test
 
 import (
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -28,6 +30,7 @@ var _ = Describe("CMSEntry", func() {
 			Expect(ce.Charge).To(Equal("11357(C)HS"))
 			Expect(ce.IncidentNumber).To(Equal("A1567564"))
 			Expect(ce.Name).To(Equal("BIRD/BIG"))
+			Expect(ce.DateOfBirth).To(Equal(time.Date(1965, time.September, 14, 0, 0, 0, 0, time.UTC)))
 		})
 
 		It("Parses states out of DL numbers", func() {

@@ -36,7 +36,7 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	It("runs and has output", func() {
+	PIt("runs and has output", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 

@@ -1,6 +1,9 @@
 package data
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 type CMSEntry struct {
 	CourtNumber    string
@@ -11,6 +14,7 @@ type CMSEntry struct {
 	IncidentNumber string
 	Name           string
 	CDL            string
+	DateOfBirth    time.Time
 }
 
 func NewCMSEntry(record []string) CMSEntry {
@@ -23,7 +27,16 @@ func NewCMSEntry(record []string) CMSEntry {
 		SSN        int = 24
 		CII        int = 22
 		CDL        int = 25
+		DOB        int = 20
 	)
+
+	dob, err := time.Parse("1/2/06", record[DOB])
+	if err != nil {
+		panic(err)
+	}
+	if time.Now().Before(dob) {
+		dob = dob.AddDate(-100, 0, 0)
+	}
 
 	return CMSEntry{
 		CourtNumber:    record[COURTNO],
@@ -34,6 +47,7 @@ func NewCMSEntry(record []string) CMSEntry {
 		IncidentNumber: record[INCIDENTNO],
 		Name:           strings.TrimSpace(record[NAME]),
 		CDL:            strings.SplitN(record[CDL], " ", 2)[0],
+		DateOfBirth:    dob,
 	}
 }
 
