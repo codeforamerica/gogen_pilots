@@ -5,6 +5,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gogen/data"
+	"gogen/data/datafakes"
 	. "gogen/processor"
 	"io/ioutil"
 	"os"
@@ -25,8 +26,7 @@ var _ = Describe("DataProcessor", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
-		Expect(err).ToNot(HaveOccurred())
+		outputWriter := data.NewCMSWriter(path.Join(outputDir, "felonies_sf_results.csv"))
 
 		pathToWeights, err := path.Abs(path.Join("..", "test_fixtures", "conviction_weights.csv"))
 		Expect(err).ToNot(HaveOccurred())
@@ -50,7 +50,7 @@ var _ = Describe("DataProcessor", func() {
 		Expect(err).ToNot(HaveOccurred())
 		cmsCSVReader = csv.NewReader(cmsFile)
 
-		dataProcessor = NewDataProcessor(cmsCSVReader, weightsInformation, dojInformation, outputDir)
+		dataProcessor = NewDataProcessor(cmsCSVReader, weightsInformation, dojInformation, outputWriter)
 	})
 
 	It("runs and has output", func() {
@@ -67,5 +67,21 @@ var _ = Describe("DataProcessor", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(string(outputBody)).To(Equal(string(expectedResultsBody)))
+	})
+
+	Context("Checking Eligibility", func() {
+		var outputWriter *datafakes.FakeCMSWriter
+
+		BeforeEach(func() {
+			outputWriter = &datafakes.FakeCMSWriter{}
+			dataProcessor = NewDataProcessor(cmsCSVReader, weightsInformation, dojInformation, outputWriter)
+		})
+
+		FIt("Checks for weight disqualifiers", func() {
+			dataProcessor.Process()
+			_, info := outputWriter.WriteEntryArgsForCall(1)
+			Expect(info.QFinalSum).To(Equal(54.0))
+			Expect(info.Over1Lb).To(Equal("eligible"))
+		})
 	})
 })

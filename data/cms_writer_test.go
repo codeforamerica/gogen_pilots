@@ -15,10 +15,15 @@ var _ = Describe("csvWriter", func() {
 	var entry CMSEntry
 	var outputDir string
 	var err error
+	var info EligibilityInfo
 
 	BeforeEach(func() {
 		entry = CMSEntry{
 			RawRow: []string{"A", "Slice", "Of", "Strings"},
+		}
+		info = EligibilityInfo{
+			Over1Lb:   "a eligibility value",
+			QFinalSum: 999.9,
 		}
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
@@ -27,13 +32,12 @@ var _ = Describe("csvWriter", func() {
 	})
 
 	It("Writes CMS Entries to a csv file", func() {
-		writer.WriteEntry(entry)
+		writer.WriteEntry(entry, info)
 		writer.Flush()
 
-		pathToExpectedResults, err := path.Abs(path.Join("..", "test_fixtures", "data", "expected_cms_writer_output.csv"))
-		Expect(err).ToNot(HaveOccurred())
-		expectedResultsBody, err := ioutil.ReadFile(pathToExpectedResults)
-		Expect(err).ToNot(HaveOccurred())
+		expectedResultsBody := `Court Number,Ind,Incident Number,Truename,Case Level,Case Dispo,Case Disposition Description ,Dispo Date,Action Number,1st Filed,Charge Level,Charge Date,Current Charge,Current Level,Current Charge Description,Chg Disp,Charge Disposition Description,Ch Dispo Date,Race,Sex,DOB,SFNO,CII,FBI,SSN,DL Number,EOR,PRI_NAME,PRI_DOB,SUBJECT_ID,CII_NUMBER,PRI_SSN,Superstrikes,Superstrike Code Section(s),PC290 Charges,PC290 Code Section(s),PC290 Registration,Two Priors,Over 1lb,Q_final_sum,Age at Conviction,Years Since Event,Years Since Most Recent Conviction,Final Recommendation
+A,Slice,Of,Strings,a eligibility value,999.9
+`
 
 		pathToOutput, err := path.Abs(path.Join(outputDir, "written_csv.csv"))
 		Expect(err).ToNot(HaveOccurred())

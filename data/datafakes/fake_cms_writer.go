@@ -11,10 +11,11 @@ type FakeCMSWriter struct {
 	flushMutex       sync.RWMutex
 	flushArgsForCall []struct {
 	}
-	WriteEntryStub        func(data.CMSEntry)
+	WriteEntryStub        func(data.CMSEntry, data.EligibilityInfo)
 	writeEntryMutex       sync.RWMutex
 	writeEntryArgsForCall []struct {
 		arg1 data.CMSEntry
+		arg2 data.EligibilityInfo
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
@@ -43,15 +44,16 @@ func (fake *FakeCMSWriter) FlushCalls(stub func()) {
 	fake.FlushStub = stub
 }
 
-func (fake *FakeCMSWriter) WriteEntry(arg1 data.CMSEntry) {
+func (fake *FakeCMSWriter) WriteEntry(arg1 data.CMSEntry, arg2 data.EligibilityInfo) {
 	fake.writeEntryMutex.Lock()
 	fake.writeEntryArgsForCall = append(fake.writeEntryArgsForCall, struct {
 		arg1 data.CMSEntry
-	}{arg1})
-	fake.recordInvocation("WriteEntry", []interface{}{arg1})
+		arg2 data.EligibilityInfo
+	}{arg1, arg2})
+	fake.recordInvocation("WriteEntry", []interface{}{arg1, arg2})
 	fake.writeEntryMutex.Unlock()
 	if fake.WriteEntryStub != nil {
-		fake.WriteEntryStub(arg1)
+		fake.WriteEntryStub(arg1, arg2)
 	}
 }
 
@@ -61,17 +63,17 @@ func (fake *FakeCMSWriter) WriteEntryCallCount() int {
 	return len(fake.writeEntryArgsForCall)
 }
 
-func (fake *FakeCMSWriter) WriteEntryCalls(stub func(data.CMSEntry)) {
+func (fake *FakeCMSWriter) WriteEntryCalls(stub func(data.CMSEntry, data.EligibilityInfo)) {
 	fake.writeEntryMutex.Lock()
 	defer fake.writeEntryMutex.Unlock()
 	fake.WriteEntryStub = stub
 }
 
-func (fake *FakeCMSWriter) WriteEntryArgsForCall(i int) data.CMSEntry {
+func (fake *FakeCMSWriter) WriteEntryArgsForCall(i int) (data.CMSEntry, data.EligibilityInfo) {
 	fake.writeEntryMutex.RLock()
 	defer fake.writeEntryMutex.RUnlock()
 	argsForCall := fake.writeEntryArgsForCall[i]
-	return argsForCall.arg1
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *FakeCMSWriter) Invocations() map[string][][]interface{} {

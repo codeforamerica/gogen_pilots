@@ -45,7 +45,9 @@ func main() {
 
 	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
 
-	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, opts.OutputFolder)
+	cmsWriter := NewCMSWriter(opts.OutputFolder)
+
+	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter)
 
 	dataProcessor.Process()
 }
