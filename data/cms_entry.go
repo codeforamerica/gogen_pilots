@@ -16,6 +16,7 @@ type CMSEntry struct {
 	CDL             string
 	DateOfBirth     time.Time
 	DispositionDate time.Time
+	RawRow          []string
 }
 
 func NewCMSEntry(record []string) CMSEntry {
@@ -46,6 +47,7 @@ func NewCMSEntry(record []string) CMSEntry {
 		CDL:             strings.SplitN(record[CDL], " ", 2)[0],
 		DateOfBirth:     dob,
 		DispositionDate: dispositionDate,
+		RawRow:          record,
 	}
 }
 

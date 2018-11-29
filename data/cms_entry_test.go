@@ -32,6 +32,7 @@ var _ = Describe("CMSEntry", func() {
 			Expect(ce.Name).To(Equal("BIRD/BIG"))
 			Expect(ce.DateOfBirth).To(Equal(time.Date(1965, time.September, 14, 0, 0, 0, 0, time.UTC)))
 			Expect(ce.DispositionDate).To(Equal(time.Date(1999, time.April, 20, 0, 0, 0, 0, time.UTC)))
+			Expect(ce.RawRow).To(Equal(record))
 		})
 
 		It("Parses states out of DL numbers", func() {

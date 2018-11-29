@@ -29,7 +29,7 @@ func main() {
 		panic(err)
 	}
 
-	cmsInformation, _ := NewCMSInformation(csv.NewReader(cmsFile))
+	cmsCSV := csv.NewReader(cmsFile)
 
 	weightsFile, err := os.Open(opts.ConvictionWeights)
 	if err != nil {
@@ -45,7 +45,7 @@ func main() {
 
 	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
 
-	dataProcessor := NewDataProcessor(cmsInformation, weightsInformation, dojInformation)
+	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, opts.OutputFolder)
 
 	dataProcessor.Process()
 }
