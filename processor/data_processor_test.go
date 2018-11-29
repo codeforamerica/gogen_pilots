@@ -5,7 +5,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gogen/data"
-	"gogen/data/datafakes"
 	. "gogen/processor"
 	"io/ioutil"
 	"os"
@@ -53,7 +52,7 @@ var _ = Describe("DataProcessor", func() {
 		dataProcessor = NewDataProcessor(cmsCSVReader, weightsInformation, dojInformation, outputWriter)
 	})
 
-	It("runs and has output", func() {
+	PIt("runs and has output", func() {
 		dataProcessor.Process()
 
 		pathToExpectedResults, err := path.Abs(path.Join("..", "test_fixtures", "felonies_sf_results.csv"))
@@ -67,21 +66,5 @@ var _ = Describe("DataProcessor", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(string(outputBody)).To(Equal(string(expectedResultsBody)))
-	})
-
-	Context("Checking Eligibility", func() {
-		var outputWriter *datafakes.FakeCMSWriter
-
-		BeforeEach(func() {
-			outputWriter = &datafakes.FakeCMSWriter{}
-			dataProcessor = NewDataProcessor(cmsCSVReader, weightsInformation, dojInformation, outputWriter)
-		})
-
-		FIt("Checks for weight disqualifiers", func() {
-			dataProcessor.Process()
-			_, info := outputWriter.WriteEntryArgsForCall(1)
-			Expect(info.QFinalSum).To(Equal(54.0))
-			Expect(info.Over1Lb).To(Equal("eligible"))
-		})
 	})
 })

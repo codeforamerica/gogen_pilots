@@ -2,12 +2,16 @@ package data
 
 import (
 	"encoding/csv"
-	"errors"
 	"strconv"
 )
 
 type WeightsInformation struct {
 	cases map[string]float64
+}
+
+type WeightsEntry struct {
+	Weight float64
+	Found  bool
 }
 
 func NewWeightsInformation(sourceCSV *csv.Reader) (*WeightsInformation, error) {
@@ -34,19 +38,8 @@ func NewWeightsInformation(sourceCSV *csv.Reader) (*WeightsInformation, error) {
 	return &WeightsInformation{cases}, nil
 }
 
-func (w WeightsInformation) Under1LB(courtNumber string) (bool, error) {
+func (w WeightsInformation) GetWeight(courtNumber string) WeightsEntry {
 	weight, ok := w.cases[courtNumber]
-	if !ok {
-		return false, errors.New("court number did not exist")
-	}
-	return weight <= 453.592, nil
-}
 
-func (w WeightsInformation) GetWeight(courtNumber string) (float64, error) {
-	weight, ok := w.cases[courtNumber]
-	if !ok {
-		return 0, errors.New("court number did not exist")
-	}
-
-	return weight, nil
+	return WeightsEntry{weight, ok}
 }

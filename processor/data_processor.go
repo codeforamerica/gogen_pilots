@@ -46,13 +46,10 @@ func (d DataProcessor) Process() {
 
 		row := data.NewCMSEntry(raw_row)
 
-		//weightsEntry, err := d.weightsInformation.GetWeight(row.CourtNumber)
-		//if err != nil {
-		//	panic(err)
-		//}
+		weightsEntry := d.weightsInformation.GetWeight(row.CourtNumber)
 		//dojHistory := findDOJHistory(row)
 
-		eligibilityInfo := d.computeEligibility(row)
+		eligibilityInfo := ComputeEligibility(row, weightsEntry)
 
 		d.outputCMSWriter.WriteEntry(row, eligibilityInfo)
 	}
@@ -63,25 +60,5 @@ func (d DataProcessor) readHeaders() {
 	_, err := d.cmsCSV.Read()
 	if err != nil {
 		panic(err)
-	}
-}
-
-func (d DataProcessor) computeEligibility(entry data.CMSEntry) data.EligibilityInfo {
-	var eligibleString string
-	weight, err := d.weightsInformation.GetWeight(entry.CourtNumber)
-	if err != nil {
-		eligibleString = "no match"
-	}
-	eligible, _ := d.weightsInformation.Under1LB(entry.CourtNumber)
-
-	if eligible {
-		eligibleString = "eligible"
-	} else {
-		eligibleString = "ineligible"
-	}
-
-	return data.EligibilityInfo{
-		QFinalSum: weight,
-		Over1Lb:   eligibleString,
 	}
 }
