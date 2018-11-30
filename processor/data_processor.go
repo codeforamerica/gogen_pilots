@@ -37,17 +37,17 @@ func (d DataProcessor) Process() {
 	d.readHeaders()
 
 	for {
-		raw_row, err := d.cmsCSV.Read()
+		rawRow, err := d.cmsCSV.Read()
 		if err == io.EOF {
 			break
 		} else if err != nil {
 			panic(err)
 		}
 
-		row := data.NewCMSEntry(raw_row)
+		row := data.NewCMSEntry(rawRow)
 
 		weightsEntry := d.weightsInformation.GetWeight(row.CourtNumber)
-		//dojHistory := findDOJHistory(row)
+		//dojHistory := d.dojInformation.findDOJHistory(row)
 
 		eligibilityInfo := ComputeEligibility(row, weightsEntry)
 
