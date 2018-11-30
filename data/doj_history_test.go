@@ -17,8 +17,7 @@ var _ = Describe("DOJHistory", func() {
 			})
 
 			PIt("Sets the name of the history", func() {
-				row := []string{}
-				history.PushRow(row)
+				
 			})
 		})
 	})

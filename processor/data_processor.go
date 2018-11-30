@@ -2,6 +2,7 @@ package processor
 
 import (
 	"encoding/csv"
+	"fmt"
 	"gogen/data"
 	"io"
 )
@@ -11,6 +12,13 @@ type DataProcessor struct {
 	weightsInformation *data.WeightsInformation
 	dojInformation     *data.DOJInformation
 	outputCMSWriter    data.CMSWriter
+	stats              dataProcessorStats
+}
+
+type dataProcessorStats struct {
+	nCMSRows         int
+	nCMSFelonies     int
+	nCMSMisdemeanors int
 }
 
 func NewDataProcessor(
@@ -43,8 +51,8 @@ func (d DataProcessor) Process() {
 		} else if err != nil {
 			panic(err)
 		}
-
 		row := data.NewCMSEntry(rawRow)
+		d.incrementStats(row)
 
 		weightsEntry := d.weightsInformation.GetWeight(row.CourtNumber)
 		//dojHistory := d.dojInformation.findDOJHistory(row)
@@ -54,6 +62,16 @@ func (d DataProcessor) Process() {
 		d.outputCMSWriter.WriteEntry(row, eligibilityInfo)
 	}
 	d.outputCMSWriter.Flush()
+	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
+}
+
+func (d *DataProcessor) incrementStats(row data.CMSEntry) {
+	d.stats.nCMSRows++
+	if row.Level == "F" {
+		d.stats.nCMSFelonies++
+	} else {
+		d.stats.nCMSMisdemeanors++
+	}
 }
 
 func (d DataProcessor) readHeaders() {

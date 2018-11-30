@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"path/filepath"
 
 	. "gogen/data"
 	. "gogen/processor"
@@ -45,7 +46,7 @@ func main() {
 
 	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
 
-	cmsWriter := NewCMSWriter(opts.OutputFolder)
+	cmsWriter := NewCMSWriter(filepath.Join(opts.OutputFolder, "results.csv"))
 
 	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter)
 

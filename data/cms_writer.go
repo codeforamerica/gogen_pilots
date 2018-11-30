@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 var headers = []string{
@@ -64,7 +63,7 @@ type csvWriter struct {
 }
 
 func NewCMSWriter(outputFilePath string) CMSWriter {
-	outputFile, err := os.Create(filepath.Join(outputFilePath))
+	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
 		panic(err)
 	}

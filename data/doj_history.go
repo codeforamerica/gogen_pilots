@@ -3,16 +3,31 @@ package data
 import "time"
 
 type DOJHistory struct {
-	Name              string
-	WeakName          string
 	SubjectID         string
+	Name              string
 	CII               string
-	Convictions       [][]string
-	Rows              []DOJRow
 	DOB               time.Time
 	SSN               string
 	CDL               string
 	PC290Registration bool
+	Convictions       []DOJRow
 }
 
-func (dh DOJHistory) PushRow(row []string) {}
+func (history DOJHistory) PushRow(row DOJRow) {
+	if history.SubjectID == "" {
+		history.SubjectID = row.SubjectID
+		history.Name = row.Name
+		history.CII = row.CII
+		history.DOB = row.DOB
+		history.SSN = row.SSN
+		history.CDL = row.CDL
+	}
+
+	if(row.Convicted) {
+		history.Convictions = append(history.Convictions, row)
+	}
+
+	if(row.PC290Registration) {
+		history.PC290Registration = true
+	}
+}

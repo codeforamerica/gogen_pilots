@@ -13,7 +13,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("gogen", func() {
+var _ bool = Describe("gogen", func() {
 	var (
 		outputDir     string
 		pathToWeights string
@@ -36,7 +36,7 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 	})
 
-	PIt("runs and has output", func() {
+	It("runs and has output", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
@@ -48,11 +48,24 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session.Out).Should(gbytes.Say("Processed 8 entries"))
-		Eventually(session.Out).Should(gbytes.Say("Found 7 felony charges"))
+		Eventually(session.Out).Should(gbytes.Say(`Found 9 charges in CMS data \(8 felonies, 1 misdemeanors\)`))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 11 charges in DOJ data \(11 felony and 0 misdemeanors\)`))
+		//Eventually(session.Out).Should(gbytes.Say(`Failed to match 1 out of 8 charges in CMS data`))
+		//Eventually(session.Out).Should(gbytes.Say(`Failed to match # out of # charges in DOJ data`))
+		//Eventually(session.Out).Should(gbytes.Say(`Failed to match #  out of # unique subjects in DOJ data`))
+		//Eventually(session.Out).Should(gbytes.Say(`Match details: ...`))
 
-		//TODO expect an outputs csv file to exist
-		Expect(true).To(Equal(false))
+		pathToExpectedResults, err := path.Abs(path.Join("test_fixtures", "felonies_sf_results.csv"))
+		Expect(err).ToNot(HaveOccurred())
+		_, err = ioutil.ReadFile(pathToExpectedResults)
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
+		Expect(err).ToNot(HaveOccurred())
+		_, err = ioutil.ReadFile(pathToOutput)
+		Expect(err).ToNot(HaveOccurred())
+
+		//Expect(string(outputBody)).To(Equal(string(expectedResultsBody)))
 
 		Eventually(session).Should(gexec.Exit())
 	})

@@ -7,6 +7,21 @@ type DOJInformation struct {
 	DOJHistories map[string]DOJHistory
 }
 
+type MatchData struct {
+	history           DOJHistory
+	cii               bool
+	ssn               bool
+	courtno           bool
+	name_and_dob      bool
+	weak_name_and_dob bool
+	cdl               bool
+	match_strength    int
+}
+
+func (information DOJInformation) findDOJHistory(entry CMSEntry) DOJHistory {
+	return DOJHistory{}
+}
+
 func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 	const SubjectIDIndex int = 0
 
@@ -21,7 +36,7 @@ func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 	}
 
 	for _, row := range rows {
-		info.DOJHistories[row[SubjectIDIndex]].PushRow(row)
+		info.DOJHistories[row[SubjectIDIndex]].PushRow(NewDOJRow(row))
 	}
 
 	return &info, nil
