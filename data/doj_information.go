@@ -18,16 +18,16 @@ type DOJInformation struct {
 }
 
 type MatchData struct {
-	history       *DOJHistory
-	matchResults  map[string]bool
-	matchStrength int
+	History       *DOJHistory
+	MatchResults  map[string]bool
+	MatchStrength int
 }
 
 func (information *DOJInformation) findDOJHistory(entry CMSEntry) *DOJHistory {
 	var matches []MatchData
 	for _, history := range information.Histories {
-		matchData := history.match(entry)
-		if matchData.matchStrength > 0 {
+		matchData := history.Match(entry)
+		if matchData.MatchStrength > 0 {
 			matches = append(matches, matchData)
 		}
 	}
@@ -42,22 +42,22 @@ func (information *DOJInformation) findDOJHistory(entry CMSEntry) *DOJHistory {
 		fmt.Print("Ambiguous match!")
 		for _, match := range matches {
 			//TODO better printing for ambiguous matches
-			if match.matchStrength > bestMatch.matchStrength {
+			if match.MatchStrength > bestMatch.MatchStrength {
 				bestMatch = match
 			}
 		}
 	}
 
 	information.summarizeMatchData(bestMatch)
-	return bestMatch.history
+	return bestMatch.History
 }
 
 func (information *DOJInformation) summarizeMatchData(data MatchData) {
-	for key, val := range data.matchResults {
+	for key, val := range data.MatchResults {
 		if val {
 			information.SummaryMatchData.matchCountByType[key]++
 		}
-		information.SummaryMatchData.matchStrengths[data.matchStrength]++
+		information.SummaryMatchData.matchStrengths[data.MatchStrength]++
 	}
 }
 
