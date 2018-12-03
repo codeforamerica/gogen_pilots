@@ -1,25 +1,64 @@
 package data
 
-import "encoding/csv"
+import (
+	"encoding/csv"
+	"fmt"
+)
+
+type SummaryMatchData struct {
+	ambiguousMatches int
+	matchCountByType map[string]int
+	matchStrengths   map[int]int
+}
 
 type DOJInformation struct {
-	Rows         [][]string
-	DOJHistories map[string]DOJHistory
+	Rows             [][]string
+	Histories        map[string]*DOJHistory
+	SummaryMatchData SummaryMatchData
 }
 
 type MatchData struct {
-	history           DOJHistory
-	cii               bool
-	ssn               bool
-	courtno           bool
-	name_and_dob      bool
-	weak_name_and_dob bool
-	cdl               bool
-	match_strength    int
+	history       *DOJHistory
+	matchResults  map[string]bool
+	matchStrength int
 }
 
-func (information DOJInformation) findDOJHistory(entry CMSEntry) DOJHistory {
-	return DOJHistory{}
+func (information *DOJInformation) findDOJHistory(entry CMSEntry) *DOJHistory {
+	var matches []MatchData
+	for _, history := range information.Histories {
+		matchData := history.match(entry)
+		if matchData.matchStrength > 0 {
+			matches = append(matches, matchData)
+		}
+	}
+
+	if len(matches) == 0 {
+		return nil
+	}
+
+	bestMatch := matches[0]
+	if len(matches) > 1 {
+		information.SummaryMatchData.ambiguousMatches++
+		fmt.Print("Ambiguous match!")
+		for _, match := range matches {
+			//TODO better printing for ambiguous matches
+			if match.matchStrength > bestMatch.matchStrength {
+				bestMatch = match
+			}
+		}
+	}
+
+	information.summarizeMatchData(bestMatch)
+	return bestMatch.history
+}
+
+func (information *DOJInformation) summarizeMatchData(data MatchData) {
+	for key, val := range data.matchResults {
+		if val {
+			information.SummaryMatchData.matchCountByType[key]++
+		}
+		information.SummaryMatchData.matchStrengths[data.matchStrength]++
+	}
 }
 
 func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
@@ -31,12 +70,15 @@ func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 	}
 
 	info := DOJInformation{
-		Rows:         rows,
-		DOJHistories: make(map[string]DOJHistory),
+		Rows:      rows,
+		Histories: make(map[string]*DOJHistory),
 	}
 
 	for _, row := range rows {
-		info.DOJHistories[row[SubjectIDIndex]].PushRow(NewDOJRow(row))
+		if info.Histories[row[SubjectIDIndex]] == nil {
+			info.Histories[row[SubjectIDIndex]] = new(DOJHistory)
+		}
+		info.Histories[row[SubjectIDIndex]].PushRow(NewDOJRow(row))
 	}
 
 	return &info, nil
