@@ -54,7 +54,7 @@ var headers = []string{
 }
 
 type CMSWriter interface {
-	WriteEntry(data.CMSEntry, EligibilityInfo)
+	WriteEntry(data.CMSEntry, *data.DOJHistory, EligibilityInfo)
 	Flush()
 }
 
@@ -77,8 +77,38 @@ func NewCMSWriter(outputFilePath string) CMSWriter {
 	return w
 }
 
-func (cw csvWriter) WriteEntry(entry data.CMSEntry, info EligibilityInfo) {
-	cw.outputFileWriter.Write(append(entry.RawRow, info.Over1Lb, info.QFinalSum))
+func (cw csvWriter) WriteEntry(entry data.CMSEntry, history *data.DOJHistory, info EligibilityInfo) {
+	var historyCols []string
+	if history == nil {
+		historyCols = []string{"no match", "no match", "no match", "no match", "no match"}
+	} else {
+		historyCols = []string{
+			history.Name,
+			history.DOB.Format("2006-01-02"),
+			history.SubjectID,
+			history.CII,
+			history.SSN,
+		}
+	}
+
+	eligibilityCols := []string {
+		info.Superstrikes,
+		info.SuperstrikeCodeSections,
+		info.PC290Charges,
+		info.PC290CodeSections,
+		info.PC290Registration,
+		info.TwoPriors,
+		info.Over1Lb,
+		info.QFinalSum,
+		info.AgeAtConviction,
+		info.YearsSinceEvent,
+		info.YearsSinceMostRecentConviction,
+		info.FinalRecommendation,
+	}
+
+	extraCols := append(historyCols, eligibilityCols...)
+
+	_ = cw.outputFileWriter.Write(append(entry.RawRow, extraCols...))
 }
 
 func (cw csvWriter) Flush() {

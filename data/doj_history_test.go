@@ -14,19 +14,21 @@ var _ = Describe("DOJHistory", func() {
 	var conviction2 data.DOJRow
 	var conviction3 data.DOJRow
 	var conviction4 data.DOJRow
+	var conviction5 data.DOJRow
 	var nonConviction data.DOJRow
 	var birthDate time.Time
 
 	BeforeEach(func() {
 		birthDate = time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
-		conviction1 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1234", DOB: birthDate, CodeSection: "11357 HS", Convicted: true, DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO", NumCrtCase: "777CRTCASE"}
-		nonConviction = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1235", DOB: birthDate, CodeSection: "11357 HS", Convicted: false, DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC)}
-		conviction2 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
-		conviction3 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
-		conviction4 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 334455-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
-		registration := data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "290 PC", Convicted: false, DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC), PC290Registration: true}
+		conviction1 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1234", DOB: birthDate, CodeSection: "11357 HS", Convicted: true, DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO", NumCrtCase: "777CRTCASE"}
+		nonConviction = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1235", DOB: birthDate, CodeSection: "11357 HS", Convicted: false, DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC)}
+		conviction2 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+		conviction3 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "286(Q)(1) PC", Convicted: true, DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+		conviction4 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
+		conviction5 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 334455-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
+		registration := data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "290 PC", Convicted: false, DispositionDate: time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC), PC290Registration: true}
 
-		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4}
+		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5}
 		history = data.DOJHistory{}
 		for _, row := range rows {
 			history.PushRow(row)
@@ -43,7 +45,7 @@ var _ = Describe("DOJHistory", func() {
 			Expect(history.DOB).To(Equal(birthDate))
 			Expect(history.CDL).To(Equal("testcdl"))
 			Expect(history.PC290Registration).To(BeTrue())
-			Expect(history.Convictions).To(ConsistOf(&conviction1, &conviction2, &conviction3, &conviction4))
+			Expect(history.Convictions).To(ConsistOf(&conviction1, &conviction2, &conviction3, &conviction4, &conviction5))
 		})
 	})
 
@@ -238,4 +240,25 @@ var _ = Describe("DOJHistory", func() {
 			}))
 		})
 	})
+
+	Describe("pc290CodeSections", func() {
+		It("Returns a list of convicted code sections that match PC290 registerable offenses", func() {
+			Expect(history.PC290CodeSections()).To(ConsistOf("286(Q)(1) PC"))
+		})
+	})
+
+	Describe("ThreeConvictionsSameCode", func() {
+		It("returns true if there are three convictions of same code section", func() {
+			Expect(history.ThreeConvictionsSameCode("11360 HS")).To(BeTrue())
+			Expect(history.ThreeConvictionsSameCode("11357 HS")).To(BeFalse())
+		})
+	})
+
+	Describe("MostRecentConvictionDate", func() {
+		It("returns the most recent conviction date", func() {
+			Expect(history.MostRecentConvictionDate()).To(Equal(time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC)))
+		})
+	})
+
+
 })

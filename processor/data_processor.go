@@ -19,6 +19,7 @@ type dataProcessorStats struct {
 	nCMSRows         int
 	nCMSFelonies     int
 	nCMSMisdemeanors int
+	unmatchedCMSRows int
 }
 
 func NewDataProcessor(
@@ -52,24 +53,28 @@ func (d DataProcessor) Process() {
 			panic(err)
 		}
 		row := data.NewCMSEntry(rawRow)
-		d.incrementStats(row)
 
 		weightsEntry := d.weightsInformation.GetWeight(row.CourtNumber)
 		dojHistory := d.dojInformation.FindDOJHistory(row)
-		eligibilityInfo := ComputeEligibility(row, weightsEntry, dojHistory)
+		eligibilityInfo := NewEligibilityInfo(row, weightsEntry, dojHistory)
 
-		d.outputCMSWriter.WriteEntry(row, *eligibilityInfo)
+		d.incrementStats(row, dojHistory)
+		d.outputCMSWriter.WriteEntry(row, dojHistory, *eligibilityInfo)
 	}
 	d.outputCMSWriter.Flush()
-	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
+	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)\n", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
+	fmt.Printf("Failed to match %d out of %d charges in CMS data (%d%%)\n", d.stats.unmatchedCMSRows, d.stats.nCMSRows, ((d.stats.unmatchedCMSRows) * 100) / d.stats.nCMSRows)
 }
 
-func (d *DataProcessor) incrementStats(row data.CMSEntry) {
+func (d *DataProcessor) incrementStats(row data.CMSEntry, history *data.DOJHistory) {
 	d.stats.nCMSRows++
 	if row.Level == "F" {
 		d.stats.nCMSFelonies++
 	} else {
 		d.stats.nCMSMisdemeanors++
+	}
+	if history == nil {
+		d.stats.unmatchedCMSRows++
 	}
 }
 

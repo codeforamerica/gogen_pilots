@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"fmt"
+	"github.com/onsi/gomega/format"
 	"io/ioutil"
 	"os/exec"
 
@@ -50,21 +51,24 @@ var _ bool = Describe("gogen", func() {
 
 		Eventually(session.Out).Should(gbytes.Say(`Found 9 charges in CMS data \(8 felonies, 1 misdemeanors\)`))
 		//Eventually(session.Out).Should(gbytes.Say(`Found 11 charges in DOJ data \(11 felony and 0 misdemeanors\)`))
-		//Eventually(session.Out).Should(gbytes.Say(`Failed to match 1 out of 8 charges in CMS data`))
+		//Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 9 charges in CMS data`))
 		//Eventually(session.Out).Should(gbytes.Say(`Failed to match # out of # charges in DOJ data`))
 		//Eventually(session.Out).Should(gbytes.Say(`Failed to match #  out of # unique subjects in DOJ data`))
 		//Eventually(session.Out).Should(gbytes.Say(`Match details: ...`))
 
 		pathToExpectedResults, err := path.Abs(path.Join("test_fixtures", "felonies_sf_results.csv"))
 		Expect(err).ToNot(HaveOccurred())
+		//expectedResultsBody, err := ioutil.ReadFile(pathToExpectedResults)
 		_, err = ioutil.ReadFile(pathToExpectedResults)
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
 		Expect(err).ToNot(HaveOccurred())
+		//outputBody, err := ioutil.ReadFile(pathToOutput)
 		_, err = ioutil.ReadFile(pathToOutput)
 		Expect(err).ToNot(HaveOccurred())
 
+		format.TruncatedDiff = false
 		//Expect(string(outputBody)).To(Equal(string(expectedResultsBody)))
 
 		Eventually(session).Should(gexec.Exit())

@@ -8,7 +8,7 @@ import (
 	"gogen/data"
 )
 
-var _ = Describe("EligibilityChecker", func() {
+var _ = Describe("EligiblityInfo", func() {
 	var (
 		entry      data.CMSEntry
 		weightInfo data.WeightsEntry
@@ -25,7 +25,7 @@ var _ = Describe("EligibilityChecker", func() {
 	})
 
 	It("Checks for weight disqualifiers", func() {
-		info := ComputeEligibility(entry, weightInfo, history)
+		info := NewEligibilityInfo(entry, weightInfo, history)
 
 		Expect(info.QFinalSum).To(Equal("54.0"))
 		Expect(info.Over1Lb).To(Equal("eligible"))
@@ -40,10 +40,10 @@ var _ = Describe("EligibilityChecker", func() {
 		})
 
 		It("reports the not found weights entry", func() {
-			info := ComputeEligibility(entry, weightInfo, history)
+			info := NewEligibilityInfo(entry, weightInfo, history)
 
-			Expect(info.QFinalSum).To(Equal("not found"))
-			Expect(info.Over1Lb).To(Equal("not found"))
+			Expect(info.QFinalSum).To(Equal("no match"))
+			Expect(info.Over1Lb).To(Equal("no match"))
 		})
 	})
 
@@ -59,7 +59,7 @@ var _ = Describe("EligibilityChecker", func() {
 		})
 
 		It("reports the not found weights entry", func() {
-			info := ComputeEligibility(entry, weightInfo, history)
+			info := NewEligibilityInfo(entry, weightInfo, history)
 
 			Expect(info.QFinalSum).To(Equal("n/a"))
 			Expect(info.Over1Lb).To(Equal("n/a"))
