@@ -1,8 +1,8 @@
-package data
+package processor
 
 import (
 	"encoding/csv"
-	"fmt"
+	"gogen/data"
 	"os"
 )
 
@@ -54,7 +54,7 @@ var headers = []string{
 }
 
 type CMSWriter interface {
-	WriteEntry(CMSEntry, EligibilityInfo)
+	WriteEntry(data.CMSEntry, EligibilityInfo)
 	Flush()
 }
 
@@ -77,8 +77,8 @@ func NewCMSWriter(outputFilePath string) CMSWriter {
 	return w
 }
 
-func (cw csvWriter) WriteEntry(entry CMSEntry, info EligibilityInfo) {
-	cw.outputFileWriter.Write(append(entry.RawRow, info.Over1Lb, fmt.Sprintf("%.1f", info.QFinalSum)))
+func (cw csvWriter) WriteEntry(entry data.CMSEntry, info EligibilityInfo) {
+	cw.outputFileWriter.Write(append(entry.RawRow, info.Over1Lb, info.QFinalSum))
 }
 
 func (cw csvWriter) Flush() {

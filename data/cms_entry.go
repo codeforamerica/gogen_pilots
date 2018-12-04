@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-type EligibilityInfo struct {
-	QFinalSum float64
-	Over1Lb   string
-}
-
 type CMSEntry struct {
 	CourtNumber     string
 	Level           string
@@ -22,7 +17,6 @@ type CMSEntry struct {
 	DateOfBirth     time.Time
 	DispositionDate time.Time
 	RawRow          []string
-	EligibilityInfo EligibilityInfo
 }
 
 func NewCMSEntry(record []string) CMSEntry {

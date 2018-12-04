@@ -63,7 +63,6 @@ var _ = Describe("DOJHistory", func() {
 				DateOfBirth:     time.Date(1985, time.May, 12, 0, 0, 0, 0, time.UTC),
 				DispositionDate: time.Time{},
 				RawRow:          nil,
-				EligibilityInfo: data.EligibilityInfo{},
 			}
 		})
 

@@ -25,7 +25,7 @@ var _ = Describe("DataProcessor", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		outputWriter := data.NewCMSWriter(path.Join(outputDir, "felonies_sf_results.csv"))
+		outputWriter := NewCMSWriter(path.Join(outputDir, "felonies_sf_results.csv"))
 
 		pathToWeights, err := path.Abs(path.Join("..", "test_fixtures", "conviction_weights.csv"))
 		Expect(err).ToNot(HaveOccurred())

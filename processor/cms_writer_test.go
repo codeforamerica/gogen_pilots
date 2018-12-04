@@ -1,8 +1,9 @@
-package data_test
+package processor_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	. "gogen/processor"
 
 	. "gogen/data"
 
@@ -23,7 +24,7 @@ var _ = Describe("csvWriter", func() {
 		}
 		info = EligibilityInfo{
 			Over1Lb:   "a eligibility value",
-			QFinalSum: 999.9,
+			QFinalSum: "999.9",
 		}
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")

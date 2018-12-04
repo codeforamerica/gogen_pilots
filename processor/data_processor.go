@@ -11,7 +11,7 @@ type DataProcessor struct {
 	cmsCSV             *csv.Reader
 	weightsInformation *data.WeightsInformation
 	dojInformation     *data.DOJInformation
-	outputCMSWriter    data.CMSWriter
+	outputCMSWriter    CMSWriter
 	stats              dataProcessorStats
 }
 
@@ -25,7 +25,7 @@ func NewDataProcessor(
 	cmsCSV *csv.Reader,
 	weightsInformation *data.WeightsInformation,
 	dojInformation *data.DOJInformation,
-	outputCMSWriter data.CMSWriter,
+	outputCMSWriter CMSWriter,
 ) DataProcessor {
 	return DataProcessor{
 		cmsCSV:             cmsCSV,
@@ -55,11 +55,10 @@ func (d DataProcessor) Process() {
 		d.incrementStats(row)
 
 		weightsEntry := d.weightsInformation.GetWeight(row.CourtNumber)
-		//dojHistory := d.dojInformation.findDOJHistory(row)
+		dojHistory := d.dojInformation.FindDOJHistory(row)
+		eligibilityInfo := ComputeEligibility(row, weightsEntry, dojHistory)
 
-		eligibilityInfo := ComputeEligibility(row, weightsEntry)
-
-		d.outputCMSWriter.WriteEntry(row, eligibilityInfo)
+		d.outputCMSWriter.WriteEntry(row, *eligibilityInfo)
 	}
 	d.outputCMSWriter.Flush()
 	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)

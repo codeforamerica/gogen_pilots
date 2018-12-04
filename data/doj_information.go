@@ -23,7 +23,7 @@ type MatchData struct {
 	MatchStrength int
 }
 
-func (information *DOJInformation) findDOJHistory(entry CMSEntry) *DOJHistory {
+func (information *DOJInformation) FindDOJHistory(entry CMSEntry) *DOJHistory {
 	var matches []MatchData
 	for _, history := range information.Histories {
 		matchData := history.Match(entry)
@@ -80,6 +80,9 @@ func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 		}
 		info.Histories[row[SubjectIDIndex]].PushRow(NewDOJRow(row))
 	}
+
+	info.SummaryMatchData.matchCountByType = make(map[string]int)
+	info.SummaryMatchData.matchStrengths = make(map[int]int)
 
 	return &info, nil
 }
