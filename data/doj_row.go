@@ -22,8 +22,9 @@ type DOJRow struct {
 	County            string
 	Felony            bool
 	NumCrtCase        string
+	CycleDate         time.Time
 	RawRow            []string
-	CourtNoParts []string
+	CourtNoParts      []string
 }
 
 func NewDOJRow(rawRow []string) DOJRow {
@@ -41,6 +42,7 @@ func NewDOJRow(rawRow []string) DOJRow {
 		DispositionDate:   parseDate(dateFormat, rawRow[STP_EVENT_DATE]),
 		OFN:               rawRow[OFN],
 		NumCrtCase:        rawRow[FE_NUM_CRT_CASE],
+		CycleDate:         parseDate(dateFormat, rawRow[CYC_DATE]),
 		PC290Registration: rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
 		County:            rawRow[STP_ORI_CNTY_NAME],
 		Felony:            rawRow[CONV_STAT_DESCR] == "FELONY",
@@ -48,7 +50,7 @@ func NewDOJRow(rawRow []string) DOJRow {
 }
 
 func (row *DOJRow) MatchingCourtNumber(courtNumber string) bool {
-	if courtNumber == row.OFN { // || courtNumber == row.NumCrtCase {
+	if courtNumber == row.OFN || courtNumber == row.NumCrtCase {
 		return true
 	}
 

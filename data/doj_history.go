@@ -112,13 +112,13 @@ func (history *DOJHistory) SuperstrikesCodeSections() []string {
 }
 
 func (history *DOJHistory) ThreeConvictionsSameCode(codeSection string) bool {
-	countMatches := 0
+	matchingCycles := make(map[time.Time]bool)
 	for _, row := range history.Convictions {
 		if codeSection == strings.Replace(row.CodeSection, " ", "", -1) {
-			countMatches++
+			matchingCycles[row.CycleDate] = true
 		}
 	}
-	return countMatches > 2
+	return len(matchingCycles) > 2
 }
 
 func (history *DOJHistory) MostRecentConvictionDate() time.Time {
