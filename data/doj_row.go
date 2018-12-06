@@ -23,6 +23,7 @@ type DOJRow struct {
 	Felony            bool
 	NumCrtCase        string
 	RawRow            []string
+	CourtNoParts []string
 }
 
 func NewDOJRow(rawRow []string) DOJRow {
@@ -46,13 +47,16 @@ func NewDOJRow(rawRow []string) DOJRow {
 	}
 }
 
-func (row DOJRow) MatchingCourtNumber(courtNumber string) bool {
-	if courtNumber == row.OFN || courtNumber == row.NumCrtCase {
+func (row *DOJRow) MatchingCourtNumber(courtNumber string) bool {
+	if courtNumber == row.OFN { // || courtNumber == row.NumCrtCase {
 		return true
 	}
 
-	parts := regexp.MustCompile("[ ,-]").Split(row.OFN, -1)
-	for _, part := range parts {
+	if row.CourtNoParts == nil {
+		row.CourtNoParts = regexp.MustCompile("[ ,-]").Split(row.OFN, -1)
+	}
+
+	for _, part := range row.CourtNoParts {
 		if part == courtNumber {
 			return true
 		}

@@ -52,11 +52,12 @@ func (d DataProcessor) Process() {
 	currentRowIndex := 0.0
 	totalRows := 9102.0
 
-	fmt.Println("Processing Data...")
+	fmt.Printf("Processing Data from %d Histories... \n", len(d.dojInformation.Histories))
 	var totalTime time.Duration = 0
 	var totalWeightSearchTime time.Duration = 0
 	var totalDOJSearchTime time.Duration = 0
 	var totalEligibilityTime time.Duration = 0
+	var totalMatchingTime time.Duration = 0
 
 	for {
 		startTime := time.Now()
@@ -74,9 +75,10 @@ func (d DataProcessor) Process() {
 		totalWeightSearchTime += weightEndTime.Sub(weightStartTime)
 
 		dojStartTime := time.Now()
-		dojHistory := d.dojInformation.FindDOJHistory(row)
+		dojHistory, avgMatchTime := d.dojInformation.FindDOJHistory(row)
 		dojEndTime := time.Now()
 		totalDOJSearchTime += dojEndTime.Sub(dojStartTime)
+		totalMatchingTime += avgMatchTime
 
 		eligibilityStartTime := time.Now()
 		eligibilityInfo := NewEligibilityInfo(row, weightsEntry, dojHistory, d.comparisonTime)
@@ -90,8 +92,9 @@ func (d DataProcessor) Process() {
 		avgWeightSearchTime := utilities.AverageTime(totalWeightSearchTime, currentRowIndex)
 		avgDOJSearchTime := utilities.AverageTime(totalDOJSearchTime, currentRowIndex)
 		avgEligibilityTime := utilities.AverageTime(totalEligibilityTime, currentRowIndex)
+		avgMatchingTime := utilities.AverageTime(totalMatchingTime, currentRowIndex)
 
-		tail := fmt.Sprintf("weight: %s, doj: %s, eligibility: %s", avgWeightSearchTime, avgDOJSearchTime, avgEligibilityTime)
+		tail := fmt.Sprintf("weight: %s, doj: %s (match: %s), eligibility: %s", avgWeightSearchTime, avgDOJSearchTime, avgMatchingTime, avgEligibilityTime)
 
 		totalTime += time.Since(startTime)
 		utilities.PrintProgressBar(currentRowIndex, totalRows, totalTime, tail)

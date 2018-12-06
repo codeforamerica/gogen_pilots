@@ -26,7 +26,7 @@ var _ = Describe("CMSEntry", func() {
 			Expect(ce.CourtNumber).To(Equal("305563"))
 			Expect(ce.Level).To(Equal("M"))
 			Expect(ce.SSN).To(Equal("123456789"))
-			Expect(ce.CII).To(Equal("A123456780"))
+			Expect(ce.CII).To(Equal("23456780"))
 			Expect(ce.Charge).To(Equal("11357(C)HS"))
 			Expect(ce.IncidentNumber).To(Equal("A1567564"))
 			Expect(ce.Name).To(Equal("BIRD/BIG"))
@@ -49,7 +49,7 @@ var _ = Describe("CMSEntry", func() {
 
 		Describe("#FormattedName", func() {
 			It("Formats the name", func() {
-				Expect(ce.FormattedName()).To(Equal("BIRD,BIG"))
+				Expect(ce.FormattedName).To(Equal("BIRD,BIG"))
 			})
 
 			Context("There is a middle name", func() {
@@ -59,7 +59,7 @@ var _ = Describe("CMSEntry", func() {
 				})
 
 				It("Formats the name", func() {
-					Expect(ce.FormattedName()).To(Equal("BIRD,BIG FLAPPY YELLOW"))
+					Expect(ce.FormattedName).To(Equal("BIRD,BIG FLAPPY YELLOW"))
 				})
 			})
 
@@ -70,7 +70,7 @@ var _ = Describe("CMSEntry", func() {
 				})
 
 				It("Formats the name", func() {
-					Expect(ce.FormattedName()).To(Equal("BIRD"))
+					Expect(ce.FormattedName).To(Equal("BIRD"))
 				})
 			})
 		})

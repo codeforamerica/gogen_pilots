@@ -17,6 +17,7 @@ type DOJHistory struct {
 	CDL               string
 	PC290Registration bool
 	Convictions       []*DOJRow
+	OriginalCII       string
 }
 
 func (history *DOJHistory) PushRow(row DOJRow) {
@@ -24,7 +25,8 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.SubjectID = row.SubjectID
 		history.Name = row.Name
 		history.WeakName = strings.Split(row.Name, " ")[0]
-		history.CII = row.CII
+		history.CII = formatCII(row.CII)
+		history.OriginalCII = row.CII
 		history.DOB = row.DOB
 		history.SSN = row.SSN
 		history.CDL = row.CDL
@@ -42,16 +44,7 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 	var results = make(map[string]bool)
 
-	if entry.CII != "" {
-		cmsCII := entry.CII
-		for len(cmsCII) < 8 {
-			cmsCII = "0" + cmsCII
-		}
-		cmsCII = cmsCII[len(cmsCII)-8:]
-		dojCII := history.CII[len(history.CII)-8:]
-		results["cii"] = cmsCII == dojCII
-	}
-
+	results["cii"] = entry.CII != "" && entry.CII == history.CII
 	results["ssn"] = entry.SSN != "" && entry.SSN == history.SSN
 	results["cdl"] = entry.CDL != "" && entry.CDL == history.CDL
 
@@ -66,7 +59,7 @@ func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 		results["courtno"] = matched
 	}
 
-	name := entry.FormattedName()
+	name := entry.FormattedName
 	dateOfBirth := entry.DateOfBirth
 	if (name != "" && dateOfBirth != time.Time{}) {
 		results["nameAndDob"] = name == history.Name && dateOfBirth == history.DOB

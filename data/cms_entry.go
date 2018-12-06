@@ -13,6 +13,7 @@ type CMSEntry struct {
 	Charge          string
 	IncidentNumber  string
 	Name            string
+	FormattedName   string
 	CDL             string
 	DateOfBirth     time.Time
 	DispositionDate time.Time
@@ -36,15 +37,18 @@ func NewCMSEntry(record []string) CMSEntry {
 
 	dob := parseDate(DateFormat, record[DOB])
 	dispositionDate := parseDate(DateFormat, record[DISPODATE])
+	formattedName := formatName(strings.TrimSpace(record[NAME]))
+	cii := formatCII(record[CII])
 
 	return CMSEntry{
 		CourtNumber:     record[COURTNO],
 		Level:           record[LEVEL],
 		SSN:             record[SSN],
-		CII:             record[CII],
+		CII:             formatCII(cii),
 		Charge:          strings.TrimSpace(record[CHARGE]),
 		IncidentNumber:  record[INCIDENTNO],
 		Name:            strings.TrimSpace(record[NAME]),
+		FormattedName:   formattedName,
 		CDL:             strings.SplitN(record[CDL], " ", 2)[0],
 		DateOfBirth:     dob,
 		DispositionDate: dispositionDate,
@@ -52,8 +56,8 @@ func NewCMSEntry(record []string) CMSEntry {
 	}
 }
 
-func (c CMSEntry) FormattedName() string {
-	nameParts := strings.Split(c.Name, "/")
+func formatName(name string) string {
+	nameParts := strings.Split(name, "/")
 
 	if len(nameParts) > 1 {
 		lastCommaFirst := strings.Join(nameParts[0:2], ",")
@@ -61,4 +65,14 @@ func (c CMSEntry) FormattedName() string {
 	}
 
 	return nameParts[0]
+}
+
+func formatCII(cii string) string {
+	if cii == "" {
+	return cii
+	}
+	for len(cii) < 8 {
+		cii = "0" + cii
+	}
+	return cii[len(cii)-8:]
 }

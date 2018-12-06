@@ -86,7 +86,7 @@ func (cw csvWriter) WriteEntry(entry data.CMSEntry, history *data.DOJHistory, in
 			history.Name,
 			history.DOB.Format("2006-01-02"),
 			history.SubjectID,
-			history.CII,
+			history.OriginalCII,
 			history.SSN,
 		}
 	}

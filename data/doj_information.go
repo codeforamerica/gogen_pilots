@@ -31,26 +31,30 @@ type MatchData struct {
 	MatchStrength int
 }
 
-func (information *DOJInformation) FindDOJHistory(entry CMSEntry) *DOJHistory {
+func (information *DOJInformation) FindDOJHistory(entry CMSEntry) (*DOJHistory, time.Duration) {
 	var matches []MatchData
+	var totalTime time.Duration = 0
+
 	for _, history := range information.Histories {
+		startTime := time.Now()
 		matchData := history.Match(entry)
 		if matchData.MatchStrength > 0 {
 			matches = append(matches, matchData)
 		}
+		totalTime += time.Since(startTime)
 	}
 
 	if len(matches) == 0 {
-		return nil
+		return nil, utilities.AverageTime(totalTime, float64(len(information.Histories)))
 	}
 
 	bestMatch := matches[0]
 	if len(matches) > 1 {
 		information.SummaryMatchData.ambiguousMatches++
-		fmt.Println(fmt.Sprintf("Ambiguous match for `%s`", entry.FormattedName()))
+		fmt.Println(fmt.Sprintf("Ambiguous match for `%s`", entry.FormattedName))
 		for _, match := range matches {
 			//TODO better printing for ambiguous matches
-			fmt.Println(fmt.Sprintf("(name: `%s`, matches: %t): %+v", match.History.Name, entry.FormattedName() == match.History.Name, match))
+			fmt.Println(fmt.Sprintf("(name: `%s`, matches: %t): %+v", match.History.Name, entry.FormattedName == match.History.Name, match))
 			if match.MatchStrength > bestMatch.MatchStrength {
 				bestMatch = match
 			}
@@ -58,7 +62,7 @@ func (information *DOJInformation) FindDOJHistory(entry CMSEntry) *DOJHistory {
 	}
 
 	information.summarizeMatchData(bestMatch)
-	return bestMatch.History
+	return bestMatch.History, utilities.AverageTime(totalTime, float64(len(information.Histories)))
 }
 
 func (information *DOJInformation) summarizeMatchData(data MatchData) {
@@ -77,12 +81,36 @@ func (information *DOJInformation) generateIndexes() {
 	information.ssnIndex = make(map[string]*DOJHistory)
 	information.cdlIndex = make(map[string]*DOJHistory)
 	information.courtNumberIndex = make(map[string]*DOJHistory)
+
+
+}
+
+func (information *DOJInformation) generateHistories() {
+	currentRowIndex := 0.0
+	totalRows := 486481.0
+
+	fmt.Println("Reading DOJ Data Into Memory")
+
+	var totalTime time.Duration = 0
+
+	for _, row := range information.Rows {
+		startTime := time.Now()
+		dojRow := NewDOJRow(row)
+		if information.Histories[dojRow.SubjectID] == nil {
+			information.Histories[dojRow.SubjectID] = new(DOJHistory)
+		}
+		information.Histories[dojRow.SubjectID].PushRow(dojRow)
+		currentRowIndex++
+
+		totalTime += time.Since(startTime)
+
+		utilities.PrintProgressBar(currentRowIndex, totalRows, totalTime, "")
+	}
+	fmt.Println("\nComplete...")
 }
 
 func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 
-	currentRowIndex := 0.0
-	totalRows := 486481.0
 
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
@@ -94,24 +122,8 @@ func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 		Histories: make(map[string]*DOJHistory),
 	}
 
-	fmt.Println("Reading DOJ Data Into Memory")
-
-	var totalTime time.Duration = 0
-
-	for _, row := range rows {
-		startTime := time.Now()
-		dojRow := NewDOJRow(row)
-		if info.Histories[dojRow.SubjectID] == nil {
-			info.Histories[dojRow.SubjectID] = new(DOJHistory)
-		}
-		info.Histories[dojRow.SubjectID].PushRow(dojRow)
-		currentRowIndex++
-
-		totalTime += time.Since(startTime)
-
-		utilities.PrintProgressBar(currentRowIndex, totalRows, totalTime, "")
-	}
-	fmt.Println("\nComplete...")
+	info.generateHistories()
+	info.generateIndexes()
 
 	info.SummaryMatchData.matchCountByType = make(map[string]int)
 	info.SummaryMatchData.matchStrengths = make(map[int]int)

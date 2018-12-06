@@ -20,13 +20,13 @@ var _ = Describe("DOJHistory", func() {
 
 	BeforeEach(func() {
 		birthDate = time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
-		conviction1 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1234", DOB: birthDate, CodeSection: "11357 HS", Convicted: true, DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO", NumCrtCase: "777CRTCASE"}
-		nonConviction = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1235", DOB: birthDate, CodeSection: "11357 HS", Convicted: false, DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC)}
-		conviction2 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
-		conviction3 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "286(Q)(1) PC", Convicted: true, DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
-		conviction4 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
-		conviction5 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 334455-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
-		registration := data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "12345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "290 PC", Convicted: false, DispositionDate: time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC), PC290Registration: true}
+		conviction1 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1234", DOB: birthDate, CodeSection: "11357 HS", Convicted: true, DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO", NumCrtCase: "777CRTCASE"}
+		nonConviction = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1235", DOB: birthDate, CodeSection: "11357 HS", Convicted: false, DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC)}
+		conviction2 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+		conviction3 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "286(Q)(1) PC", Convicted: true, DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+		conviction4 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
+		conviction5 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1236 334455-00", DOB: birthDate, CodeSection: "11360 HS", Convicted: true, DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO"}
+		registration := data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "290 PC", Convicted: false, DispositionDate: time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC), PC290Registration: true}
 
 		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5}
 		history = data.DOJHistory{}
@@ -61,6 +61,7 @@ var _ = Describe("DOJHistory", func() {
 				Charge:          "bla",
 				IncidentNumber:  "bla",
 				Name:            "BLAH/BLAH",
+				FormattedName:   "BLAH,BLAH",
 				CDL:             "bla",
 				DateOfBirth:     time.Date(1985, time.May, 12, 0, 0, 0, 0, time.UTC),
 				DispositionDate: time.Time{},
@@ -85,6 +86,7 @@ var _ = Describe("DOJHistory", func() {
 
 		It("matches name and dob", func() {
 			cmsEntry.Name = "SOUP/ZAK/E"
+			cmsEntry.FormattedName = "SOUP,ZAK E"
 			cmsEntry.DateOfBirth = birthDate
 
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
@@ -103,6 +105,7 @@ var _ = Describe("DOJHistory", func() {
 
 		It("matches weak name and dob (excluding middle name)", func() {
 			cmsEntry.Name = "SOUP/ZAK/F"
+			cmsEntry.FormattedName = "SOUP,ZAK F"
 			cmsEntry.DateOfBirth = birthDate
 
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
@@ -123,6 +126,7 @@ var _ = Describe("DOJHistory", func() {
 			history.DOB = time.Time{}
 
 			cmsEntry.Name = "SOUP/ZAK/E"
+			cmsEntry.FormattedName = "SOUP,ZAK E"
 			cmsEntry.DateOfBirth = time.Time{}
 
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
@@ -139,24 +143,6 @@ var _ = Describe("DOJHistory", func() {
 
 		It("matches on CII", func() {
 			cmsEntry.CII = "12345678"
-
-			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
-				History: &history,
-				MatchResults: map[string]bool{
-					"cii":            true,
-					"ssn":            false,
-					"nameAndDob":     false,
-					"weakNameAndDob": false,
-					"courtno":        false,
-					"cdl":            false,
-				},
-				MatchStrength: 1,
-			}))
-		})
-
-		It("only matches the last 8 digits of the CII, zero padded", func() {
-			cmsEntry.CII = "123456"
-			history.CII = "A00123456"
 
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
 				History: &history,
