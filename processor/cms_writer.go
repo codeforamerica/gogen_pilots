@@ -91,7 +91,7 @@ func (cw csvWriter) WriteEntry(entry data.CMSEntry, history *data.DOJHistory, in
 		}
 	}
 
-	eligibilityCols := []string {
+	eligibilityCols := []string{
 		info.Superstrikes,
 		info.SuperstrikeCodeSections,
 		info.PC290Charges,

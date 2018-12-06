@@ -128,10 +128,10 @@ var _ = Describe("DOJHistory", func() {
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
 				History: &history,
 				MatchResults: map[string]bool{
-					"cii":            false,
-					"ssn":            false,
-					"courtno":        false,
-					"cdl":            false,
+					"cii":     false,
+					"ssn":     false,
+					"courtno": false,
+					"cdl":     false,
 				},
 				MatchStrength: 0,
 			}))
@@ -249,8 +249,8 @@ var _ = Describe("DOJHistory", func() {
 
 	Describe("ThreeConvictionsSameCode", func() {
 		It("returns true if there are three convictions of same code section", func() {
-			Expect(history.ThreeConvictionsSameCode("11360 HS")).To(BeTrue())
-			Expect(history.ThreeConvictionsSameCode("11357 HS")).To(BeFalse())
+			Expect(history.ThreeConvictionsSameCode("11360HS")).To(BeTrue())
+			Expect(history.ThreeConvictionsSameCode("11357HS")).To(BeFalse())
 		})
 	})
 
@@ -259,6 +259,5 @@ var _ = Describe("DOJHistory", func() {
 			Expect(history.MostRecentConvictionDate()).To(Equal(time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC)))
 		})
 	})
-
 
 })

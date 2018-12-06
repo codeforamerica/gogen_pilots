@@ -20,6 +20,7 @@ type EligibilityInfo struct {
 	YearsSinceEvent                string
 	YearsSinceMostRecentConviction string
 	FinalRecommendation            string
+	comparisonTime                 time.Time
 }
 
 const (
@@ -33,7 +34,7 @@ const (
 func (info *EligibilityInfo) checkWeight(entry data.CMSEntry, weightInfo data.WeightsEntry) {
 	var eligibleString string
 
-	if strings.HasPrefix(entry.Charge, "11357") || entry.Level == "M" {
+	if strings.HasPrefix(entry.Charge, "11357") || strings.HasPrefix(entry.Charge, "11358") || entry.Level == "M" {
 		info.QFinalSum = notApplicable
 		info.Over1Lb = notApplicable
 		return
@@ -73,9 +74,7 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 	if (mostRecentConvictionDate == time.Time{}) {
 		info.YearsSinceMostRecentConviction = notFound
 	} else {
-		hours := time.Since(mostRecentConvictionDate).Hours()
-		years := hours / (24 * 265.25)
-		info.YearsSinceMostRecentConviction = fmt.Sprintf("%.1f", years)
+		info.YearsSinceMostRecentConviction = info.yearsSinceEvent(mostRecentConvictionDate)
 	}
 
 	if entry.Level != "F" || strings.HasPrefix(entry.Charge, "11357") {
@@ -87,9 +86,6 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 		info.Superstrikes = result
 		info.SuperstrikeCodeSections = result
 		info.TwoPriors = result
-		info.AgeAtConviction = result
-		info.YearsSinceEvent = result
-		info.YearsSinceMostRecentConviction = result
 		return
 	}
 
@@ -105,6 +101,7 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 		info.PC290CodeSections = strings.Join(pc290, "; ")
 	} else {
 		info.PC290Charges = eligible
+		info.PC290CodeSections = "-"
 	}
 
 	superstrikes := history.SuperstrikesCodeSections()
@@ -113,6 +110,7 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 		info.SuperstrikeCodeSections = strings.Join(superstrikes, "; ")
 	} else {
 		info.Superstrikes = eligible
+		info.SuperstrikeCodeSections = "-"
 	}
 
 	if history.ThreeConvictionsSameCode(entry.Charge) {
@@ -120,6 +118,12 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 	} else {
 		info.TwoPriors = eligible
 	}
+}
+
+func (info *EligibilityInfo) yearsSinceEvent(date time.Time) string {
+	hours := info.comparisonTime.Sub(date).Hours()
+	years := hours / (24 * 365.25)
+	return fmt.Sprintf("%.1f", years)
 }
 
 func (info *EligibilityInfo) computeFinalEligibility() {
@@ -144,15 +148,22 @@ func (info *EligibilityInfo) computeFinalEligibility() {
 	info.FinalRecommendation = eligible
 }
 
-func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, history *data.DOJHistory) *EligibilityInfo {
+func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, history *data.DOJHistory, comparisonTime time.Time) *EligibilityInfo {
 	eligibilityInfo := new(EligibilityInfo)
+	eligibilityInfo.comparisonTime = comparisonTime
 
 	if (entry.DateOfBirth == time.Time{} || entry.DispositionDate == time.Time{}) {
 		eligibilityInfo.AgeAtConviction = notFound
 	} else {
 		hours := entry.DispositionDate.Sub(entry.DateOfBirth).Hours()
-		years := int(hours / (24 * 265.25))
-		eligibilityInfo.YearsSinceMostRecentConviction = fmt.Sprintf("%d", years)
+		years := int(hours / (24 * 365.25))
+		eligibilityInfo.AgeAtConviction = fmt.Sprintf("%d", years)
+	}
+
+	if (entry.DispositionDate == time.Time{}) {
+		eligibilityInfo.YearsSinceEvent = notFound
+	} else {
+		eligibilityInfo.YearsSinceEvent = eligibilityInfo.yearsSinceEvent(entry.DispositionDate)
 	}
 
 	eligibilityInfo.checkWeight(entry, weightInfo)

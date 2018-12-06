@@ -55,7 +55,7 @@ func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 	results["ssn"] = entry.SSN != "" && entry.SSN == history.SSN
 	results["cdl"] = entry.CDL != "" && entry.CDL == history.CDL
 
-	if (entry.CourtNumber != "") {
+	if entry.CourtNumber != "" {
 		matched := false
 		for _, row := range history.Convictions {
 			if row.County == "SAN FRANCISCO" && row.MatchingCourtNumber(entry.CourtNumber) {
@@ -121,7 +121,7 @@ func (history *DOJHistory) SuperstrikesCodeSections() []string {
 func (history *DOJHistory) ThreeConvictionsSameCode(codeSection string) bool {
 	countMatches := 0
 	for _, row := range history.Convictions {
-		if codeSection == row.CodeSection {
+		if codeSection == strings.Replace(row.CodeSection, " ", "", -1) {
 			countMatches++
 		}
 	}
