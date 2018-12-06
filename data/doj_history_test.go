@@ -62,6 +62,7 @@ var _ = Describe("DOJHistory", func() {
 				IncidentNumber:  "bla",
 				Name:            "BLAH/BLAH",
 				FormattedName:   "BLAH,BLAH",
+				WeakName:        "BLAH,BLAH",
 				CDL:             "bla",
 				DateOfBirth:     time.Date(1985, time.May, 12, 0, 0, 0, 0, time.UTC),
 				DispositionDate: time.Time{},
@@ -87,6 +88,7 @@ var _ = Describe("DOJHistory", func() {
 		It("matches name and dob", func() {
 			cmsEntry.Name = "SOUP/ZAK/E"
 			cmsEntry.FormattedName = "SOUP,ZAK E"
+			cmsEntry.WeakName = "SOUP,ZAK"
 			cmsEntry.DateOfBirth = birthDate
 
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{
@@ -106,6 +108,7 @@ var _ = Describe("DOJHistory", func() {
 		It("matches weak name and dob (excluding middle name)", func() {
 			cmsEntry.Name = "SOUP/ZAK/F"
 			cmsEntry.FormattedName = "SOUP,ZAK F"
+			cmsEntry.WeakName = "SOUP,ZAK"
 			cmsEntry.DateOfBirth = birthDate
 
 			Expect(history.Match(cmsEntry)).To(Equal(data.MatchData{

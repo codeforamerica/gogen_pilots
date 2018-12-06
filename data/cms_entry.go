@@ -14,44 +14,69 @@ type CMSEntry struct {
 	IncidentNumber  string
 	Name            string
 	FormattedName   string
+	WeakName        string
 	CDL             string
 	DateOfBirth     time.Time
 	DispositionDate time.Time
+	BookingDate     time.Time
 	RawRow          []string
 }
 
 func NewCMSEntry(record []string) CMSEntry {
+	const DateFormat string = "1/2/06"
 	const (
-		COURTNO    int    = 0
-		INCIDENTNO int    = 2
-		NAME       int    = 3
-		CHARGE     int    = 12
-		LEVEL      int    = 13
-		SSN        int    = 24
-		CII        int    = 22
-		CDL        int    = 25
-		DOB        int    = 20
-		DISPODATE  int    = 7
-		DateFormat string = "1/2/06"
+		COURTNO = iota
+		IND
+		INCIDENTNO
+		NAME
+		CASE_CLAS
+		DISPO
+		DISPO_DESCRIPTION
+		DISPO_DATE
+		ACTION_NUMER
+		FILED_CHARGE
+		FILED_CHARGE_CLASS
+		FILED_CHARGE_DATE
+		CURRENT_CHARGE
+		CURRENT_CHARGE_CLASS
+		CURRENT_CHARGE_DESCRIPTION
+		CHARGE_DISPO
+		CHARGE_DISPO_DESCRIPTION
+		CHARGE_DISPO_DATE
+		BOOKED_CHARGE
+		BOOKED_CHARGE_LEVEL
+		BOOKED_CHARGE_DATE
+		RACE
+		SEX
+		DOB
+		SFNO
+		CII
+		FBI
+		SSN
+		CDL
 	)
 
 	dob := parseDate(DateFormat, record[DOB])
-	dispositionDate := parseDate(DateFormat, record[DISPODATE])
+	dispositionDate := parseDate(DateFormat, record[DISPO_DATE])
+	bookingDate := parseDate(DateFormat, record[BOOKED_CHARGE_DATE])
 	formattedName := formatName(strings.TrimSpace(record[NAME]))
+	firstLast := strings.Split(formattedName, " ")[0]
 	cii := formatCII(record[CII])
 
 	return CMSEntry{
 		CourtNumber:     record[COURTNO],
-		Level:           record[LEVEL],
+		Level:           record[CURRENT_CHARGE_CLASS],
 		SSN:             record[SSN],
 		CII:             formatCII(cii),
-		Charge:          strings.TrimSpace(record[CHARGE]),
+		Charge:          strings.TrimSpace(record[CURRENT_CHARGE]),
 		IncidentNumber:  record[INCIDENTNO],
 		Name:            strings.TrimSpace(record[NAME]),
 		FormattedName:   formattedName,
+		WeakName:        firstLast,
 		CDL:             strings.SplitN(record[CDL], " ", 2)[0],
 		DateOfBirth:     dob,
 		DispositionDate: dispositionDate,
+		BookingDate:     bookingDate,
 		RawRow:          record,
 	}
 }
@@ -69,7 +94,7 @@ func formatName(name string) string {
 
 func formatCII(cii string) string {
 	if cii == "" {
-	return cii
+		return cii
 	}
 	for len(cii) < 8 {
 		cii = "0" + cii

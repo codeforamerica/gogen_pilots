@@ -81,8 +81,6 @@ func (information *DOJInformation) generateIndexes() {
 	information.ssnIndex = make(map[string]*DOJHistory)
 	information.cdlIndex = make(map[string]*DOJHistory)
 	information.courtNumberIndex = make(map[string]*DOJHistory)
-
-
 }
 
 func (information *DOJInformation) generateHistories() {
@@ -110,8 +108,6 @@ func (information *DOJInformation) generateHistories() {
 }
 
 func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
-
-
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
 		panic(err)

@@ -63,7 +63,20 @@ func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 	dateOfBirth := entry.DateOfBirth
 	if (name != "" && dateOfBirth != time.Time{}) {
 		results["nameAndDob"] = name == history.Name && dateOfBirth == history.DOB
-		results["weakNameAndDob"] = history.matchWeakName(name) && dateOfBirth == history.DOB
+		results["weakNameAndDob"] = entry.WeakName == history.WeakName && dateOfBirth == history.DOB
+	}
+	if (entry.WeakName != "" && entry.BookingDate != time.Time{}) {
+		matched := false
+		if entry.WeakName == history.WeakName {
+
+			for _, row := range history.Convictions {
+				if row.County == "SAN FRANCISCO" && row.CycleDate == entry.BookingDate {
+					matched = true
+					break
+				}
+			}
+		}
+		results["weakNameAndCycleDate"] = matched
 	}
 
 	matchStrength := 0
@@ -78,12 +91,6 @@ func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 		MatchResults:  results,
 		MatchStrength: matchStrength,
 	}
-}
-
-func (history *DOJHistory) matchWeakName(formattedName string) bool {
-	firstLast := strings.Split(formattedName, " ")[0]
-
-	return firstLast == history.WeakName
 }
 
 func (history *DOJHistory) PC290CodeSections() []string {

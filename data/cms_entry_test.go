@@ -16,7 +16,7 @@ var _ = Describe("CMSEntry", func() {
 	)
 
 	BeforeEach(func() {
-		record = []string{"305563", "", "A1567564", "BIRD/BIG", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+		record = []string{"305563", "", "A1567564", "BIRD/BIG", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
 		ce = NewCMSEntry(record)
 	})
 
@@ -41,7 +41,7 @@ var _ = Describe("CMSEntry", func() {
 
 		Context("The DOB is invalid", func() {
 			It("Returns the error", func() {
-				record = []string{"305563", "", "A1567564", "BIRD/BIG", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "A BAD DATE 1994", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+				record = []string{"305563", "", "A1567564", "BIRD/BIG", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "", "", "", "A BAD DATE 1994", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
 				ce = NewCMSEntry(record)
 				Expect(ce.DateOfBirth).To(Equal(time.Time{}))
 			})
@@ -54,7 +54,7 @@ var _ = Describe("CMSEntry", func() {
 
 			Context("There is a middle name", func() {
 				BeforeEach(func() {
-					record = []string{"305563", "", "A1567564", "BIRD/BIG/FLAPPY/YELLOW", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+					record = []string{"305563", "", "A1567564", "BIRD/BIG/FLAPPY/YELLOW", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
 					ce = NewCMSEntry(record)
 				})
 
@@ -65,7 +65,7 @@ var _ = Describe("CMSEntry", func() {
 
 			Context("There is only one name part", func() {
 				BeforeEach(func() {
-					record = []string{"305563", "", "A1567564", "BIRD", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+					record = []string{"305563", "", "A1567564", "BIRD", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "11357(C)HS", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
 					ce = NewCMSEntry(record)
 				})
 
@@ -77,7 +77,7 @@ var _ = Describe("CMSEntry", func() {
 
 		Context("There is whitespace in the columns", func() {
 			BeforeEach(func() {
-				record = []string{"305563", "", "A1567564", "BIRD/BIG        ", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "	11357(C)HS     ", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
+				record = []string{"305563", "", "A1567564", "BIRD/BIG        ", "MISD", "190", "COUNTY JAIL W/ PROBATION CONDITION  ", "4/20/99", "M66654", "          ", " ", "      ", "	11357(C)HS     ", "M", "", "190", "COUNTY JAIL W/ PROBATION CONDITION   ", "      ", "", "", "", "", "", "9/14/65", "S554423", "A123456780", "", "123456789", "F1234567 CA", "EOR"}
 				ce = NewCMSEntry(record)
 			})
 
