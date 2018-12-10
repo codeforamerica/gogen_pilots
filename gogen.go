@@ -54,8 +54,9 @@ func main() {
 	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
 
 	cmsWriter := NewCMSWriter(filepath.Join(opts.OutputFolder, "results.csv"))
+	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "unmatched_doj.csv"))
 
-	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter, time.Now())
+	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter, dojWriter, time.Now())
 
 	dataProcessor.Process()
 }

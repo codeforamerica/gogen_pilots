@@ -6,6 +6,7 @@ import (
 	"gogen/data"
 	"gogen/utilities"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -14,17 +15,26 @@ type DataProcessor struct {
 	weightsInformation *data.WeightsInformation
 	dojInformation     *data.DOJInformation
 	outputCMSWriter    CMSWriter
+	outputDOJWriter    CMSWriter
 	stats              dataProcessorStats
 	comparisonTime     time.Time
 }
 
 type dataProcessorStats struct {
-	nCMSRows              int
-	nCMSFelonies          int
-	nCMSMisdemeanors      int
-	unmatchedCMSRows      int
-	unmatchedFelonies     int
-	unmatchedMisdemeanors int
+	nCMSRows                 int
+	nCMSFelonies             int
+	nCMSMisdemeanors         int
+	unmatchedCMSRows         int
+	unmatchedCMSFelonies     int
+	unmatchedCMSMisdemeanors int
+	nDOJProp64Convictions    int
+	nDOJSubjects             int
+	nDOJFelonies             int
+	nDOJMisdemeanors         int
+	unmatchedDOJConvictions  int
+	unmatchedDOJFelonies     int
+	unmatchedDOJMisdemeanors int
+	matchedSubjectIds        map[string]bool
 }
 
 func NewDataProcessor(
@@ -32,6 +42,7 @@ func NewDataProcessor(
 	weightsInformation *data.WeightsInformation,
 	dojInformation *data.DOJInformation,
 	outputCMSWriter CMSWriter,
+	outputDOJWriter CMSWriter,
 	comparisonTime time.Time,
 ) DataProcessor {
 	return DataProcessor{
@@ -39,14 +50,11 @@ func NewDataProcessor(
 		weightsInformation: weightsInformation,
 		dojInformation:     dojInformation,
 		outputCMSWriter:    outputCMSWriter,
+		outputDOJWriter:    outputDOJWriter,
 		comparisonTime:     comparisonTime,
+		stats:              dataProcessorStats{matchedSubjectIds: make(map[string]bool)},
 	}
 }
-
-/*
-Some Notes:
-Using a pure csv.Reader means we don't get line count - how to progress bar?
-*/
 
 func (d DataProcessor) Process() {
 	d.readHeaders()
@@ -90,7 +98,7 @@ func (d DataProcessor) Process() {
 		eligibilityEndTime := time.Now()
 		totalEligibilityTime += eligibilityEndTime.Sub(eligibilityStartTime)
 
-		d.incrementStats(row, dojHistory)
+		d.incrementCMSStats(row, dojHistory)
 		d.outputCMSWriter.WriteEntry(row, dojHistory, *eligibilityInfo)
 
 		currentRowIndex++
@@ -105,15 +113,53 @@ func (d DataProcessor) Process() {
 		utilities.PrintProgressBar(currentRowIndex, totalRows, totalTime, tail)
 	}
 	d.outputCMSWriter.Flush()
+
+	previousSubjectId := ""
+	previousCountOrder := ""
+	d.stats.nDOJSubjects = len(d.dojInformation.Histories)
+	for _, rawRow := range (d.dojInformation.Rows) {
+		row := data.NewDOJRow(rawRow)
+		if isProp64Conviction(row, "SAN FRANCISCO") {
+			if !d.stats.matchedSubjectIds[row.SubjectID] {
+				history := d.dojInformation.Histories[row.SubjectID]
+				d.outputDOJWriter.WriteDOJEntry(rawRow, *EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
+			}
+			if previousCountOrder != row.CountOrder || previousSubjectId != row.SubjectID {
+				d.incrementDOJStats(row)
+			}
+			previousSubjectId = row.SubjectID
+			previousCountOrder = row.CountOrder
+		}
+
+	}
+	d.outputDOJWriter.Flush()
+
 	fmt.Println("\nComplete...")
 	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)\n", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
+	fmt.Printf("Found %d charges in DOJ data (%d felonies, %d misdemeanors)\n", d.stats.nDOJProp64Convictions, d.stats.nDOJFelonies, d.stats.nDOJMisdemeanors)
+
 	fmt.Printf("Failed to match %d out of %d charges in CMS data (%d%%)\n", d.stats.unmatchedCMSRows, d.stats.nCMSRows, ((d.stats.unmatchedCMSRows)*100)/d.stats.nCMSRows)
-	fmt.Printf("Failed to match %d out of %d felonies in CMS data (%d%%)\n", d.stats.unmatchedFelonies, d.stats.nCMSFelonies, ((d.stats.unmatchedFelonies)*100)/d.stats.nCMSFelonies)
-	fmt.Printf("Failed to match %d out of %d misdemeanors in CMS data (%d%%)\n", d.stats.unmatchedMisdemeanors, d.stats.nCMSMisdemeanors, ((d.stats.unmatchedMisdemeanors)*100)/d.stats.nCMSMisdemeanors)
+	fmt.Printf("Failed to match %d out of %d felonies in CMS data (%d%%)\n", d.stats.unmatchedCMSFelonies, d.stats.nCMSFelonies, ((d.stats.unmatchedCMSFelonies)*100)/d.stats.nCMSFelonies)
+	fmt.Printf("Failed to match %d out of %d misdemeanors in CMS data (%d%%)\n", d.stats.unmatchedCMSMisdemeanors, d.stats.nCMSMisdemeanors, ((d.stats.unmatchedCMSMisdemeanors)*100)/d.stats.nCMSMisdemeanors)
 	fmt.Printf("Summary Match Data: %+v", d.dojInformation.SummaryMatchData)
 }
 
-func (d *DataProcessor) incrementStats(row data.CMSEntry, history *data.DOJHistory) {
+func isProp64Conviction(row data.DOJRow, county string) bool {
+	if !row.Convicted {
+		return false
+	}
+
+	if row.County != county {
+		return false
+	}
+
+	return strings.HasPrefix(row.CodeSection, "11357") ||
+		strings.HasPrefix(row.CodeSection, "11358") ||
+		strings.HasPrefix(row.CodeSection, "11359") ||
+		strings.HasPrefix(row.CodeSection, "11360")
+}
+
+func (d *DataProcessor) incrementCMSStats(row data.CMSEntry, history *data.DOJHistory) {
 	d.stats.nCMSRows++
 	if row.Level == "F" {
 		d.stats.nCMSFelonies++
@@ -123,9 +169,30 @@ func (d *DataProcessor) incrementStats(row data.CMSEntry, history *data.DOJHisto
 	if history == nil {
 		d.stats.unmatchedCMSRows++
 		if row.Level == "F" {
-			d.stats.unmatchedFelonies++
+			d.stats.unmatchedCMSFelonies++
 		} else {
-			d.stats.unmatchedMisdemeanors++
+			d.stats.unmatchedCMSMisdemeanors++
+		}
+	} else {
+		d.stats.matchedSubjectIds[history.SubjectID] = true
+	}
+}
+
+func (d *DataProcessor) incrementDOJStats(row data.DOJRow) {
+
+	d.stats.nDOJProp64Convictions++
+	if row.Felony {
+		d.stats.nDOJFelonies++
+	} else {
+		d.stats.nDOJMisdemeanors++
+	}
+
+	if !d.stats.matchedSubjectIds[row.SubjectID] {
+		d.stats.unmatchedDOJConvictions++
+		if row.Felony {
+			d.stats.unmatchedDOJFelonies++
+		} else {
+			d.stats.unmatchedDOJMisdemeanors++
 		}
 	}
 }

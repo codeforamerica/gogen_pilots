@@ -53,7 +53,6 @@ func (information *DOJInformation) FindDOJHistory(entry CMSEntry) (*DOJHistory, 
 		information.SummaryMatchData.ambiguousMatches++
 		fmt.Println(fmt.Sprintf("Ambiguous match for `%s`", entry.FormattedName))
 		for _, match := range matches {
-			//TODO better printing for ambiguous matches
 			fmt.Println(fmt.Sprintf("(name: `%s`, matches: %t): %+v", match.History.Name, entry.FormattedName == match.History.Name, match))
 			if match.MatchStrength > bestMatch.MatchStrength {
 				bestMatch = match

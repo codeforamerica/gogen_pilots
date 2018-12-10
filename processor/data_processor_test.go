@@ -55,14 +55,16 @@ var _ = Describe("DataProcessor", func() {
 		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile))
 
 		cmsWriter := NewCMSWriter(path.Join(outputDir, "results.csv"))
+		dojWriter := NewDOJWriter(path.Join(outputDir, "unmatched_doj.csv"))
 
 		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-		dataProcessor = NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter, comparisonTime)
+		dataProcessor = NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter, dojWriter, comparisonTime)
 	})
 
 	It("runs and has output", func() {
 		dataProcessor.Process()
+		format.TruncatedDiff = false
 
 		pathToExpectedResults, err := path.Abs(path.Join("..", "test_fixtures", "felonies_sf_results.csv"))
 		Expect(err).ToNot(HaveOccurred())
@@ -74,7 +76,18 @@ var _ = Describe("DataProcessor", func() {
 		outputBody, err := ioutil.ReadFile(pathToOutput)
 		Expect(err).ToNot(HaveOccurred())
 
-		format.TruncatedDiff = false
 		Expect(string(outputBody)).To(Equal(string(expectedResultsBody)))
+
+		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "unmatched_doj.csv"))
+		Expect(err).ToNot(HaveOccurred())
+		outputDOJBody, err := ioutil.ReadFile(pathToDOJOutput)
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "unmatched_doj.csv"))
+		Expect(err).ToNot(HaveOccurred())
+		expectedDOJResultsBody, err := ioutil.ReadFile(pathToExpectedDOJResults)
+		Expect(err).ToNot(HaveOccurred())
+
+		Expect(string(outputDOJBody)).To(Equal(string(expectedDOJResultsBody)))
 	})
 })
