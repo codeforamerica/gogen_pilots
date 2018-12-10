@@ -31,10 +31,10 @@ const (
 	notFound      = "not found"
 )
 
-func (info *EligibilityInfo) checkWeight(entry data.CMSEntry, weightInfo data.WeightsEntry) {
+func (info *EligibilityInfo) checkWeight(charge string, level string, weightInfo data.WeightsEntry) {
 	var eligibleString string
 
-	if strings.HasPrefix(entry.Charge, "11357") || strings.HasPrefix(entry.Charge, "11358") || entry.Level == "M" {
+	if strings.HasPrefix(charge, "11357") || strings.HasPrefix(charge, "11358") || level == "M" {
 		info.QFinalSum = notApplicable
 		info.Over1Lb = notApplicable
 		return
@@ -55,7 +55,7 @@ func (info *EligibilityInfo) checkWeight(entry data.CMSEntry, weightInfo data.We
 	info.Over1Lb = eligibleString
 }
 
-func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.DOJHistory) {
+func (info *EligibilityInfo) checkDOJHistory(charge string, level string, history *data.DOJHistory) {
 	result := ""
 	if history == nil {
 		result = noMatch
@@ -77,7 +77,7 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 		info.YearsSinceMostRecentConviction = info.yearsSinceEvent(mostRecentConvictionDate)
 	}
 
-	if entry.Level != "F" || strings.HasPrefix(entry.Charge, "11357") {
+	if level != "F" || strings.HasPrefix(charge, "11357") {
 		result = notApplicable
 
 		info.PC290Registration = result
@@ -113,7 +113,7 @@ func (info *EligibilityInfo) checkDOJHistory(entry data.CMSEntry, history *data.
 		info.SuperstrikeCodeSections = "-"
 	}
 
-	if history.ThreeConvictionsSameCode(entry.Charge) {
+	if history.ThreeConvictionsSameCode(charge) {
 		info.TwoPriors = ineligible
 	} else {
 		info.TwoPriors = eligible
@@ -166,8 +166,36 @@ func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, histo
 		eligibilityInfo.YearsSinceEvent = eligibilityInfo.yearsSinceEvent(entry.DispositionDate)
 	}
 
-	eligibilityInfo.checkWeight(entry, weightInfo)
-	eligibilityInfo.checkDOJHistory(entry, history)
+	eligibilityInfo.checkWeight(entry.Charge, entry.Level, weightInfo)
+	eligibilityInfo.checkDOJHistory(entry.Charge, entry.Level, history)
+	eligibilityInfo.computeFinalEligibility()
+	return eligibilityInfo
+}
+
+func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, comparisonTime time.Time) *EligibilityInfo {
+	eligibilityInfo := new(EligibilityInfo)
+	eligibilityInfo.comparisonTime = comparisonTime
+
+	if (history.DOB == time.Time{} || row.DispositionDate == time.Time{}) {
+		eligibilityInfo.AgeAtConviction = notFound
+	} else {
+		hours := row.DispositionDate.Sub(history.DOB).Hours()
+		years := int(hours / (24 * 365.25))
+		eligibilityInfo.AgeAtConviction = fmt.Sprintf("%d", years)
+	}
+
+	if (row.DispositionDate == time.Time{}) {
+		eligibilityInfo.YearsSinceEvent = notFound
+	} else {
+		eligibilityInfo.YearsSinceEvent = eligibilityInfo.yearsSinceEvent(row.DispositionDate)
+	}
+
+	level := "M"
+	if row.Felony {
+		level = "F"
+	}
+	eligibilityInfo.checkWeight(row.CodeSection, level, data.WeightsEntry{Weight: 0, Found:  false,})
+	eligibilityInfo.checkDOJHistory(row.CodeSection, level, history)
 	eligibilityInfo.computeFinalEligibility()
 	return eligibilityInfo
 }
