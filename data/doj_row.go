@@ -39,7 +39,7 @@ func NewDOJRow(rawRow []string) DOJRow {
 		DOB:               parseDate(dateFormat, rawRow[PRI_DOB]),
 		CDL:               rawRow[PRI_CDL],
 		Convicted:         strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
-		CodeSection:       strings.Split(rawRow[OFFENSE_DESCR], "-")[0],
+		CodeSection:       findCodeSection(rawRow),
 		DispositionDate:   parseDate(dateFormat, rawRow[STP_EVENT_DATE]),
 		OFN:               rawRow[OFN],
 		NumCrtCase:        rawRow[FE_NUM_CRT_CASE],
@@ -48,6 +48,15 @@ func NewDOJRow(rawRow []string) DOJRow {
 		County:            rawRow[STP_ORI_CNTY_NAME],
 		Felony:            rawRow[CONV_STAT_DESCR] == "FELONY",
 		CountOrder:        rawRow[CNT_ORDER],
+	}
+}
+
+func findCodeSection(rawRow []string) string {
+	switch offenseDescription := rawRow[OFFENSE_DESCR]; offenseDescription {
+	case "SEE COMMENT FOR CHARGE":
+		return strings.Split(rawRow[COMMENT_TEXT], "-")[0]
+	default:
+		return strings.Split(rawRow[OFFENSE_DESCR], "-")[0]
 	}
 }
 
