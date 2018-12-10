@@ -17,6 +17,7 @@ type DOJHistory struct {
 	CDL               string
 	PC290Registration bool
 	Convictions       []*DOJRow
+	seenConvictions map[string]bool
 	OriginalCII       string
 }
 
@@ -30,10 +31,12 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.DOB = row.DOB
 		history.SSN = row.SSN
 		history.CDL = row.CDL
+		history.seenConvictions = make(map[string]bool)
 	}
 
-	if row.Convicted {
+	if row.Convicted && !history.seenConvictions[row.CountOrder] {
 		history.Convictions = append(history.Convictions, &row)
+		history.seenConvictions[row.CountOrder] = true
 	}
 
 	if row.PC290Registration {
@@ -61,10 +64,12 @@ func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 
 	name := entry.FormattedName
 	dateOfBirth := entry.DateOfBirth
+
 	if (name != "" && dateOfBirth != time.Time{}) {
 		results["nameAndDob"] = name == history.Name && dateOfBirth == history.DOB
 		results["weakNameAndDob"] = entry.WeakName == history.WeakName && dateOfBirth == history.DOB
 	}
+
 	if (entry.WeakName != "" && entry.BookingDate != time.Time{}) {
 		matched := false
 		if entry.WeakName == history.WeakName {

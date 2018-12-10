@@ -32,7 +32,7 @@ func NewWeightsInformation(sourceCSV *csv.Reader) (*WeightsInformation, error) {
 			return nil, err
 		}
 
-		cases[record[COURTNO]] = weight
+		cases[formatCourtNumber(record[COURTNO])] = weight
 	}
 
 	return &WeightsInformation{cases}, nil

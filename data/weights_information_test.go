@@ -48,7 +48,7 @@ var _ = Describe("WeightsInformation", func() {
 		})
 
 		It("Knows about convictions under 1 pound", func() {
-			val := weightsInformation.GetWeight("305599")
+			val := weightsInformation.GetWeight("00305599")
 			Expect(val.Weight).To(Equal(54.0))
 			Expect(val.Found).To(Equal(true))
 		})

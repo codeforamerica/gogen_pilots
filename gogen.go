@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/csv"
-	"path/filepath"
-	"time"
-
+	"fmt"
 	. "gogen/data"
 	. "gogen/processor"
+	"path/filepath"
+	"time"
+	"unicode/utf8"
 
 	"os"
 
@@ -18,6 +19,7 @@ var opts struct {
 	ConvictionWeights string `long:"conviction-weights" description:"The file containing conviction weights from SFDA" required:"true"`
 	DOJFile           string `long:"input-doj" description:"The file containing criminal histories from CA DOJ" required:"true"`
 	CMSFile           string `long:"input-csv" description:"The file containing criminal histories from SF's cms" required:"true"`
+	Delimiter         string `long:"delimiter" short:"d" default:"," hidden:"true"`
 }
 
 func main() {
@@ -32,6 +34,10 @@ func main() {
 	}
 
 	cmsCSV := csv.NewReader(cmsFile)
+	delimiterRune, _ := utf8.DecodeRuneInString(opts.Delimiter)
+	fmt.Println(delimiterRune)
+	cmsCSV.Comma = delimiterRune
+
 
 	weightsFile, err := os.Open(opts.ConvictionWeights)
 	if err != nil {

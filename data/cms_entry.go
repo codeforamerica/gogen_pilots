@@ -7,6 +7,7 @@ import (
 
 type CMSEntry struct {
 	CourtNumber     string
+	FormattedCourtNumber string
 	Level           string
 	SSN             string
 	CII             string
@@ -23,7 +24,7 @@ type CMSEntry struct {
 }
 
 func NewCMSEntry(record []string) CMSEntry {
-	const DateFormat string = "1/2/06"
+	const DateFormat string = "010206"
 	const (
 		COURTNO = iota
 		IND
@@ -65,6 +66,7 @@ func NewCMSEntry(record []string) CMSEntry {
 
 	return CMSEntry{
 		CourtNumber:     record[COURTNO],
+		FormattedCourtNumber: formatCourtNumber(record[COURTNO]),
 		Level:           record[CURRENT_CHARGE_CLASS],
 		SSN:             record[SSN],
 		CII:             formatCII(cii),
@@ -79,6 +81,13 @@ func NewCMSEntry(record []string) CMSEntry {
 		BookingDate:     bookingDate,
 		RawRow:          record,
 	}
+}
+
+func (entry CMSEntry) MJCharge() bool {
+	return strings.HasPrefix(entry.Charge, "11357") ||
+		strings.HasPrefix(entry.Charge, "11358") ||
+		strings.HasPrefix(entry.Charge, "11359") ||
+		strings.HasPrefix(entry.Charge, "11360")
 }
 
 func formatName(name string) string {
@@ -100,4 +109,15 @@ func formatCII(cii string) string {
 		cii = "0" + cii
 	}
 	return cii[len(cii)-8:]
+}
+
+func formatCourtNumber(number string) string {
+	if number == "" {
+		return number
+	}
+
+	for len(number) < 8 {
+		number = "0" + number
+	}
+	return number[len(number)-8:]
 }

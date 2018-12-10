@@ -19,10 +19,12 @@ type DataProcessor struct {
 }
 
 type dataProcessorStats struct {
-	nCMSRows         int
-	nCMSFelonies     int
-	nCMSMisdemeanors int
-	unmatchedCMSRows int
+	nCMSRows              int
+	nCMSFelonies          int
+	nCMSMisdemeanors      int
+	unmatchedCMSRows      int
+	unmatchedFelonies     int
+	unmatchedMisdemeanors int
 }
 
 func NewDataProcessor(
@@ -68,9 +70,12 @@ func (d DataProcessor) Process() {
 			panic(err)
 		}
 		row := data.NewCMSEntry(rawRow)
+		if !row.MJCharge() {
+			continue
+		}
 
 		weightStartTime := time.Now()
-		weightsEntry := d.weightsInformation.GetWeight(row.CourtNumber)
+		weightsEntry := d.weightsInformation.GetWeight(row.FormattedCourtNumber)
 		weightEndTime := time.Now()
 		totalWeightSearchTime += weightEndTime.Sub(weightStartTime)
 
@@ -103,6 +108,8 @@ func (d DataProcessor) Process() {
 	fmt.Println("\nComplete...")
 	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)\n", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
 	fmt.Printf("Failed to match %d out of %d charges in CMS data (%d%%)\n", d.stats.unmatchedCMSRows, d.stats.nCMSRows, ((d.stats.unmatchedCMSRows)*100)/d.stats.nCMSRows)
+	fmt.Printf("Failed to match %d out of %d felonies in CMS data (%d%%)\n", d.stats.unmatchedFelonies, d.stats.nCMSFelonies, ((d.stats.unmatchedFelonies)*100)/d.stats.nCMSFelonies)
+	fmt.Printf("Failed to match %d out of %d misdemeanors in CMS data (%d%%)\n", d.stats.unmatchedMisdemeanors, d.stats.nCMSMisdemeanors, ((d.stats.unmatchedMisdemeanors)*100)/d.stats.nCMSMisdemeanors)
 	fmt.Printf("Summary Match Data: %+v", d.dojInformation.SummaryMatchData)
 }
 
@@ -115,6 +122,11 @@ func (d *DataProcessor) incrementStats(row data.CMSEntry, history *data.DOJHisto
 	}
 	if history == nil {
 		d.stats.unmatchedCMSRows++
+		if row.Level == "F" {
+			d.stats.unmatchedFelonies++
+		} else {
+			d.stats.unmatchedMisdemeanors++
+		}
 	}
 }
 

@@ -25,6 +25,7 @@ type DOJRow struct {
 	CycleDate         time.Time
 	RawRow            []string
 	CourtNoParts      []string
+	CountOrder        string
 }
 
 func NewDOJRow(rawRow []string) DOJRow {
@@ -46,6 +47,7 @@ func NewDOJRow(rawRow []string) DOJRow {
 		PC290Registration: rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
 		County:            rawRow[STP_ORI_CNTY_NAME],
 		Felony:            rawRow[CONV_STAT_DESCR] == "FELONY",
+		CountOrder:        rawRow[CNT_ORDER],
 	}
 }
 
