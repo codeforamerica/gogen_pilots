@@ -6,21 +6,21 @@ import (
 )
 
 type CMSEntry struct {
-	CourtNumber     string
+	CourtNumber          string
 	FormattedCourtNumber string
-	Level           string
-	SSN             string
-	CII             string
-	Charge          string
-	IncidentNumber  string
-	Name            string
-	FormattedName   string
-	WeakName        string
-	CDL             string
-	DateOfBirth     time.Time
-	DispositionDate time.Time
-	BookingDate     time.Time
-	RawRow          []string
+	Level                string
+	SSN                  string
+	CII                  string
+	Charge               string
+	IncidentNumber       string
+	Name                 string
+	FormattedName        string
+	WeakName             string
+	CDL                  string
+	DateOfBirth          time.Time
+	DispositionDate      time.Time
+	BookingDate          time.Time
+	RawRow               []string
 }
 
 func NewCMSEntry(record []string) CMSEntry {
@@ -65,21 +65,21 @@ func NewCMSEntry(record []string) CMSEntry {
 	cii := formatCII(record[CII])
 
 	return CMSEntry{
-		CourtNumber:     record[COURTNO],
+		CourtNumber:          record[COURTNO],
 		FormattedCourtNumber: formatCourtNumber(record[COURTNO]),
-		Level:           record[CURRENT_CHARGE_CLASS],
-		SSN:             record[SSN],
-		CII:             formatCII(cii),
-		Charge:          strings.TrimSpace(record[CURRENT_CHARGE]),
-		IncidentNumber:  record[INCIDENTNO],
-		Name:            strings.TrimSpace(record[NAME]),
-		FormattedName:   formattedName,
-		WeakName:        firstLast,
-		CDL:             strings.SplitN(record[CDL], " ", 2)[0],
-		DateOfBirth:     dob,
-		DispositionDate: dispositionDate,
-		BookingDate:     bookingDate,
-		RawRow:          record,
+		Level:                record[CURRENT_CHARGE_CLASS],
+		SSN:                  record[SSN],
+		CII:                  formatCII(cii),
+		Charge:               strings.TrimSpace(record[CURRENT_CHARGE]),
+		IncidentNumber:       record[INCIDENTNO],
+		Name:                 strings.TrimSpace(record[NAME]),
+		FormattedName:        formattedName,
+		WeakName:             firstLast,
+		CDL:                  strings.SplitN(record[CDL], " ", 2)[0],
+		DateOfBirth:          dob,
+		DispositionDate:      dispositionDate,
+		BookingDate:          bookingDate,
+		RawRow:               record,
 	}
 }
 

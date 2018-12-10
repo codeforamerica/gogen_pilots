@@ -38,7 +38,6 @@ func main() {
 	fmt.Println(delimiterRune)
 	cmsCSV.Comma = delimiterRune
 
-
 	weightsFile, err := os.Open(opts.ConvictionWeights)
 	if err != nil {
 		panic(err)

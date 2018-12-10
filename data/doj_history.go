@@ -17,7 +17,7 @@ type DOJHistory struct {
 	CDL               string
 	PC290Registration bool
 	Convictions       []*DOJRow
-	seenConvictions map[string]bool
+	seenConvictions   map[string]bool
 	OriginalCII       string
 }
 
