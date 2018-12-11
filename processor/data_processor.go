@@ -165,6 +165,7 @@ func (d DataProcessor) Process() {
 	fmt.Printf("Total Unique DOJ Histories: %d\n", len(d.dojInformation.Histories))
 	fmt.Printf("Num fully cleared records: %d\n", d.clearanceStats.numberFullyClearedRecords)
 	fmt.Printf("Num cleared records for last 7 years: %d\n", d.clearanceStats.numberClearedRecordsLast7Years)
+	fmt.Printf("Num records no felonies: %d\n", d.clearanceStats.numberRecordsNoFelonies)
 }
 
 func isProp64Conviction(row data.DOJRow, county string) bool {
@@ -221,12 +222,16 @@ func (d *DataProcessor) incrementDOJStats(row data.DOJRow) {
 }
 
 func (d *DataProcessor) incrementClearanceStats(row data.DOJRow, history *data.DOJHistory, eligibilityInfo *EligibilityInfo) {
-	if history.OnlyProp64MisdemeanorsSince(time.Time{}) && eligibilityInfo.FinalRecommendation == "eligible" {
+	if history.OnlyProp64MisdemeanorsSince(time.Time{}) && eligibilityInfo.FinalRecommendation == eligible {
 		d.clearanceStats.numberFullyClearedRecords++
 	}
 
-	if history.OnlyProp64MisdemeanorsSince(d.comparisonTime.AddDate(-7, 0, 0)) && eligibilityInfo.FinalRecommendation == "eligible" {
+	if history.OnlyProp64MisdemeanorsSince(d.comparisonTime.AddDate(-7, 0, 0)) && eligibilityInfo.FinalRecommendation == eligible {
 		d.clearanceStats.numberClearedRecordsLast7Years++
+	}
+
+	if history.OnlyProp64FeloniesSince(time.Time{}) && eligibilityInfo.FinalRecommendation == eligible {
+		d.clearanceStats.numberRecordsNoFelonies++
 	}
 }
 
