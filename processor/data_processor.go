@@ -135,12 +135,16 @@ func (d DataProcessor) Process() {
 	d.outputDOJWriter.Flush()
 
 	fmt.Println("\nComplete...")
-	fmt.Printf("Found %d charges in CMS data (%d felonies, %d misdemeanors)\n", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
-	fmt.Printf("Found %d charges in DOJ data (%d felonies, %d misdemeanors)\n", d.stats.nDOJProp64Convictions, d.stats.nDOJFelonies, d.stats.nDOJMisdemeanors)
+	fmt.Printf("Found %d convictions in CMS data (%d felonies, %d misdemeanors)\n", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
+	fmt.Printf("Found %d convictions in DOJ data (%d felonies, %d misdemeanors)\n", d.stats.nDOJProp64Convictions, d.stats.nDOJFelonies, d.stats.nDOJMisdemeanors)
 
-	fmt.Printf("Failed to match %d out of %d charges in CMS data (%d%%)\n", d.stats.unmatchedCMSRows, d.stats.nCMSRows, ((d.stats.unmatchedCMSRows)*100)/d.stats.nCMSRows)
+	fmt.Printf("Failed to match %d out of %d convictions in CMS data (%d%%)\n", d.stats.unmatchedCMSRows, d.stats.nCMSRows, ((d.stats.unmatchedCMSRows)*100)/d.stats.nCMSRows)
 	fmt.Printf("Failed to match %d out of %d felonies in CMS data (%d%%)\n", d.stats.unmatchedCMSFelonies, d.stats.nCMSFelonies, ((d.stats.unmatchedCMSFelonies)*100)/d.stats.nCMSFelonies)
 	fmt.Printf("Failed to match %d out of %d misdemeanors in CMS data (%d%%)\n", d.stats.unmatchedCMSMisdemeanors, d.stats.nCMSMisdemeanors, ((d.stats.unmatchedCMSMisdemeanors)*100)/d.stats.nCMSMisdemeanors)
+
+	fmt.Printf("Failed to match %d out of %d convictions in DOJ data (%d%%)\n", d.stats.unmatchedDOJConvictions, d.stats.nDOJProp64Convictions, ((d.stats.unmatchedDOJConvictions)*100)/d.stats.nDOJProp64Convictions)
+	fmt.Printf("Failed to match %d out of %d unique subjects in DOJ data (%d%%)\n", len(d.dojInformation.Histories) - len(d.stats.matchedSubjectIds), len(d.dojInformation.Histories), ((len(d.dojInformation.Histories) - len(d.stats.matchedSubjectIds))*100)/len(d.dojInformation.Histories))
+
 	fmt.Printf("Summary Match Data: %+v", d.dojInformation.SummaryMatchData)
 }
 

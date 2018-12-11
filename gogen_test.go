@@ -47,12 +47,11 @@ var _ = Describe("gogen", func() {
 		command := exec.Command(pathToGogen, outputsFlag, weightsFlag, dojFlag, cmsFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 9 charges in CMS data \(8 felonies, 1 misdemeanors\)`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 11 charges in DOJ data \(11 felony and 0 misdemeanors\)`))
-		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 9 charges in CMS data`))
-		Eventually(session.Out).Should(gbytes.Say(`Failed to match # out of # charges in DOJ data`))
-		Eventually(session.Out).Should(gbytes.Say(`Failed to match #  out of # unique subjects in DOJ data`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 9 convictions in CMS data \(8 felonies, 1 misdemeanors\)`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 8 convictions in DOJ data \(8 felonies, 0 misdemeanors\)`))
+		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 9 convictions in CMS data`))
+		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 8 convictions in DOJ data`))
+		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 7 unique subjects in DOJ data`))
 
 		Eventually(session).Should(gexec.Exit())
 	})

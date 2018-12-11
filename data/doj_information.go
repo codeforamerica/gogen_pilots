@@ -111,7 +111,7 @@ func NewDOJInformation(sourceCSV *csv.Reader) (*DOJInformation, error) {
 	if err != nil {
 		panic(err)
 	}
-
+	rows = rows[1:]
 	info := DOJInformation{
 		Rows:      rows,
 		Histories: make(map[string]*DOJHistory),
