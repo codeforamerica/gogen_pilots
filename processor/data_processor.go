@@ -17,7 +17,14 @@ type DataProcessor struct {
 	outputCMSWriter    CMSWriter
 	outputDOJWriter    CMSWriter
 	stats              dataProcessorStats
+	clearanceStats     clearanceStats
 	comparisonTime     time.Time
+}
+
+type clearanceStats struct {
+	numberFullyClearedRecords      int
+	numberClearedRecordsLast7Years int
+	numberRecordsNoFelonies        int
 }
 
 type dataProcessorStats struct {
@@ -114,23 +121,30 @@ func (d DataProcessor) Process() {
 	}
 	d.outputCMSWriter.Flush()
 
+	fmt.Println("\nDetermining Unmatched DOJ eligibility")
 	previousSubjectId := ""
 	previousCountOrder := ""
 	d.stats.nDOJSubjects = len(d.dojInformation.Histories)
-	for _, rawRow := range (d.dojInformation.Rows) {
+	totalRows = float64(len(d.dojInformation.Rows))
+	totalTime = 0
+
+	for i, rawRow := range d.dojInformation.Rows {
+		startTime := time.Now()
 		row := data.NewDOJRow(rawRow)
 		if isProp64Conviction(row, "SAN FRANCISCO") {
+			history := d.dojInformation.Histories[row.SubjectID]
 			if !d.stats.matchedSubjectIds[row.SubjectID] {
-				history := d.dojInformation.Histories[row.SubjectID]
 				d.outputDOJWriter.WriteDOJEntry(rawRow, *EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 			}
 			if previousCountOrder != row.CountOrder || previousSubjectId != row.SubjectID {
 				d.incrementDOJStats(row)
+				d.incrementClearanceStats(row, history, EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 			}
 			previousSubjectId = row.SubjectID
 			previousCountOrder = row.CountOrder
 		}
-
+		totalTime += time.Since(startTime)
+		utilities.PrintProgressBar(float64(i), totalRows, totalTime, "")
 	}
 	d.outputDOJWriter.Flush()
 
@@ -143,9 +157,13 @@ func (d DataProcessor) Process() {
 	fmt.Printf("Failed to match %d out of %d misdemeanors in CMS data (%d%%)\n", d.stats.unmatchedCMSMisdemeanors, d.stats.nCMSMisdemeanors, ((d.stats.unmatchedCMSMisdemeanors)*100)/d.stats.nCMSMisdemeanors)
 
 	fmt.Printf("Failed to match %d out of %d convictions in DOJ data (%d%%)\n", d.stats.unmatchedDOJConvictions, d.stats.nDOJProp64Convictions, ((d.stats.unmatchedDOJConvictions)*100)/d.stats.nDOJProp64Convictions)
-	fmt.Printf("Failed to match %d out of %d unique subjects in DOJ data (%d%%)\n", len(d.dojInformation.Histories) - len(d.stats.matchedSubjectIds), len(d.dojInformation.Histories), ((len(d.dojInformation.Histories) - len(d.stats.matchedSubjectIds))*100)/len(d.dojInformation.Histories))
+	fmt.Printf("Failed to match %d out of %d unique subjects in DOJ data (%d%%)\n", len(d.dojInformation.Histories)-len(d.stats.matchedSubjectIds), len(d.dojInformation.Histories), ((len(d.dojInformation.Histories)-len(d.stats.matchedSubjectIds))*100)/len(d.dojInformation.Histories))
 
-	fmt.Printf("Summary Match Data: %+v", d.dojInformation.SummaryMatchData)
+	fmt.Printf("Summary Match Data: %+v\n", d.dojInformation.SummaryMatchData)
+
+	fmt.Println("==========================================")
+	fmt.Printf("Total Unique DOJ Histories: %d\n", len(d.dojInformation.Histories))
+	fmt.Printf("Num fully cleared records: %d\n", d.clearanceStats.numberFullyClearedRecords)
 }
 
 func isProp64Conviction(row data.DOJRow, county string) bool {
@@ -198,6 +216,12 @@ func (d *DataProcessor) incrementDOJStats(row data.DOJRow) {
 		} else {
 			d.stats.unmatchedDOJMisdemeanors++
 		}
+	}
+}
+
+func (d *DataProcessor) incrementClearanceStats(row data.DOJRow, history *data.DOJHistory, eligibilityInfo *EligibilityInfo) {
+	if history.OnlyProp64Misdemeanors() && eligibilityInfo.FinalRecommendation == "eligible" {
+		d.clearanceStats.numberFullyClearedRecords++
 	}
 }
 

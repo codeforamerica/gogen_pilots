@@ -98,6 +98,16 @@ func (history *DOJHistory) Match(entry CMSEntry) MatchData {
 	}
 }
 
+func (history *DOJHistory) OnlyProp64Misdemeanors() bool {
+	for _, row := range history.Convictions {
+		matcher := regexp.MustCompile(`(11357|11358|11359|11360).*`)
+		if !matcher.Match([]byte(row.CodeSection)) || row.Felony {
+			return false
+		}
+	}
+	return true
+}
+
 func (history *DOJHistory) PC290CodeSections() []string {
 	var result []string
 
