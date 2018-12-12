@@ -169,7 +169,7 @@ type CMSWriter interface {
 
 type csvWriter struct {
 	outputFileWriter *csv.Writer
-	filename string
+	filename         string
 }
 
 func NewCMSWriter(outputFilePath string) CMSWriter {

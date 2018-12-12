@@ -3,6 +3,7 @@ package processor
 import (
 	"fmt"
 	"gogen/data"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -20,6 +21,7 @@ type EligibilityInfo struct {
 	YearsSinceEvent                string
 	YearsSinceMostRecentConviction string
 	FinalRecommendation            string
+	Prop64Charge                   string
 	comparisonTime                 time.Time
 }
 
@@ -127,7 +129,17 @@ func (info *EligibilityInfo) yearsSinceEvent(date time.Time) string {
 	return fmt.Sprintf("%.1f", years)
 }
 
-func (info *EligibilityInfo) computeFinalEligibility() {
+func (info *EligibilityInfo) computeFinalEligibility(charge string, prop64Matcher *regexp.Regexp) {
+	if prop64Matcher == nil {
+		prop64Matcher = regexp.MustCompile("")
+	}
+
+	if !prop64Matcher.Match([]byte(charge)) {
+		info.Prop64Charge = ineligible
+		info.FinalRecommendation = ineligible
+		return
+	}
+
 	disqualifiers := info.Over1Lb == ineligible ||
 		info.PC290Registration == ineligible ||
 		info.PC290Charges == ineligible ||
@@ -149,7 +161,7 @@ func (info *EligibilityInfo) computeFinalEligibility() {
 	info.FinalRecommendation = eligible
 }
 
-func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, history *data.DOJHistory, comparisonTime time.Time) *EligibilityInfo {
+func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, history *data.DOJHistory, comparisonTime time.Time, prop64Matcher *regexp.Regexp) *EligibilityInfo {
 	eligibilityInfo := new(EligibilityInfo)
 	eligibilityInfo.comparisonTime = comparisonTime
 
@@ -169,11 +181,11 @@ func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, histo
 
 	eligibilityInfo.checkWeight(entry.Charge, entry.Level, weightInfo)
 	eligibilityInfo.checkDOJHistory(entry.Charge, entry.Level, history)
-	eligibilityInfo.computeFinalEligibility()
+	eligibilityInfo.computeFinalEligibility(entry.Charge, prop64Matcher)
 	return eligibilityInfo
 }
 
-func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, comparisonTime time.Time) *EligibilityInfo {
+func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, comparisonTime time.Time, prop64Matcher *regexp.Regexp) *EligibilityInfo {
 	eligibilityInfo := new(EligibilityInfo)
 	eligibilityInfo.comparisonTime = comparisonTime
 
@@ -197,6 +209,6 @@ func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, compa
 	}
 	eligibilityInfo.checkWeight(row.CodeSection, level, data.WeightsEntry{Weight: 0, Found: false})
 	eligibilityInfo.checkDOJHistory(row.CodeSection, level, history)
-	eligibilityInfo.computeFinalEligibility()
+	eligibilityInfo.computeFinalEligibility(row.CodeSection, prop64Matcher)
 	return eligibilityInfo
 }

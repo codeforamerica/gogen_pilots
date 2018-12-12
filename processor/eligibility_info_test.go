@@ -26,7 +26,7 @@ var _ = Describe("EligiblityInfo", func() {
 	})
 
 	It("Checks for weight disqualifiers", func() {
-		info := NewEligibilityInfo(entry, weightInfo, history, time.Now())
+		info := NewEligibilityInfo(entry, weightInfo, history, time.Now(), nil)
 
 		Expect(info.QFinalSum).To(Equal("54.0"))
 		Expect(info.Over1Lb).To(Equal("eligible"))
@@ -41,7 +41,7 @@ var _ = Describe("EligiblityInfo", func() {
 		})
 
 		It("reports the not found weights entry", func() {
-			info := NewEligibilityInfo(entry, weightInfo, history, time.Now())
+			info := NewEligibilityInfo(entry, weightInfo, history, time.Now(), nil)
 
 			Expect(info.QFinalSum).To(Equal("no match"))
 			Expect(info.Over1Lb).To(Equal("no match"))
@@ -60,7 +60,7 @@ var _ = Describe("EligiblityInfo", func() {
 		})
 
 		It("reports the not found weights entry", func() {
-			info := NewEligibilityInfo(entry, weightInfo, history, time.Now())
+			info := NewEligibilityInfo(entry, weightInfo, history, time.Now(), nil)
 
 			Expect(info.QFinalSum).To(Equal("n/a"))
 			Expect(info.Over1Lb).To(Equal("n/a"))

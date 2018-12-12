@@ -6,6 +6,7 @@ import (
 	"gogen/data"
 	"gogen/utilities"
 	"io"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -16,6 +17,7 @@ type DataProcessor struct {
 	dojInformation     *data.DOJInformation
 	outputCMSWriter    CMSWriter
 	outputDOJWriter    CMSWriter
+	prop64Matcher      *regexp.Regexp
 	stats              dataProcessorStats
 	clearanceStats     clearanceStats
 	convictionStats    convictionStats
@@ -23,13 +25,16 @@ type DataProcessor struct {
 }
 
 type clearanceStats struct {
-	numberFullyClearedRecords      int
-	numberClearedRecordsLast7Years int
-	numberRecordsNoFelonies        int
-	numberDQedForSuperstrike       int
-	numberDQedForPC290             int
-	numberDQedForTwoPriors         int
-	numberDQedForOver1LB           int
+	numberFullyClearedRecords                 int
+	numberClearedRecordsLast7Years            int
+	numberHistoriesWithConvictionInLast7Years int
+	numberRecordsNoFelonies                   int
+	numberHistoriesWithFelonies               int
+	numberDQedForSuperstrike                  int
+	numberDQedForPC290                        int
+	numberDQedForTwoPriors                    int
+	numberDQedForOver1LB                      map[string]bool
+	numberOnlyDQIsWeight                      int
 }
 
 type convictionStats struct {
@@ -55,6 +60,7 @@ type dataProcessorStats struct {
 	unmatchedDOJMisdemeanors int
 	finalRecNeedsReview      int
 	matchedSubjectIds        map[string]bool
+	matchedCMSIDs            map[string]int
 }
 
 func NewDataProcessor(
@@ -72,13 +78,20 @@ func NewDataProcessor(
 		outputCMSWriter:    outputCMSWriter,
 		outputDOJWriter:    outputDOJWriter,
 		comparisonTime:     comparisonTime,
+		prop64Matcher:      regexp.MustCompile(`(11357|11358|11359|11360).*`),
 		convictionStats: convictionStats{
 			numCMSConvictions:           make(map[string]int),
 			numDOJConvictions:           make(map[string]int),
 			CMSEligibilityByCodeSection: make(map[string]map[string]int),
 			DOJEligibilityByCodeSection: make(map[string]map[string]int),
 		},
-		stats: dataProcessorStats{matchedSubjectIds: make(map[string]bool)},
+		stats: dataProcessorStats{
+			matchedSubjectIds: make(map[string]bool),
+			matchedCMSIDs:     make(map[string]int),
+		},
+		clearanceStats: clearanceStats{
+			numberDQedForOver1LB: make(map[string]bool),
+		},
 	}
 }
 
@@ -104,6 +117,7 @@ func (d DataProcessor) Process() {
 			panic(err)
 		}
 		row := data.NewCMSEntry(rawRow)
+		d.stats.matchedCMSIDs[row.Name+row.DateOfBirth.Format("01/02/2006")]++
 		if !row.MJCharge() {
 			continue
 		}
@@ -120,7 +134,11 @@ func (d DataProcessor) Process() {
 		totalMatchingTime += avgMatchTime
 
 		eligibilityStartTime := time.Now()
-		eligibilityInfo := NewEligibilityInfo(row, weightsEntry, dojHistory, d.comparisonTime)
+		eligibilityInfo := NewEligibilityInfo(row, weightsEntry, dojHistory, d.comparisonTime, d.prop64Matcher)
+		d.checkDisqualifiedFor1LB(row, eligibilityInfo)
+		if eligibilityInfo.FinalRecommendation == needsReview {
+			d.stats.finalRecNeedsReview++
+		}
 		eligibilityEndTime := time.Now()
 		totalEligibilityTime += eligibilityEndTime.Sub(eligibilityStartTime)
 
@@ -153,13 +171,14 @@ func (d DataProcessor) Process() {
 		if isProp64Conviction(row, "SAN FRANCISCO") {
 			history := d.dojInformation.Histories[row.SubjectID]
 			if !d.stats.matchedSubjectIds[row.SubjectID] {
-				d.outputDOJWriter.WriteDOJEntry(rawRow, *EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
+				eligibilityInfo := EligibilityInfoFromDOJRow(&row, history, d.comparisonTime, d.prop64Matcher)
+				d.outputDOJWriter.WriteDOJEntry(rawRow, *eligibilityInfo)
+				if eligibilityInfo.FinalRecommendation == needsReview {
+					d.stats.finalRecNeedsReview++
+				}
 			}
 			if previousCountOrder != row.CountOrder || previousSubjectId != row.SubjectID {
 				d.incrementDOJStats(row)
-				//TODO make sure to dedupe by individual, not count, for these metrics
-				d.incrementConvictionStats(row, EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
-				d.incrementClearanceStats(row, history, EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 			}
 			previousSubjectId = row.SubjectID
 			previousCountOrder = row.CountOrder
@@ -168,6 +187,23 @@ func (d DataProcessor) Process() {
 		utilities.PrintProgressBar(float64(i), totalRows, totalTime, "")
 	}
 	d.outputDOJWriter.Flush()
+
+	fmt.Println("\nDetermining summary statistics")
+
+	totalTime = 0
+	numHistories := 0
+	for _, history := range d.dojInformation.Histories {
+		startTime := time.Now()
+
+		d.checkAllConvictionsCleared(history)
+		d.checkConvictionsClearedLast7Years(history)
+		d.checkAllFeloniesReduced(history)
+		d.checkDisqualifiers(history)
+
+		totalTime += time.Since(startTime)
+		numHistories++
+		utilities.PrintProgressBar(float64(numHistories), float64(len(d.dojInformation.Histories)), totalTime, "")
+	}
 
 	fmt.Println("\nComplete...")
 	fmt.Printf("Found %d convictions in CMS data (%d felonies, %d misdemeanors)\n", d.stats.nCMSRows, d.stats.nCMSFelonies, d.stats.nCMSMisdemeanors)
@@ -184,15 +220,18 @@ func (d DataProcessor) Process() {
 
 	fmt.Println("==========================================")
 	uniqueDOJHistories := len(d.dojInformation.Histories)
+	uniqueCMSHistories := len(d.stats.matchedCMSIDs)
 	fmt.Printf("Total Unique DOJ Histories: %d\n", uniqueDOJHistories)
+	fmt.Printf("Total Unique CMS Histories: %d\n", uniqueCMSHistories)
+	fmt.Printf("Num fully cleared DOJ records out of all DOJ: %d (%d%%)\n", d.clearanceStats.numberFullyClearedRecords, utilities.Percent(d.clearanceStats.numberFullyClearedRecords, uniqueDOJHistories))
+	fmt.Printf("Num cleared DOJ records for last 7 years out of doj records with conv in last 7 years: %d (%d%%)\n", d.clearanceStats.numberClearedRecordsLast7Years, utilities.Percent(d.clearanceStats.numberClearedRecordsLast7Years, d.clearanceStats.numberHistoriesWithConvictionInLast7Years))
+	fmt.Printf("Num DOJ records no felonies out of DOJ recs with felonies: %d (%d%%)\n", d.clearanceStats.numberRecordsNoFelonies, utilities.Percent(d.clearanceStats.numberRecordsNoFelonies, d.clearanceStats.numberHistoriesWithFelonies))
+
 	fmt.Printf("Num Convictions Needs Review: %d (%d%%)\n", d.stats.finalRecNeedsReview, utilities.Percent(d.stats.finalRecNeedsReview, d.stats.nCMSRows))
-	fmt.Printf("Num fully cleared DOJ records: %d (%d%%)\n", d.clearanceStats.numberFullyClearedRecords, utilities.Percent(d.clearanceStats.numberFullyClearedRecords, uniqueDOJHistories))
-	fmt.Printf("Num cleared DOJ records for last 7 years: %d (%d%%)\n", d.clearanceStats.numberClearedRecordsLast7Years, utilities.Percent(d.clearanceStats.numberClearedRecordsLast7Years, uniqueDOJHistories))
-	fmt.Printf("Num DOJ records no felonies: %d (%d%%)\n", d.clearanceStats.numberRecordsNoFelonies, utilities.Percent(d.clearanceStats.numberRecordsNoFelonies, uniqueDOJHistories))
-	fmt.Printf("Num DOJ records DQed for Superstrike: %d (%d%%)\n", d.clearanceStats.numberDQedForSuperstrike, utilities.Percent(d.clearanceStats.numberDQedForSuperstrike, uniqueDOJHistories))
-	fmt.Printf("Num DOJ records DQed for PC290: %d (%d%%)\n", d.clearanceStats.numberDQedForPC290, utilities.Percent(d.clearanceStats.numberDQedForPC290, uniqueDOJHistories))
-	fmt.Printf("Num DOJ records DQed for Two Priors: %d (%d%%)\n", d.clearanceStats.numberDQedForTwoPriors, utilities.Percent(d.clearanceStats.numberDQedForTwoPriors, uniqueDOJHistories))
-	fmt.Printf("Num CMS records DQed for Over 1lb: %d (%d%%)\n", d.clearanceStats.numberDQedForOver1LB, utilities.Percent(d.clearanceStats.numberDQedForOver1LB, d.stats.nCMSRows))
+	fmt.Printf("Num DOJ records DQed for Superstrike out of all DOJ: %d (%d%%)\n", d.clearanceStats.numberDQedForSuperstrike, utilities.Percent(d.clearanceStats.numberDQedForSuperstrike, uniqueDOJHistories))
+	fmt.Printf("Num DOJ records DQed for PC290 out of all DOJ: %d (%d%%)\n", d.clearanceStats.numberDQedForPC290, utilities.Percent(d.clearanceStats.numberDQedForPC290, uniqueDOJHistories))
+	fmt.Printf("Num DOJ records DQed for Two Priors out of all DOJ: %d (%d%%)\n", d.clearanceStats.numberDQedForTwoPriors, utilities.Percent(d.clearanceStats.numberDQedForTwoPriors, uniqueDOJHistories))
+	fmt.Printf("Num CMS records DQed for Over 1lb out of all CMS: %d (%d%%)\n", len(d.clearanceStats.numberDQedForOver1LB), utilities.Percent(len(d.clearanceStats.numberDQedForOver1LB), d.stats.nCMSRows))
 	fmt.Printf("Num CMS convictions by type %v\n", d.convictionStats.numCMSConvictions)
 	fmt.Printf("Num DOJ convictions by type %v\n", d.convictionStats.numDOJConvictions)
 	fmt.Printf("CMS Eligibility by code section %v\n", d.convictionStats.CMSEligibilityByCodeSection)
@@ -231,19 +270,11 @@ func (d *DataProcessor) incrementCMSStats(row data.CMSEntry, history *data.DOJHi
 	} else {
 		d.stats.matchedSubjectIds[history.SubjectID] = true
 	}
-	if info.FinalRecommendation == needsReview {
-		d.stats.finalRecNeedsReview++
-	}
-	if info.Over1Lb == ineligible {
-		d.clearanceStats.numberDQedForOver1LB++
-	}
 	d.convictionStats.numCMSConvictions[row.Charge]++
-	if d.convictionStats.CMSEligibilityByCodeSection[row.Charge] == nil {
-		d.convictionStats.CMSEligibilityByCodeSection[row.Charge] = make(map[string]int)
-		d.convictionStats.CMSEligibilityByCodeSection[row.Charge][info.FinalRecommendation]++
-	} else {
-		d.convictionStats.CMSEligibilityByCodeSection[row.Charge][info.FinalRecommendation]++
+	if d.convictionStats.CMSEligibilityByCodeSection[info.FinalRecommendation] == nil {
+		d.convictionStats.CMSEligibilityByCodeSection[info.FinalRecommendation] = make(map[string]int)
 	}
+	d.convictionStats.CMSEligibilityByCodeSection[info.FinalRecommendation][row.Charge]++
 }
 
 func (d *DataProcessor) incrementDOJStats(row data.DOJRow) {
@@ -265,40 +296,6 @@ func (d *DataProcessor) incrementDOJStats(row data.DOJRow) {
 	}
 }
 
-func (d *DataProcessor) incrementClearanceStats(row data.DOJRow, history *data.DOJHistory, eligibilityInfo *EligibilityInfo) {
-	if history.OnlyProp64MisdemeanorsSince(time.Time{}) && eligibilityInfo.FinalRecommendation == eligible {
-		d.clearanceStats.numberFullyClearedRecords++
-	}
-
-	if history.OnlyProp64MisdemeanorsSince(d.comparisonTime.AddDate(-7, 0, 0)) && eligibilityInfo.FinalRecommendation == eligible {
-		d.clearanceStats.numberClearedRecordsLast7Years++
-	}
-
-	if history.OnlyProp64FeloniesSince(time.Time{}) && eligibilityInfo.FinalRecommendation == eligible {
-		d.clearanceStats.numberRecordsNoFelonies++
-	}
-
-	if eligibilityInfo.Superstrikes == ineligible {
-		d.clearanceStats.numberDQedForSuperstrike++
-	}
-
-	pc290Charges := eligibilityInfo.PC290Charges == ineligible
-	pc290CodeSections := eligibilityInfo.PC290CodeSections == ineligible
-	pc290Registration := eligibilityInfo.PC290Registration == ineligible
-	if pc290Charges || pc290CodeSections || pc290Registration {
-		d.clearanceStats.numberDQedForPC290++
-	}
-
-	if eligibilityInfo.TwoPriors == ineligible {
-		d.clearanceStats.numberDQedForTwoPriors++
-	}
-
-	for _, conviction := range history.Convictions {
-		//TODO only in SF
-		d.convictionStats.numDOJConvictions[conviction.CodeSection]++
-	}
-}
-
 func (d *DataProcessor) incrementConvictionStats(row data.DOJRow, info *EligibilityInfo) {
 	if d.convictionStats.DOJEligibilityByCodeSection[row.CodeSection] == nil {
 		d.convictionStats.DOJEligibilityByCodeSection[row.CodeSection] = make(map[string]int)
@@ -312,5 +309,125 @@ func (d DataProcessor) readHeaders() {
 	_, err := d.cmsCSV.Read()
 	if err != nil {
 		panic(err)
+	}
+}
+
+func (d *DataProcessor) checkAllConvictionsCleared(history *data.DOJHistory) {
+	clearableConvictions := 0
+	for _, conviction := range history.Convictions {
+		if conviction.County != "SAN FRANCISCO" {
+			return
+		}
+		if !d.prop64Matcher.Match([]byte(conviction.CodeSection)) {
+			return
+		}
+		if conviction.Felony && !strings.HasPrefix(conviction.CodeSection, "11357") {
+			return
+		}
+		clearableConvictions++
+	}
+	if clearableConvictions > 0 {
+		d.clearanceStats.numberFullyClearedRecords++
+	}
+}
+
+func (d *DataProcessor) checkConvictionsClearedLast7Years(history *data.DOJHistory) {
+	last7YearsConvictions := make([]*data.DOJRow, 0)
+	for _, conviction := range history.Convictions {
+		if conviction.DispositionDate.After(d.comparisonTime.AddDate(-7, 0, 0)) {
+			last7YearsConvictions = append(last7YearsConvictions, conviction)
+		}
+	}
+
+	if len(last7YearsConvictions) == 0 {
+		return
+	}
+
+	d.clearanceStats.numberHistoriesWithConvictionInLast7Years++
+
+	clearableConvictions := 0
+	for _, conviction := range last7YearsConvictions {
+		if conviction.County != "SAN FRANCISCO" {
+			return
+		}
+		if !d.prop64Matcher.Match([]byte(conviction.CodeSection)) {
+			return
+		}
+		if conviction.Felony && !strings.HasPrefix(conviction.CodeSection, "11357") {
+			return
+		}
+		clearableConvictions++
+	}
+
+	if clearableConvictions > 0 {
+		d.clearanceStats.numberFullyClearedRecords++
+	}
+}
+
+func (d *DataProcessor) checkAllFeloniesReduced(history *data.DOJHistory) {
+	felonies := make([]*data.DOJRow, 0)
+	for _, conviction := range history.Convictions {
+		if conviction.Felony {
+			felonies = append(felonies, conviction)
+		}
+	}
+
+	if len(felonies) == 0 {
+		return
+	}
+
+	d.clearanceStats.numberHistoriesWithFelonies++
+
+	reducibleFelonies := 0
+	for _, conviction := range felonies {
+		if conviction.County != "SAN FRANCISCO" {
+			return
+		}
+		if !d.prop64Matcher.Match([]byte(conviction.CodeSection)) {
+			return
+		}
+		eligibility := EligibilityInfoFromDOJRow(conviction, history, d.comparisonTime, d.prop64Matcher)
+
+		if !(eligibility.FinalRecommendation == eligible || eligibility.FinalRecommendation == needsReview) {
+			return
+		}
+		reducibleFelonies++
+	}
+
+	if reducibleFelonies > 0 {
+		d.clearanceStats.numberRecordsNoFelonies++
+	}
+}
+
+func (d *DataProcessor) checkDisqualifiers(history *data.DOJHistory) {
+	superstrikeSeen := false
+	pc290Seen := false
+	twoPriorsSeen := false
+	for _, conviction := range history.Convictions {
+		d.convictionStats.numDOJConvictions[conviction.CodeSection]++
+		eligibility := EligibilityInfoFromDOJRow(conviction, history, d.comparisonTime, d.prop64Matcher)
+		if d.convictionStats.DOJEligibilityByCodeSection[eligibility.FinalRecommendation] == nil {
+			d.convictionStats.DOJEligibilityByCodeSection[eligibility.FinalRecommendation] = make(map[string]int)
+		}
+		d.convictionStats.DOJEligibilityByCodeSection[eligibility.FinalRecommendation][conviction.CodeSection]++
+
+		if eligibility.Superstrikes != eligible && !superstrikeSeen {
+			d.clearanceStats.numberDQedForSuperstrike++
+			superstrikeSeen = true
+		}
+		if (eligibility.PC290Registration != eligible || eligibility.PC290Charges != eligible) && !pc290Seen {
+			d.clearanceStats.numberDQedForPC290++
+			pc290Seen = true
+		}
+		if eligibility.TwoPriors != eligible && !twoPriorsSeen {
+			d.clearanceStats.numberDQedForTwoPriors++
+			twoPriorsSeen = true
+		}
+	}
+}
+
+func (d *DataProcessor) checkDisqualifiedFor1LB(entry data.CMSEntry, info *EligibilityInfo) {
+	if info.Over1Lb == ineligible {
+		d.clearanceStats.numberDQedForOver1LB[entry.Name+entry.DateOfBirth.Format("01/02/2006")] = true
 	}
 }

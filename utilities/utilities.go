@@ -27,5 +27,8 @@ func AverageTime(totalTime time.Duration, index float64) time.Duration {
 }
 
 func Percent(num int, denom int) int {
+	if denom == 0 {
+		return 0
+	}
 	return num * 100 / denom
 }
