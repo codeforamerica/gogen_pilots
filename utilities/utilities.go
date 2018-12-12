@@ -25,3 +25,7 @@ func PrintProgressBar(index, totalRows float64, totalTime time.Duration, tail st
 func AverageTime(totalTime time.Duration, index float64) time.Duration {
 	return time.Duration(float64(totalTime) / index)
 }
+
+func Percent(num int, denom int) int {
+	return num * 100 / denom
+}

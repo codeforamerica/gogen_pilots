@@ -29,6 +29,7 @@ const (
 	notApplicable = "n/a"
 	noMatch       = "no match"
 	notFound      = "not found"
+	needsReview   = "needs review"
 )
 
 func (info *EligibilityInfo) checkWeight(charge string, level string, weightInfo data.WeightsEntry) {
@@ -138,10 +139,10 @@ func (info *EligibilityInfo) computeFinalEligibility() {
 		return
 	}
 
-	needsReview := info.Over1Lb == noMatch || info.PC290Registration == noMatch
+	convictionNeedsReview := info.Over1Lb == noMatch || info.PC290Registration == noMatch
 
-	if needsReview {
-		info.FinalRecommendation = "needs review"
+	if convictionNeedsReview {
+		info.FinalRecommendation = needsReview
 		return
 	}
 
@@ -194,7 +195,7 @@ func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, compa
 	if row.Felony {
 		level = "F"
 	}
-	eligibilityInfo.checkWeight(row.CodeSection, level, data.WeightsEntry{Weight: 0, Found:  false,})
+	eligibilityInfo.checkWeight(row.CodeSection, level, data.WeightsEntry{Weight: 0, Found: false})
 	eligibilityInfo.checkDOJHistory(row.CodeSection, level, history)
 	eligibilityInfo.computeFinalEligibility()
 	return eligibilityInfo
