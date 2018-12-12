@@ -155,9 +155,10 @@ func (d DataProcessor) Process() {
 			if !d.stats.matchedSubjectIds[row.SubjectID] {
 				d.outputDOJWriter.WriteDOJEntry(rawRow, *EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 			}
-			d.incrementConvictionStats(row, EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 			if previousCountOrder != row.CountOrder || previousSubjectId != row.SubjectID {
 				d.incrementDOJStats(row)
+				//TODO make sure to dedupe by individual, not count, for these metrics
+				d.incrementConvictionStats(row, EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 				d.incrementClearanceStats(row, history, EligibilityInfoFromDOJRow(&row, history, d.comparisonTime))
 			}
 			previousSubjectId = row.SubjectID
@@ -293,6 +294,7 @@ func (d *DataProcessor) incrementClearanceStats(row data.DOJRow, history *data.D
 	}
 
 	for _, conviction := range history.Convictions {
+		//TODO only in SF
 		d.convictionStats.numDOJConvictions[conviction.CodeSection]++
 	}
 }
