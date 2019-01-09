@@ -9,8 +9,6 @@ import (
 )
 
 type EligibilityInfo struct {
-	QFinalSum                      string
-	Over1Lb                        string
 	PC290Registration              string
 	PC290Charges                   string
 	PC290CodeSections              string
@@ -33,30 +31,6 @@ const (
 	notFound      = "not found"
 	needsReview   = "needs review"
 )
-
-func (info *EligibilityInfo) checkWeight(charge string, level string, weightInfo data.WeightsEntry) {
-	var eligibleString string
-
-	if strings.HasPrefix(charge, "11357") || strings.HasPrefix(charge, "11358") || level == "M" {
-		info.QFinalSum = notApplicable
-		info.Over1Lb = notApplicable
-		return
-	}
-
-	if !weightInfo.Found {
-		info.QFinalSum = noMatch
-		info.Over1Lb = noMatch
-		return
-	}
-
-	if weightInfo.Weight <= 453.592 {
-		eligibleString = eligible
-	} else {
-		eligibleString = ineligible
-	}
-	info.QFinalSum = fmt.Sprintf("%.1f", weightInfo.Weight)
-	info.Over1Lb = eligibleString
-}
 
 func (info *EligibilityInfo) checkDOJHistory(charge string, level string, history *data.DOJHistory) {
 	result := ""
@@ -140,8 +114,7 @@ func (info *EligibilityInfo) computeFinalEligibility(charge string, prop64Matche
 		return
 	}
 
-	disqualifiers := info.Over1Lb == ineligible ||
-		info.PC290Registration == ineligible ||
+	disqualifiers := info.PC290Registration == ineligible ||
 		info.PC290Charges == ineligible ||
 		info.Superstrikes == ineligible ||
 		info.TwoPriors == ineligible
@@ -151,7 +124,7 @@ func (info *EligibilityInfo) computeFinalEligibility(charge string, prop64Matche
 		return
 	}
 
-	convictionNeedsReview := info.Over1Lb == noMatch || info.PC290Registration == noMatch
+	convictionNeedsReview := info.PC290Registration == noMatch
 
 	if convictionNeedsReview {
 		info.FinalRecommendation = needsReview
@@ -159,30 +132,6 @@ func (info *EligibilityInfo) computeFinalEligibility(charge string, prop64Matche
 	}
 
 	info.FinalRecommendation = eligible
-}
-
-func NewEligibilityInfo(entry data.CMSEntry, weightInfo data.WeightsEntry, history *data.DOJHistory, comparisonTime time.Time, prop64Matcher *regexp.Regexp) *EligibilityInfo {
-	eligibilityInfo := new(EligibilityInfo)
-	eligibilityInfo.comparisonTime = comparisonTime
-
-	if (entry.DateOfBirth == time.Time{} || entry.DispositionDate == time.Time{}) {
-		eligibilityInfo.AgeAtConviction = notFound
-	} else {
-		hours := entry.DispositionDate.Sub(entry.DateOfBirth).Hours()
-		years := int(hours / (24 * 365.25))
-		eligibilityInfo.AgeAtConviction = fmt.Sprintf("%d", years)
-	}
-
-	if (entry.DispositionDate == time.Time{}) {
-		eligibilityInfo.YearsSinceEvent = notFound
-	} else {
-		eligibilityInfo.YearsSinceEvent = eligibilityInfo.yearsSinceEvent(entry.DispositionDate)
-	}
-
-	eligibilityInfo.checkWeight(entry.Charge, entry.Level, weightInfo)
-	eligibilityInfo.checkDOJHistory(entry.Charge, entry.Level, history)
-	eligibilityInfo.computeFinalEligibility(entry.Charge, prop64Matcher)
-	return eligibilityInfo
 }
 
 func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, comparisonTime time.Time, prop64Matcher *regexp.Regexp) *EligibilityInfo {
@@ -207,7 +156,6 @@ func EligibilityInfoFromDOJRow(row *data.DOJRow, history *data.DOJHistory, compa
 	if row.Felony {
 		level = "F"
 	}
-	eligibilityInfo.checkWeight(row.CodeSection, level, data.WeightsEntry{Weight: 0, Found: false})
 	eligibilityInfo.checkDOJHistory(row.CodeSection, level, history)
 	eligibilityInfo.computeFinalEligibility(row.CodeSection, prop64Matcher)
 	return eligibilityInfo

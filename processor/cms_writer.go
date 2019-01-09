@@ -6,39 +6,6 @@ import (
 	"os"
 )
 
-var cmsHeaders = []string{
-	"Court Number",
-	"Ind",
-	"Incident Number",
-	"Truename",
-	"Case Level",
-	"Case Dispo",
-	"Case Disposition Description ",
-	"Dispo Date",
-	"Action Number",
-	"1st Filed",
-	"Charge Level",
-	"Charge Date",
-	"Current Charge",
-	"Current Level",
-	"Current Charge Description",
-	"Chg Disp",
-	"Charge Disposition Description",
-	"Ch Dispo Date",
-	"Booked charge",
-	"Booked charge level",
-	"Booked charge date",
-	"Race",
-	"Sex",
-	"DOB",
-	"SFNO",
-	"CII",
-	"FBI",
-	"SSN",
-	"DL Number",
-	"EOR",
-}
-
 var dojHistoryHeaders = []string{
 	"PRI_NAME",
 	"PRI_DOB",
@@ -172,24 +139,6 @@ type csvWriter struct {
 	filename         string
 }
 
-func NewCMSWriter(outputFilePath string) CMSWriter {
-	outputFile, err := os.Create(outputFilePath)
-	if err != nil {
-		panic(err)
-	}
-
-	w := new(csvWriter)
-	w.outputFileWriter = csv.NewWriter(outputFile)
-	w.filename = outputFilePath
-
-	headers := append(cmsHeaders, dojHistoryHeaders...)
-	headers = append(headers, eligiblityHeaders...)
-
-	w.outputFileWriter.Write(headers)
-
-	return w
-}
-
 func NewDOJWriter(outputFilePath string) CMSWriter {
 	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
@@ -228,8 +177,6 @@ func (cw csvWriter) WriteEntry(entry data.CMSEntry, history *data.DOJHistory, in
 		info.PC290CodeSections,
 		info.PC290Registration,
 		info.TwoPriors,
-		info.Over1Lb,
-		info.QFinalSum,
 		info.AgeAtConviction,
 		info.YearsSinceEvent,
 		info.YearsSinceMostRecentConviction,
@@ -249,8 +196,6 @@ func (cw csvWriter) WriteDOJEntry(entry []string, info EligibilityInfo) {
 		info.PC290CodeSections,
 		info.PC290Registration,
 		info.TwoPriors,
-		info.Over1Lb,
-		info.QFinalSum,
 		info.AgeAtConviction,
 		info.YearsSinceEvent,
 		info.YearsSinceMostRecentConviction,

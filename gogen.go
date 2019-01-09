@@ -16,9 +16,7 @@ import (
 
 var opts struct {
 	OutputFolder      string `long:"outputs" description:"The folder in which to place result files" required:"true"`
-	ConvictionWeights string `long:"conviction-weights" description:"The file containing conviction weights from SFDA" required:"true"`
 	DOJFile           string `long:"input-doj" description:"The file containing criminal histories from CA DOJ" required:"true"`
-	CMSFile           string `long:"input-csv" description:"The file containing criminal histories from SF's cms" required:"true"`
 	Delimiter         string `long:"delimiter" short:"d" default:"," hidden:"true"`
 }
 
@@ -28,22 +26,8 @@ func main() {
 		panic(err)
 	}
 
-	cmsFile, err := os.Open(opts.CMSFile)
-	if err != nil {
-		panic(err)
-	}
-
-	cmsCSV := csv.NewReader(cmsFile)
 	delimiterRune, _ := utf8.DecodeRuneInString(opts.Delimiter)
 	fmt.Println(delimiterRune)
-	cmsCSV.Comma = delimiterRune
-
-	weightsFile, err := os.Open(opts.ConvictionWeights)
-	if err != nil {
-		panic(err)
-	}
-
-	weightsInformation, _ := NewWeightsInformation(csv.NewReader(weightsFile))
 
 	dojFile, err := os.Open(opts.DOJFile)
 	if err != nil {
@@ -52,10 +36,9 @@ func main() {
 
 	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
 
-	cmsWriter := NewCMSWriter(filepath.Join(opts.OutputFolder, "results.csv"))
 	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "unmatched_doj.csv"))
 
-	dataProcessor := NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter, dojWriter, time.Now())
+	dataProcessor := NewDataProcessor(dojInformation, dojWriter, time.Now())
 
 	dataProcessor.Process()
 }

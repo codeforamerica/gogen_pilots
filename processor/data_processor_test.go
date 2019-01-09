@@ -24,28 +24,8 @@ var _ = Describe("DataProcessor", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToWeights, err := path.Abs(path.Join("..", "test_fixtures", "conviction_weights.csv"))
-		Expect(err).ToNot(HaveOccurred())
-
 		pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "cadoj.csv"))
 		Expect(err).ToNot(HaveOccurred())
-
-		pathToCMS, err := path.Abs(path.Join("..", "test_fixtures", "felonies_sf.csv"))
-		Expect(err).ToNot(HaveOccurred())
-
-		cmsFile, err := os.Open(pathToCMS)
-		if err != nil {
-			panic(err)
-		}
-
-		cmsCSV := csv.NewReader(cmsFile)
-
-		weightsFile, err := os.Open(pathToWeights)
-		if err != nil {
-			panic(err)
-		}
-
-		weightsInformation, _ := data.NewWeightsInformation(csv.NewReader(weightsFile))
 
 		dojFile, err := os.Open(pathToDOJ)
 		if err != nil {
@@ -54,29 +34,16 @@ var _ = Describe("DataProcessor", func() {
 
 		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile))
 
-		cmsWriter := NewCMSWriter(path.Join(outputDir, "results.csv"))
 		dojWriter := NewDOJWriter(path.Join(outputDir, "unmatched_doj.csv"))
 
 		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-		dataProcessor = NewDataProcessor(cmsCSV, weightsInformation, dojInformation, cmsWriter, dojWriter, comparisonTime)
+		dataProcessor = NewDataProcessor(dojInformation, dojWriter, comparisonTime)
 	})
 
 	It("runs and has output", func() {
 		dataProcessor.Process()
 		format.TruncatedDiff = false
-
-		pathToExpectedResults, err := path.Abs(path.Join("..", "test_fixtures", "felonies_sf_results.csv"))
-		Expect(err).ToNot(HaveOccurred())
-		expectedResultsBody, err := ioutil.ReadFile(pathToExpectedResults)
-		Expect(err).ToNot(HaveOccurred())
-
-		pathToOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
-		Expect(err).ToNot(HaveOccurred())
-		outputBody, err := ioutil.ReadFile(pathToOutput)
-		Expect(err).ToNot(HaveOccurred())
-
-		Expect(string(outputBody)).To(Equal(string(expectedResultsBody)))
 
 		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "unmatched_doj.csv"))
 		Expect(err).ToNot(HaveOccurred())

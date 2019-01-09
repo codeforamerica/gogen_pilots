@@ -16,9 +16,7 @@ import (
 var _ = Describe("gogen", func() {
 	var (
 		outputDir     string
-		pathToWeights string
 		pathToDOJ     string
-		pathToCMS     string
 		err           error
 	)
 
@@ -26,13 +24,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToWeights, err = path.Abs(path.Join("test_fixtures", "conviction_weights.csv"))
-		Expect(err).ToNot(HaveOccurred())
-
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "cadoj.csv"))
-		Expect(err).ToNot(HaveOccurred())
-
-		pathToCMS, err = path.Abs(path.Join("test_fixtures", "felonies_sf.csv"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -41,17 +33,11 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		weightsFlag := fmt.Sprintf("--conviction-weights=%s", pathToWeights)
-		cmsFlag := fmt.Sprintf("--input-csv=%s", pathToCMS)
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
-		command := exec.Command(pathToGogen, outputsFlag, weightsFlag, dojFlag, cmsFlag)
+		command := exec.Command(pathToGogen, outputsFlag, dojFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
-		Eventually(session.Out).Should(gbytes.Say(`Found 9 convictions in CMS data \(8 felonies, 1 misdemeanors\)`))
 		Eventually(session.Out).Should(gbytes.Say(`Found 8 convictions in DOJ data \(8 felonies, 0 misdemeanors\)`))
-		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 9 convictions in CMS data`))
-		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 8 convictions in DOJ data`))
-		Eventually(session.Out).Should(gbytes.Say(`Failed to match 2 out of 7 unique subjects in DOJ data`))
 
 		Eventually(session).Should(gexec.Exit())
 	})
