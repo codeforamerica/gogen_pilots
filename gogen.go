@@ -36,7 +36,7 @@ func main() {
 
 	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
 
-	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "unmatched_doj.csv"))
+	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
 
 	dataProcessor := NewDataProcessor(dojInformation, dojWriter, time.Now())
 

@@ -34,7 +34,7 @@ var _ = Describe("DataProcessor", func() {
 
 		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile))
 
-		dojWriter := NewDOJWriter(path.Join(outputDir, "unmatched_doj.csv"))
+		dojWriter := NewDOJWriter(path.Join(outputDir, "doj_results.csv"))
 
 		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
@@ -45,12 +45,12 @@ var _ = Describe("DataProcessor", func() {
 		dataProcessor.Process()
 		format.TruncatedDiff = false
 
-		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "unmatched_doj.csv"))
+		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_results.csv"))
 		Expect(err).ToNot(HaveOccurred())
 		outputDOJBody, err := ioutil.ReadFile(pathToDOJOutput)
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "unmatched_doj.csv"))
+		pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "doj_results.csv"))
 		Expect(err).ToNot(HaveOccurred())
 		expectedDOJResultsBody, err := ioutil.ReadFile(pathToExpectedDOJResults)
 		Expect(err).ToNot(HaveOccurred())
