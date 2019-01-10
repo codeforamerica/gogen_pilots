@@ -32,13 +32,13 @@ var _ = Describe("DataProcessor", func() {
 			panic(err)
 		}
 
-		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile))
+		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+
+		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime)
 
 		dojWriter := NewDOJWriter(path.Join(outputDir, "doj_results.csv"))
 
-		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-		dataProcessor = NewDataProcessor(dojInformation, dojWriter, comparisonTime)
+		dataProcessor = NewDataProcessor(dojInformation, dojWriter)
 	})
 
 	It("runs and has output", func() {

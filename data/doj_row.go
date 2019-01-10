@@ -26,9 +26,10 @@ type DOJRow struct {
 	RawRow            []string
 	CourtNoParts      []string
 	CountOrder        string
+	Index             int
 }
 
-func NewDOJRow(rawRow []string) DOJRow {
+func NewDOJRow(rawRow []string, index int) DOJRow {
 	const dateFormat = "20060102"
 	return DOJRow{
 		Name:              rawRow[PRI_NAME],
@@ -48,6 +49,7 @@ func NewDOJRow(rawRow []string) DOJRow {
 		County:            rawRow[STP_ORI_CNTY_NAME],
 		Felony:            rawRow[CONV_STAT_DESCR] == "FELONY",
 		CountOrder:        rawRow[CNT_ORDER],
+		Index:             index,
 	}
 }
 

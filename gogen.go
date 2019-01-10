@@ -34,11 +34,11 @@ func main() {
 		panic(err)
 	}
 
-	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile))
+	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile), time.Now())
 
 	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
 
-	dataProcessor := NewDataProcessor(dojInformation, dojWriter, time.Now())
+	dataProcessor := NewDataProcessor(dojInformation, dojWriter)
 
 	dataProcessor.Process()
 }

@@ -1,4 +1,4 @@
-package processor_test
+package data_test
 
 import (
 	. "github.com/onsi/ginkgo"

@@ -1,7 +1,6 @@
 package data
 
 import (
-	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -44,40 +43,6 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 	}
 }
 
-func (history *DOJHistory) OnlyProp64MisdemeanorsSince(start time.Time) bool {
-	foundConvictions := 0
-	for _, row := range history.Convictions {
-		if row.CycleDate.Before(start) {
-			continue
-		}
-
-		foundConvictions++
-
-		matcher := regexp.MustCompile(`(11357|11358|11359|11360).*`)
-		if !matcher.Match([]byte(row.CodeSection)) || row.Felony {
-			return false
-		}
-	}
-	return foundConvictions > 0
-}
-
-func (history *DOJHistory) OnlyProp64FeloniesSince(start time.Time) bool {
-	foundConvictions := 0
-	for _, row := range history.Convictions {
-		if row.CycleDate.Before(start) || !row.Felony {
-			continue
-		}
-
-		foundConvictions++
-
-		matcher := regexp.MustCompile(`(11357|11358|11359|11360).*`)
-		if !matcher.Match([]byte(row.CodeSection)) {
-			return false
-		}
-	}
-	return foundConvictions > 0
-}
-
 func (history *DOJHistory) MostRecentConvictionDate() time.Time {
 	if len(history.Convictions) == 0 {
 		return time.Time{}
@@ -87,4 +52,22 @@ func (history *DOJHistory) MostRecentConvictionDate() time.Time {
 		return convictions[i].DispositionDate.Before(convictions[j].DispositionDate)
 	})
 	return convictions[len(convictions)-1].DispositionDate
+}
+
+func (history *DOJHistory) NumberOfProp64Convictions() int {
+	result := 0
+	for _, row := range history.Convictions {
+		if IsProp64Charge(row.CodeSection) {
+			result++
+		}
+	}
+	return result
+}
+
+func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time) {
+	for _, row := range history.Convictions {
+		if IsProp64Charge(row.CodeSection) {
+			infos[row.Index] = NewEligibilityInfo(row, history, comparisonTime)
+		}
+	}
 }

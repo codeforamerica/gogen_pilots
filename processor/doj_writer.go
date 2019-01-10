@@ -2,7 +2,10 @@ package processor
 
 import (
 	"encoding/csv"
+	"fmt"
+	"gogen/data"
 	"os"
+	"time"
 )
 
 var eligiblityHeaders = []string{
@@ -113,7 +116,7 @@ var dojFullHeaders = []string{
 }
 
 type DOJWriter interface {
-	WriteDOJEntry([]string, EligibilityInfo)
+	WriteDOJEntry([]string, *data.EligibilityInfo)
 	Flush()
 }
 
@@ -142,23 +145,36 @@ func NewDOJWriter(outputFilePath string) DOJWriter {
 	return w
 }
 
-func (cw csvWriter) WriteDOJEntry(entry []string, info EligibilityInfo) {
-	eligibilityCols := []string{
-		info.Superstrikes,
-		info.SuperstrikeCodeSections,
-		info.PC290Charges,
-		info.PC290CodeSections,
-		info.PC290Registration,
-		info.TwoPriors,
-		info.AgeAtConviction,
-		info.YearsSinceEvent,
-		info.YearsSinceMostRecentConviction,
-		info.FinalRecommendation,
+func (cw csvWriter) WriteDOJEntry(entry []string, info *data.EligibilityInfo) {
+	var eligibilityCols []string
+
+	if info != nil {
+		eligibilityCols = []string{
+			writeInt(info.NumberOfConvictionsOnRecord),
+			writeDate(info.DateOfConviction),
+			writeFloat(info.YearsSinceThisConviction),
+			writeFloat(info.YearsSinceMostRecentConviction),
+			writeInt(info.NumberOfProp64Convictions),
+		}
+	} else {
+		eligibilityCols = make([]string, len(eligiblityHeaders))
 	}
 
 	_ = cw.outputFileWriter.Write(append(entry, eligibilityCols...))
 }
 
+func writeDate(val time.Time) string {
+	return val.Format("01/02/2006")
+}
+
 func (cw csvWriter) Flush() {
 	cw.outputFileWriter.Flush()
+}
+
+func writeFloat(val float64) string {
+	return fmt.Sprintf("%.1f", val)
+}
+
+func writeInt(val int) string {
+	return fmt.Sprintf("%d", val)
 }
