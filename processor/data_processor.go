@@ -10,13 +10,13 @@ import (
 )
 
 type DataProcessor struct {
-	dojInformation     *data.DOJInformation
-	outputDOJWriter    CMSWriter
-	prop64Matcher      *regexp.Regexp
-	stats              dataProcessorStats
-	clearanceStats     clearanceStats
-	convictionStats    convictionStats
-	comparisonTime     time.Time
+	dojInformation  *data.DOJInformation
+	outputDOJWriter DOJWriter
+	prop64Matcher   *regexp.Regexp
+	stats           dataProcessorStats
+	clearanceStats  clearanceStats
+	convictionStats convictionStats
+	comparisonTime  time.Time
 }
 
 type clearanceStats struct {
@@ -50,14 +50,14 @@ type dataProcessorStats struct {
 
 func NewDataProcessor(
 	dojInformation *data.DOJInformation,
-	outputDOJWriter CMSWriter,
+	outputDOJWriter DOJWriter,
 	comparisonTime time.Time,
 ) DataProcessor {
 	return DataProcessor{
-		dojInformation:     dojInformation,
-		outputDOJWriter:    outputDOJWriter,
-		comparisonTime:     comparisonTime,
-		prop64Matcher:      regexp.MustCompile(`(11357|11358|11359|11360).*`),
+		dojInformation:  dojInformation,
+		outputDOJWriter: outputDOJWriter,
+		comparisonTime:  comparisonTime,
+		prop64Matcher:   regexp.MustCompile(`(11357|11358|11359|11360).*`),
 		convictionStats: convictionStats{
 			numDOJConvictions:           make(map[string]int),
 			DOJEligibilityByCodeSection: make(map[string]map[string]int),

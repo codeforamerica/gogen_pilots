@@ -2,17 +2,8 @@ package processor
 
 import (
 	"encoding/csv"
-	"gogen/data"
 	"os"
 )
-
-var dojHistoryHeaders = []string{
-	"PRI_NAME",
-	"PRI_DOB",
-	"SUBJECT_ID",
-	"CII_NUMBER",
-	"PRI_SSN",
-}
 
 var eligiblityHeaders = []string{
 	"# of convictions on record",
@@ -121,8 +112,7 @@ var dojFullHeaders = []string{
 	"",
 }
 
-type CMSWriter interface {
-	WriteEntry(data.CMSEntry, *data.DOJHistory, EligibilityInfo)
+type DOJWriter interface {
 	WriteDOJEntry([]string, EligibilityInfo)
 	Flush()
 }
@@ -132,7 +122,7 @@ type csvWriter struct {
 	filename         string
 }
 
-func NewDOJWriter(outputFilePath string) CMSWriter {
+func NewDOJWriter(outputFilePath string) DOJWriter {
 	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
 		panic(err)
@@ -144,41 +134,12 @@ func NewDOJWriter(outputFilePath string) CMSWriter {
 
 	headers := append(dojFullHeaders, eligiblityHeaders...)
 
-	w.outputFileWriter.Write(headers)
+	err = w.outputFileWriter.Write(headers)
+	if err != nil {
+		panic(err)
+	}
 
 	return w
-}
-
-func (cw csvWriter) WriteEntry(entry data.CMSEntry, history *data.DOJHistory, info EligibilityInfo) {
-	var historyCols []string
-	if history == nil {
-		historyCols = []string{"no match", "no match", "no match", "no match", "no match"}
-	} else {
-		historyCols = []string{
-			history.Name,
-			history.DOB.Format("2006-01-02"),
-			history.SubjectID,
-			history.OriginalCII,
-			history.SSN,
-		}
-	}
-
-	eligibilityCols := []string{
-		info.Superstrikes,
-		info.SuperstrikeCodeSections,
-		info.PC290Charges,
-		info.PC290CodeSections,
-		info.PC290Registration,
-		info.TwoPriors,
-		info.AgeAtConviction,
-		info.YearsSinceEvent,
-		info.YearsSinceMostRecentConviction,
-		info.FinalRecommendation,
-	}
-
-	extraCols := append(historyCols, eligibilityCols...)
-
-	_ = cw.outputFileWriter.Write(append(entry.RawRow, extraCols...))
 }
 
 func (cw csvWriter) WriteDOJEntry(entry []string, info EligibilityInfo) {

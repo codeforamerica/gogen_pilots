@@ -15,9 +15,9 @@ import (
 
 var _ = Describe("gogen", func() {
 	var (
-		outputDir     string
-		pathToDOJ     string
-		err           error
+		outputDir string
+		pathToDOJ string
+		err       error
 	)
 
 	BeforeEach(func() {

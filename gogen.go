@@ -15,9 +15,9 @@ import (
 )
 
 var opts struct {
-	OutputFolder      string `long:"outputs" description:"The folder in which to place result files" required:"true"`
-	DOJFile           string `long:"input-doj" description:"The file containing criminal histories from CA DOJ" required:"true"`
-	Delimiter         string `long:"delimiter" short:"d" default:"," hidden:"true"`
+	OutputFolder string `long:"outputs" description:"The folder in which to place result files" required:"true"`
+	DOJFile      string `long:"input-doj" description:"The file containing criminal histories from CA DOJ" required:"true"`
+	Delimiter    string `long:"delimiter" short:"d" default:"," hidden:"true"`
 }
 
 func main() {

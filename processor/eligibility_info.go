@@ -71,30 +71,6 @@ func (info *EligibilityInfo) checkDOJHistory(charge string, level string, histor
 	} else {
 		info.PC290Registration = eligible
 	}
-
-	pc290 := history.PC290CodeSections()
-	if len(pc290) > 0 {
-		info.PC290Charges = ineligible
-		info.PC290CodeSections = strings.Join(pc290, "; ")
-	} else {
-		info.PC290Charges = eligible
-		info.PC290CodeSections = "-"
-	}
-
-	superstrikes := history.SuperstrikesCodeSections()
-	if len(superstrikes) > 0 {
-		info.Superstrikes = ineligible
-		info.SuperstrikeCodeSections = strings.Join(superstrikes, "; ")
-	} else {
-		info.Superstrikes = eligible
-		info.SuperstrikeCodeSections = "-"
-	}
-
-	if history.ThreeConvictionsSameCode(charge) {
-		info.TwoPriors = ineligible
-	} else {
-		info.TwoPriors = eligible
-	}
 }
 
 func (info *EligibilityInfo) yearsSinceEvent(date time.Time) string {
