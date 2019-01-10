@@ -15,18 +15,11 @@ var dojHistoryHeaders = []string{
 }
 
 var eligiblityHeaders = []string{
-	"Superstrikes",
-	"Superstrike Code Section(s)",
-	"PC290 Charges",
-	"PC290 Code Section(s)",
-	"PC290 Registration",
-	"Two Priors",
-	"Over 1lb",
-	"Q_final_sum",
-	"Age at Conviction",
-	"Years Since Event",
-	"Years Since Most Recent Conviction",
-	"Final Recommendation",
+	"# of convictions on record",
+	"Date of Conviction",
+	"Years Since This Conviction",
+	"Years Since Any Conviction",
+	"# of Prop 64 convictions",
 }
 
 var dojFullHeaders = []string{
