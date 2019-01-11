@@ -31,6 +31,7 @@ type DOJRow struct {
 
 func NewDOJRow(rawRow []string, index int) DOJRow {
 	const dateFormat = "20060102"
+
 	return DOJRow{
 		Name:              rawRow[PRI_NAME],
 		WeakName:          strings.Split(rawRow[PRI_NAME], " ")[0],

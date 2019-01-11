@@ -27,7 +27,6 @@ func main() {
 	}
 
 	delimiterRune, _ := utf8.DecodeRuneInString(opts.Delimiter)
-	fmt.Println(delimiterRune)
 
 	dojFile, err := os.Open(opts.DOJFile)
 	if err != nil {
