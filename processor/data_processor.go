@@ -66,6 +66,7 @@ func (d DataProcessor) Process() {
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
 	}
+	d.outputDOJWriter.Flush()
 }
 
 //func (d DataProcessor) ProcessOld() {

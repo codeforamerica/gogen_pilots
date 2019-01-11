@@ -1,7 +1,7 @@
 package data
 
 import (
-	"sort"
+	"fmt"
 	"strings"
 	"time"
 )
@@ -33,7 +33,20 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.seenConvictions = make(map[string]bool)
 	}
 
+	if row.Index == 13 {
+		fmt.Printf("Pushing Row 13\n")
+		fmt.Println(row.Convicted)
+		fmt.Println(row.CountOrder)
+	}
+
+	if row.Index == 10 {
+		fmt.Println("PRINTING 10")
+	}
+
 	if row.Convicted && !history.seenConvictions[row.CountOrder] {
+		if row.Index == 13 {
+			fmt.Printf("Adding row 13 to convictions\n")
+		}
 		history.Convictions = append(history.Convictions, &row)
 		history.seenConvictions[row.CountOrder] = true
 	}
@@ -44,14 +57,16 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 }
 
 func (history *DOJHistory) MostRecentConvictionDate() time.Time {
-	if len(history.Convictions) == 0 {
-		return time.Time{}
+
+	var latestDate time.Time
+
+	for _, conviction := range history.Convictions {
+		if conviction.DispositionDate.After(latestDate) {
+			latestDate = conviction.DispositionDate
+		}
 	}
-	convictions := history.Convictions
-	sort.Slice(convictions, func(i, j int) bool {
-		return convictions[i].DispositionDate.Before(convictions[j].DispositionDate)
-	})
-	return convictions[len(convictions)-1].DispositionDate
+
+	return latestDate
 }
 
 func (history *DOJHistory) NumberOfProp64Convictions() int {
@@ -66,7 +81,17 @@ func (history *DOJHistory) NumberOfProp64Convictions() int {
 
 func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time) {
 	for _, row := range history.Convictions {
-		if IsProp64Charge(row.CodeSection) {
+		fmt.Printf("subject: %s, index %d\n", row.SubjectID, row.Index)
+		if row.Index == 13 {
+
+			fmt.Printf("Checking code section `%s` and county `%s`\n", row.CodeSection, row.County)
+			fmt.Printf("isProp64Charge = %b\n", IsProp64Charge(row.CodeSection))
+		}
+
+		if IsProp64Charge(row.CodeSection) && row.County == "SAN FRANCISCO" {
+			if row.Index == 13 {
+				fmt.Printf("Creating new Eligiblity\n")
+			}
 			infos[row.Index] = NewEligibilityInfo(row, history, comparisonTime)
 		}
 	}

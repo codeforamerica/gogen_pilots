@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -31,6 +32,11 @@ type DOJRow struct {
 
 func NewDOJRow(rawRow []string, index int) DOJRow {
 	const dateFormat = "20060102"
+
+	if index == 13 {
+		fmt.Println(rawRow[CNT_ORDER])
+		fmt.Println(rawRow[DISP_DESCR])
+	}
 	return DOJRow{
 		Name:              rawRow[PRI_NAME],
 		WeakName:          strings.Split(rawRow[PRI_NAME], " ")[0],
