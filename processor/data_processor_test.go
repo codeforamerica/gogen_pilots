@@ -47,14 +47,18 @@ var _ = Describe("DataProcessor", func() {
 
 		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_results.csv"))
 		Expect(err).ToNot(HaveOccurred())
-		outputDOJBody, err := ioutil.ReadFile(pathToDOJOutput)
+		OutputDOJFile, err := os.Open(pathToDOJOutput)
+		Expect(err).ToNot(HaveOccurred())
+		outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "doj_results.csv"))
 		Expect(err).ToNot(HaveOccurred())
-		expectedDOJResultsBody, err := ioutil.ReadFile(pathToExpectedDOJResults)
+		ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
+		Expect(err).ToNot(HaveOccurred())
+		expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(string(outputDOJBody)).To(Equal(string(expectedDOJResultsBody)))
+		Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
 	})
 })
