@@ -44,7 +44,6 @@ var _ = Describe("DOJHistory", func() {
 			Expect(history.SSN).To(Equal("345678125"))
 			Expect(history.DOB).To(Equal(birthDate))
 			Expect(history.CDL).To(Equal("testcdl"))
-			Expect(history.PC290Registration).To(BeTrue())
 			Expect(history.Convictions).To(ConsistOf(&conviction1, &conviction2, &conviction3, &conviction4, &conviction5))
 		})
 	})

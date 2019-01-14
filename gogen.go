@@ -2,14 +2,11 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	. "gogen/data"
 	. "gogen/processor"
+	"os"
 	"path/filepath"
 	"time"
-	"unicode/utf8"
-
-	"os"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -25,8 +22,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	delimiterRune, _ := utf8.DecodeRuneInString(opts.Delimiter)
 
 	dojFile, err := os.Open(opts.DOJFile)
 	if err != nil {

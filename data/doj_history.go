@@ -6,17 +6,16 @@ import (
 )
 
 type DOJHistory struct {
-	SubjectID         string
-	Name              string
-	WeakName          string
-	CII               string
-	DOB               time.Time
-	SSN               string
-	CDL               string
-	PC290Registration bool
-	Convictions       []*DOJRow
-	seenConvictions   map[string]bool
-	OriginalCII       string
+	SubjectID       string
+	Name            string
+	WeakName        string
+	CII             string
+	DOB             time.Time
+	SSN             string
+	CDL             string
+	Convictions     []*DOJRow
+	seenConvictions map[string]bool
+	OriginalCII     string
 }
 
 func (history *DOJHistory) PushRow(row DOJRow) {
@@ -35,10 +34,6 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 	if row.Convicted && !history.seenConvictions[row.CountOrder] {
 		history.Convictions = append(history.Convictions, &row)
 		history.seenConvictions[row.CountOrder] = true
-	}
-
-	if row.PC290Registration {
-		history.PC290Registration = true
 	}
 }
 
