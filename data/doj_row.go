@@ -2,6 +2,7 @@ package data
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -27,10 +28,12 @@ type DOJRow struct {
 	CourtNoParts      []string
 	CountOrder        string
 	Index             int
+	SentenceEndDate   time.Time
 }
 
+const dateFormat = "20060102"
+
 func NewDOJRow(rawRow []string, index int) DOJRow {
-	const dateFormat = "20060102"
 
 	return DOJRow{
 		Name:              rawRow[PRI_NAME],
@@ -51,7 +54,22 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 		Felony:            rawRow[CONV_STAT_DESCR] == "FELONY",
 		CountOrder:        rawRow[CNT_ORDER],
 		Index:             index,
+		SentenceEndDate:   getSentenceEndDate(rawRow),
 	}
+}
+
+func getSentenceEndDate(rawRow []string) time.Time {
+	dispDate := parseDate(dateFormat, rawRow[STP_EVENT_DATE])
+	sentenceLength, _ := strconv.Atoi(rawRow[SENT_LENGTH] )
+	switch rawRow[SENT_TIME_CODE] {
+	case "D":
+		return dispDate.AddDate(0, 0, sentenceLength)
+	case "M":
+		return dispDate.AddDate(0, sentenceLength, 0)
+	case "Y":
+		return dispDate.AddDate(sentenceLength, 0, 0)
+	}
+	return dispDate
 }
 
 func findCodeSection(rawRow []string) string {

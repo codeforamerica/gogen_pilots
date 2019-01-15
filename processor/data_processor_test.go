@@ -59,6 +59,13 @@ var _ = Describe("DataProcessor", func() {
 		expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 		Expect(err).ToNot(HaveOccurred())
 
-		Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+		for i, row := range outputDOJCSV {
+			//for j, item := range row {
+			//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
+			//}
+			Expect(row).To(Equal(expectedDOJResultsCSV[i]))
+		}
+
+		//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
 	})
 })

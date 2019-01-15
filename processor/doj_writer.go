@@ -14,6 +14,8 @@ var eligiblityHeaders = []string{
 	"Years Since This Conviction",
 	"Years Since Any Conviction",
 	"# of Prop 64 convictions",
+	"Eligibility Determination",
+	"Eligibility Reason",
 }
 
 var dojFullHeaders = []string{
@@ -155,6 +157,8 @@ func (cw csvWriter) WriteDOJEntry(entry []string, info *data.EligibilityInfo) {
 			writeFloat(info.YearsSinceThisConviction),
 			writeFloat(info.YearsSinceMostRecentConviction),
 			writeInt(info.NumberOfProp64Convictions),
+			info.EligibilityDetermination,
+			info.EligibilityReason,
 		}
 	} else {
 		eligibilityCols = make([]string, len(eligiblityHeaders))
