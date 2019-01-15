@@ -10,6 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
+	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("gogen", func() {
@@ -33,11 +34,13 @@ var _ = Describe("gogen", func() {
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag)
+		countyFlag := fmt.Sprintf("--county=%s", "SAN FRANCISCO")
+		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		//Eventually(session.Out).Should(gbytes.Say(`Found 8 convictions in DOJ data \(8 felonies, 0 misdemeanors\)`))
 
 		Eventually(session).Should(gexec.Exit())
+		Expect(session.Err).ToNot(gbytes.Say("required"))
 	})
 })

@@ -34,7 +34,7 @@ var _ = Describe("DataProcessor", func() {
 
 		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime)
+		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SAN FRANCISCO")
 
 		dojWriter := NewDOJWriter(path.Join(outputDir, "doj_results.csv"))
 

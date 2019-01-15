@@ -60,9 +60,9 @@ func (history *DOJHistory) NumberOfProp64Convictions() int {
 	return result
 }
 
-func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time) {
+func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time, county string) {
 	for _, row := range history.Convictions {
-		if IsProp64Charge(row.CodeSection) && row.County == "SAN FRANCISCO" {
+		if IsProp64Charge(row.CodeSection) && row.County == county {
 			infos[row.Index] = NewEligibilityInfo(row, history, comparisonTime)
 		}
 	}

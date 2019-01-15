@@ -38,13 +38,13 @@ func (i *DOJInformation) generateHistories() {
 	fmt.Println("\nComplete...")
 }
 
-func (i *DOJInformation) determineEligibility() {
+func (i *DOJInformation) determineEligibility(county string) {
 	for _, history := range i.Histories {
-		history.computeEligibilities(i.Eligibilities, i.comparisonTime)
+		history.computeEligibilities(i.Eligibilities, i.comparisonTime, county)
 	}
 }
 
-func NewDOJInformation(sourceCSV *csv.Reader, comparisonTime time.Time) (*DOJInformation, error) {
+func NewDOJInformation(sourceCSV *csv.Reader, comparisonTime time.Time, county string) (*DOJInformation, error) {
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
 		panic(err)
@@ -58,6 +58,6 @@ func NewDOJInformation(sourceCSV *csv.Reader, comparisonTime time.Time) (*DOJInf
 	}
 
 	info.generateHistories()
-	info.determineEligibility()
+	info.determineEligibility(county)
 	return &info, nil
 }
