@@ -12,8 +12,8 @@ type EligibilityInfo struct {
 	YearsSinceMostRecentConviction float64
 	NumberOfProp64Convictions      int
 	comparisonTime                 time.Time
-	EligibilityDetermination string
-	EligibilityReason string
+	EligibilityDetermination       string
+	EligibilityReason              string
 }
 
 func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Time) *EligibilityInfo {
@@ -68,7 +68,7 @@ func (info *EligibilityInfo) NotEligible(reason string) {
 }
 
 func (info *EligibilityInfo) ConvictionBeforeNovNine2016(row *DOJRow) {
-	if info.DateOfConviction.Before(time.Date(2016,11,9,0,0,0,0,time.UTC)) {
+	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
 		info.ConvictionIsNotFelony(row)
 	} else {
 		info.NotEligible("Occurred after 11/09/2016")

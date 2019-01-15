@@ -60,7 +60,7 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 
 func getSentenceEndDate(rawRow []string) time.Time {
 	dispDate := parseDate(dateFormat, rawRow[STP_EVENT_DATE])
-	sentenceLength, _ := strconv.Atoi(rawRow[SENT_LENGTH] )
+	sentenceLength, _ := strconv.Atoi(rawRow[SENT_LENGTH])
 	switch rawRow[SENT_TIME_CODE] {
 	case "D":
 		return dispDate.AddDate(0, 0, sentenceLength)
