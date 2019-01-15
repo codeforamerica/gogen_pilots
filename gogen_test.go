@@ -39,6 +39,9 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 		//Eventually(session.Out).Should(gbytes.Say(`Found 8 convictions in DOJ data \(8 felonies, 0 misdemeanors\)`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 24 Total Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 22 SAN FRANCISCO County Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 14 SAN FRANCISCO County Prop64 Convictions in DOJ file`))
 
 		Eventually(session).Should(gexec.Exit())
 		Expect(session.Err).ToNot(gbytes.Say("required"))
