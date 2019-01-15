@@ -17,9 +17,9 @@ type DataProcessor struct {
 
 type clearanceStats struct {
 	numberFullyClearedRecords                 int
-	numberDismissedCounts int
-	numberReducedCounts int
-	numberIneligibleCounts int
+	numberDismissedCounts                     int
+	numberReducedCounts                       int
+	numberIneligibleCounts                    int
 	numberClearedRecordsLast7Years            int
 	numberHistoriesWithConvictionInLast7Years int
 	numberRecordsNoFelonies                   int
@@ -27,18 +27,18 @@ type clearanceStats struct {
 }
 
 type convictionStats struct {
-	totalConvictions int
-	totalCountyConvictions int
-	totalProp64Convictions int
+	totalConvictions            int
+	totalCountyConvictions      int
+	totalProp64Convictions      int
 	numDOJConvictions           map[string]int
 	DOJEligibilityByCodeSection map[string]map[string]int
 }
 
 type dataProcessorStats struct {
-	nDOJProp64Convictions    int
-	nDOJSubjects             int
-	nDOJFelonies             int
-	nDOJMisdemeanors         int
+	nDOJProp64Convictions int
+	nDOJSubjects          int
+	nDOJFelonies          int
+	nDOJMisdemeanors      int
 }
 
 func NewDataProcessor(
@@ -68,24 +68,22 @@ func (d *DataProcessor) Process(county string) {
 
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
-
-		//fmt.Printf("doj info elig determination %s", d.dojInformation.Eligibilities[i].EligibilityDetermination)
-		if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Eligible for Dismissal" {
-			fmt.Printf("in eligible for dismissal\n")
-			d.clearanceStats.numberDismissedCounts ++
+		val, ok := d.dojInformation.Eligibilities[i]
+		if ok {
+			if val.EligibilityDetermination == "Eligible for Dismissal" {
+				d.clearanceStats.numberDismissedCounts ++
+			}
+			if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Eligible for Reduction" {
+				d.clearanceStats.numberReducedCounts ++
+			}
+			if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Not Eligible" {
+				d.clearanceStats.numberIneligibleCounts ++
+			}
 		}
-		//if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Eligible for Reduction" {
-		//	d.clearanceStats.numberReducedCounts ++
-		//}
-		//if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Not Eligible" {
-		//	d.clearanceStats.numberIneligibleCounts ++
-		//}
 	}
 	d.outputDOJWriter.Flush()
 
-	fmt.Printf("outside of second loop\n", d.clearanceStats.numberDismissedCounts)
 	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedCounts)
-	//fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are eligible for reduction in DOJ file\n", d.convictionStats.totalProp64Convictions)
-	//fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are not eligible in DOJ file\n", d.convictionStats.totalProp64Convictions)
+	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedCounts)
+	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are not eligible in DOJ file\n", d.clearanceStats.numberIneligibleCounts)
 }
-
