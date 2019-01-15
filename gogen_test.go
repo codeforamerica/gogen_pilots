@@ -40,8 +40,25 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 		//Eventually(session.Out).Should(gbytes.Say(`Found 8 convictions in DOJ data \(8 felonies, 0 misdemeanors\)`))
 		Eventually(session.Out).Should(gbytes.Say(`Found 24 Total Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 22 SAN FRANCISCO County Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 14 SAN FRANCISCO County Prop64 Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 21 SAN FRANCISCO County Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 18 SAN FRANCISCO County Prop64 Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 7 SAN FRANCISCO County Prop64 Convictions that are eligible for dismissal in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 7 SAN FRANCISCO County Prop64 Convictions that are eligible for reduction in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions that are not eligible in DOJ file`))
+
+		//Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions eligible for dismissal in DOJ file because of Misdemeanor or Infraction `))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions eligible for dismissal in DOJ file because of HS 11357(b) `))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 3 SAN FRANCISCO County Prop64 Convictions eligible for dismissal in DOJ file because final conviction older than 10 years`))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 5 SAN FRANCISCO County Prop64 Convictions eligible for reduction in DOJ file because there are later convictions`))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions eligible for reduction in DOJ file because they did not complete their sentence`))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions eligible for dismissal in DOJ file because they completed their sentence`))
+		//Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions not eligible because after 11/9/16 `))
+
+		//Eventually(session.Out).Should(gbytes.Say(`Found 1 SAN FRANCISCO County Prop64 Convictions that need sentence data checked`))
+
+		//Eventually(session.Out).Should(gbytes.Say(`2 individuals will no longer have a felony on their record`))
+		//Eventually(session.Out).Should(gbytes.Say(`1 individual will no longer have any convictions on their record`))
+		//Eventually(session.Out).Should(gbytes.Say(`6 individuals will no longer have any convictions on their record in the last 7 years`))
 
 		Eventually(session).Should(gexec.Exit())
 		Expect(session.Err).ToNot(gbytes.Say("required"))

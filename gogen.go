@@ -35,5 +35,5 @@ func main() {
 
 	dataProcessor := NewDataProcessor(dojInformation, dojWriter)
 
-	dataProcessor.Process()
+	dataProcessor.Process(opts.County)
 }
