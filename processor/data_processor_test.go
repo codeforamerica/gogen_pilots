@@ -42,7 +42,7 @@ var _ = Describe("DataProcessor", func() {
 	})
 
 	It("runs and has output", func() {
-		dataProcessor.Process()
+		dataProcessor.Process("SAN FRANCISCO")
 		format.TruncatedDiff = false
 
 		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_results.csv"))
@@ -60,6 +60,7 @@ var _ = Describe("DataProcessor", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		for i, row := range outputDOJCSV {
+			//fmt.Printf("output file %#v", outputDOJCSV)
 			//for j, item := range row {
 			//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
 			//}

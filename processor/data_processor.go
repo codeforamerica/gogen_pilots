@@ -66,17 +66,21 @@ func (d *DataProcessor) Process(county string) {
 	fmt.Printf("Found %d SAN FRANCISCO County Convictions in DOJ file\n", d.convictionStats.totalCountyConvictions)
 	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions in DOJ file\n", d.convictionStats.totalProp64Convictions)
 
+	//for _, value := range d.dojInformation.Eligibilities{
+	//	fmt.Printf("eligibilities map %#v \n", value.EligibilityDetermination)
+	//}
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
 		val, ok := d.dojInformation.Eligibilities[i]
 		if ok {
-			if val.EligibilityDetermination == "Eligible for Dismissal" {
+			switch val.EligibilityDetermination {
+			case "Eligible for Dismissal":
 				d.clearanceStats.numberDismissedCounts ++
-			}
-			if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Eligible for Reduction" {
+
+			case "Eligible for Reduction":
 				d.clearanceStats.numberReducedCounts ++
-			}
-			if d.dojInformation.Eligibilities[i].EligibilityDetermination == "Not Eligible" {
+
+			case "Not eligible":
 				d.clearanceStats.numberIneligibleCounts ++
 			}
 		}

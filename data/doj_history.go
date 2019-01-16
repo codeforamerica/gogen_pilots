@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -54,6 +55,9 @@ func (history *DOJHistory) NumberOfProp64Convictions() int {
 	result := 0
 	for _, row := range history.Convictions {
 		if IsProp64Charge(row.CodeSection) {
+			if row.WeakName == "SKYWALKER,LUKE"{
+				fmt.Printf("history convictions %#v \n", row)
+			}
 			result++
 		}
 	}

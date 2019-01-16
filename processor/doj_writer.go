@@ -114,7 +114,6 @@ var dojFullHeaders = []string{
 	"CII_TYPE_ALPHA",
 	"COMMENT_TEXT",
 	"END_OF_REC",
-	"",
 }
 
 type DOJWriter interface {
