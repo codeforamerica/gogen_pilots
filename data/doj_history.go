@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"strings"
 	"time"
 )
@@ -17,6 +16,7 @@ type DOJHistory struct {
 	Convictions     []*DOJRow
 	seenConvictions map[string]bool
 	OriginalCII     string
+
 }
 
 func (history *DOJHistory) PushRow(row DOJRow) {
@@ -55,9 +55,6 @@ func (history *DOJHistory) NumberOfProp64Convictions() int {
 	result := 0
 	for _, row := range history.Convictions {
 		if IsProp64Charge(row.CodeSection) {
-			if row.WeakName == "SKYWALKER,LUKE"{
-				fmt.Printf("history convictions %#v \n", row)
-			}
 			result++
 		}
 	}
@@ -71,6 +68,16 @@ func (history *DOJHistory) NumberOfConvictionsInCounty(county string) int {
 		}
 	}
 	return result
+}
+
+func (history *DOJHistory) NumberOfFelonies() int {
+	felonies := 0
+	for _, row := range history.Convictions {
+		if row.Felony {
+			felonies ++
+		}
+	}
+	return felonies
 }
 
 func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time, county string) {

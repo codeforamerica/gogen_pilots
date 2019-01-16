@@ -20,6 +20,15 @@ type clearanceStats struct {
 	numberDismissedCounts                     int
 	numberReducedCounts                       int
 	numberIneligibleCounts                    int
+	numberDismissedMisdemeanor                int
+	numberDismissed11357b                     int
+	numberDismissedOlderThan10Years           int
+	numberReducedLaterConvictions             int
+	numberReducedIncompleteSentence           int
+	numberDismissedCompletedSentence          int
+	numberNotEligibleNovNine16                 int
+	numberNoLongerHaveFelony                  int
+	numberCheckSentencingData                 int
 	numberClearedRecordsLast7Years            int
 	numberHistoriesWithConvictionInLast7Years int
 	numberRecordsNoFelonies                   int
@@ -70,24 +79,78 @@ func (d *DataProcessor) Process(county string) {
 	//	fmt.Printf("eligibilities map %#v \n", value.EligibilityDetermination)
 	//}
 	for i, row := range d.dojInformation.Rows {
-		d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
-		val, ok := d.dojInformation.Eligibilities[i]
-		if ok {
-			switch val.EligibilityDetermination {
-			case "Eligible for Dismissal":
-				d.clearanceStats.numberDismissedCounts ++
+		//for _, history := range d.dojInformation.Histories {
+			numberDimissedFelonies := 0
+			numberDimissedMisdemeanors := 0
+			numberReducedFelonies := 0
 
-			case "Eligible for Reduction":
-				d.clearanceStats.numberReducedCounts ++
+			d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
 
-			case "Not eligible":
-				d.clearanceStats.numberIneligibleCounts ++
-			}
+			val, ok := d.dojInformation.Eligibilities[i]
+			if ok {
+				switch val.EligibilityDetermination {
+				case "Eligible for Dismissal":
+					d.clearanceStats.numberDismissedCounts ++
+
+				case "Eligible for Reduction":
+					d.clearanceStats.numberReducedCounts ++
+
+				case "Not eligible":
+					d.clearanceStats.numberIneligibleCounts ++
+				}
+
+				switch val.EligibilityReason {
+				case "Misdemeanor or Infraction":
+					numberDimissedMisdemeanors ++
+
+					d.clearanceStats.numberDismissedMisdemeanor ++
+
+				case "Occurred after 11/09/2016":
+					d.clearanceStats.numberNotEligibleNovNine16 ++
+
+				case "HS 11357(b)":
+					numberDimissedFelonies ++
+					d.clearanceStats.numberDismissed11357b ++
+
+				case "Final Conviction older than 10 years":
+					numberDimissedFelonies ++
+					d.clearanceStats.numberDismissedOlderThan10Years ++
+
+				case "Later Convictions":
+					numberReducedFelonies ++
+					d.clearanceStats.numberReducedLaterConvictions ++
+
+				case "Sentence not Completed":
+					numberReducedFelonies ++
+					d.clearanceStats.numberReducedIncompleteSentence ++
+					d.clearanceStats.numberCheckSentencingData ++
+
+				case "Sentence Completed":
+					numberDimissedFelonies ++
+					d.clearanceStats.numberDismissedCompletedSentence ++
+					d.clearanceStats.numberCheckSentencingData ++
+
+				}
+
 		}
 	}
 	d.outputDOJWriter.Flush()
 
-	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedCounts)
-	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedCounts)
-	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions that are not eligible in DOJ file\n", d.clearanceStats.numberIneligibleCounts)
+
+
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedCounts)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedCounts)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are not eligible in DOJ file\n", d.clearanceStats.numberIneligibleCounts)
+
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file because of Misdemeanor or Infraction\n", d.clearanceStats.numberDismissedMisdemeanor)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file because of HS 11357b\n", d.clearanceStats.numberDismissed11357b)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file because final conviction older than 10 years\n", d.clearanceStats.numberDismissedOlderThan10Years)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for reduction in DOJ file because there are later convictions\n", d.clearanceStats.numberReducedLaterConvictions)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for reduction in DOJ file because they did not complete their sentence\n", d.clearanceStats.numberReducedIncompleteSentence)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file because they completed their sentence\n", d.clearanceStats.numberDismissedCompletedSentence)
+	fmt.Printf("Found %d Prop64 Convictions in this county that are not eligible because after November 9 2016\n", d.clearanceStats.numberNotEligibleNovNine16)
+
+	fmt.Printf("Found %d Prop64 Convictions in this county that need sentence data checked\n", d.clearanceStats.numberCheckSentencingData)
+
+	//fmt.Printf("%d individuals will no longer have a felony on their record\n", d.clearanceStats.numberNoLongerHaveFelony)
 }
