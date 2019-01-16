@@ -16,7 +16,6 @@ type DOJHistory struct {
 	Convictions     []*DOJRow
 	seenConvictions map[string]bool
 	OriginalCII     string
-
 }
 
 func (history *DOJHistory) PushRow(row DOJRow) {

@@ -57,9 +57,9 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session.Out).Should(gbytes.Say(`Found 2 Prop64 Convictions in this county that need sentence data checked`))
 
-		//Eventually(session.Out).Should(gbytes.Say(`2 individuals will no longer have a felony on their record`))
-		//Eventually(session.Out).Should(gbytes.Say(`1 individual will no longer have any convictions on their record`))
-		//Eventually(session.Out).Should(gbytes.Say(`6 individuals will no longer have any convictions on their record in the last 7 years`))
+		Eventually(session.Out).Should(gbytes.Say(`2 individuals will no longer have a felony on their record`))
+		Eventually(session.Out).Should(gbytes.Say(`1 individuals will no longer have any convictions on their record`))
+		Eventually(session.Out).Should(gbytes.Say(`6 individuals will no longer have any convictions on their record in the last 7 years`))
 
 		Eventually(session).Should(gexec.Exit())
 		Expect(session.Err).ToNot(gbytes.Say("required"))

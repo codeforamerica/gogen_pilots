@@ -2,6 +2,7 @@ package processor
 
 import (
 	"fmt"
+	"time"
 	"gogen/data"
 	"regexp"
 )
@@ -26,9 +27,10 @@ type clearanceStats struct {
 	numberReducedLaterConvictions             int
 	numberReducedIncompleteSentence           int
 	numberDismissedCompletedSentence          int
-	numberNotEligibleNovNine16                 int
+	numberNotEligibleNovNine16                int
 	numberNoLongerHaveFelony                  int
 	numberCheckSentencingData                 int
+	numberNoMoreConvictions int
 	numberClearedRecordsLast7Years            int
 	numberHistoriesWithConvictionInLast7Years int
 	numberRecordsNoFelonies                   int
@@ -70,7 +72,69 @@ func (d *DataProcessor) Process(county string) {
 		d.convictionStats.totalConvictions += len(history.Convictions)
 		d.convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
 		d.convictionStats.totalProp64Convictions += history.NumberOfProp64Convictions()
+		var feloniesDismissed = 0
+		var feloniesReduced = 0
+		var misdemeanorsDismissed = 0
+		var feloniesDismissedLast7Years = 0
+		var misdemeanorsDismissedLast7Years = 0
+		var totalConvictionsLast7Years = 0
+
+		for _, conviction := range history.Convictions {
+			var last7years = false
+			eligibility, ok := d.dojInformation.Eligibilities[conviction.Index]
+
+			if ok {
+				if time.Since(conviction.DispositionDate).Hours() <= 61320 {
+					last7years = true
+					totalConvictionsLast7Years ++
+					fmt.Printf("in last 7 years %#v", last7years)
+				}
+
+				switch eligibility.EligibilityReason {
+				case "Misdemeanor or Infraction":
+					misdemeanorsDismissed ++
+					if last7years {
+						misdemeanorsDismissedLast7Years ++
+					}
+
+				case "HS 11357(b)":
+					feloniesDismissed ++
+					if last7years {
+						feloniesDismissedLast7Years ++
+					}
+
+				case "Final Conviction older than 10 years":
+					feloniesDismissed ++
+					if last7years {
+						feloniesDismissedLast7Years ++
+					}
+
+				case "Later Convictions":
+					feloniesReduced ++
+
+				case "Sentence not Completed":
+					feloniesReduced ++
+
+				case "Sentence Completed":
+					feloniesDismissed ++
+					if last7years {
+						feloniesDismissedLast7Years ++
+					}
+				}
+			}
+		}
+
+		if history.NumberOfFelonies() == (feloniesDismissed + feloniesReduced) {
+			d.clearanceStats.numberNoLongerHaveFelony++
+		}
+		if len(history.Convictions) == (feloniesDismissed + misdemeanorsDismissed) {
+			d.clearanceStats.numberNoMoreConvictions++
+		}
+		if totalConvictionsLast7Years == (feloniesDismissedLast7Years + misdemeanorsDismissedLast7Years) {
+			d.clearanceStats.numberClearedRecordsLast7Years++
+		}
 	}
+
 	fmt.Printf("Found %d Total Convictions in DOJ file\n", d.convictionStats.totalConvictions)
 	fmt.Printf("Found %d SAN FRANCISCO County Convictions in DOJ file\n", d.convictionStats.totalCountyConvictions)
 	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions in DOJ file\n", d.convictionStats.totalProp64Convictions)
@@ -79,64 +143,61 @@ func (d *DataProcessor) Process(county string) {
 	//	fmt.Printf("eligibilities map %#v \n", value.EligibilityDetermination)
 	//}
 	for i, row := range d.dojInformation.Rows {
-		//for _, history := range d.dojInformation.Histories {
-			numberDimissedFelonies := 0
-			numberDimissedMisdemeanors := 0
-			numberReducedFelonies := 0
+		numberDimissedFelonies := 0
+		numberDimissedMisdemeanors := 0
+		numberReducedFelonies := 0
 
-			d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
+		d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
 
-			val, ok := d.dojInformation.Eligibilities[i]
-			if ok {
-				switch val.EligibilityDetermination {
-				case "Eligible for Dismissal":
-					d.clearanceStats.numberDismissedCounts ++
+		val, ok := d.dojInformation.Eligibilities[i]
+		if ok {
+			switch val.EligibilityDetermination {
+			case "Eligible for Dismissal":
+				d.clearanceStats.numberDismissedCounts ++
 
-				case "Eligible for Reduction":
-					d.clearanceStats.numberReducedCounts ++
+			case "Eligible for Reduction":
+				d.clearanceStats.numberReducedCounts ++
 
-				case "Not eligible":
-					d.clearanceStats.numberIneligibleCounts ++
-				}
+			case "Not eligible":
+				d.clearanceStats.numberIneligibleCounts ++
+			}
 
-				switch val.EligibilityReason {
-				case "Misdemeanor or Infraction":
-					numberDimissedMisdemeanors ++
+			switch val.EligibilityReason {
+			case "Misdemeanor or Infraction":
+				numberDimissedMisdemeanors ++
 
-					d.clearanceStats.numberDismissedMisdemeanor ++
+				d.clearanceStats.numberDismissedMisdemeanor ++
 
-				case "Occurred after 11/09/2016":
-					d.clearanceStats.numberNotEligibleNovNine16 ++
+			case "Occurred after 11/09/2016":
+				d.clearanceStats.numberNotEligibleNovNine16 ++
 
-				case "HS 11357(b)":
-					numberDimissedFelonies ++
-					d.clearanceStats.numberDismissed11357b ++
+			case "HS 11357(b)":
+				numberDimissedFelonies ++
+				d.clearanceStats.numberDismissed11357b ++
 
-				case "Final Conviction older than 10 years":
-					numberDimissedFelonies ++
-					d.clearanceStats.numberDismissedOlderThan10Years ++
+			case "Final Conviction older than 10 years":
+				numberDimissedFelonies ++
+				d.clearanceStats.numberDismissedOlderThan10Years ++
 
-				case "Later Convictions":
-					numberReducedFelonies ++
-					d.clearanceStats.numberReducedLaterConvictions ++
+			case "Later Convictions":
+				numberReducedFelonies ++
+				d.clearanceStats.numberReducedLaterConvictions ++
 
-				case "Sentence not Completed":
-					numberReducedFelonies ++
-					d.clearanceStats.numberReducedIncompleteSentence ++
-					d.clearanceStats.numberCheckSentencingData ++
+			case "Sentence not Completed":
+				numberReducedFelonies ++
+				d.clearanceStats.numberReducedIncompleteSentence ++
+				d.clearanceStats.numberCheckSentencingData ++
 
-				case "Sentence Completed":
-					numberDimissedFelonies ++
-					d.clearanceStats.numberDismissedCompletedSentence ++
-					d.clearanceStats.numberCheckSentencingData ++
+			case "Sentence Completed":
+				numberDimissedFelonies ++
+				d.clearanceStats.numberDismissedCompletedSentence ++
+				d.clearanceStats.numberCheckSentencingData ++
 
-				}
+			}
 
 		}
 	}
 	d.outputDOJWriter.Flush()
-
-
 
 	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedCounts)
 	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedCounts)
@@ -152,5 +213,7 @@ func (d *DataProcessor) Process(county string) {
 
 	fmt.Printf("Found %d Prop64 Convictions in this county that need sentence data checked\n", d.clearanceStats.numberCheckSentencingData)
 
-	//fmt.Printf("%d individuals will no longer have a felony on their record\n", d.clearanceStats.numberNoLongerHaveFelony)
+	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.clearanceStats.numberNoLongerHaveFelony)
+	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.clearanceStats.numberNoMoreConvictions)
+	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.clearanceStats.numberClearedRecordsLast7Years)
 }
