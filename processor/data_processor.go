@@ -2,9 +2,10 @@ package processor
 
 import (
 	"fmt"
-	"time"
 	"gogen/data"
 	"regexp"
+	"strings"
+	"time"
 )
 
 type DataProcessor struct {
@@ -30,19 +31,36 @@ type clearanceStats struct {
 	numberNotEligibleNovNine16                int
 	numberNoLongerHaveFelony                  int
 	numberCheckSentencingData                 int
-	numberNoMoreConvictions int
+	numberNoMoreConvictions                   int
 	numberClearedRecordsLast7Years            int
 	numberHistoriesWithConvictionInLast7Years int
 	numberRecordsNoFelonies                   int
 	numberHistoriesWithFelonies               int
+	numberDismissed11357                      int
+	numberDismissed11358                      int
+	numberDismissed11359                      int
+	numberDismissed11360                      int
+	numberReduced11357                        int
+	numberReduced11358                        int
+	numberReduced11359                        int
+	numberReduced11360                        int
 }
 
 type convictionStats struct {
-	totalConvictions            int
-	totalCountyConvictions      int
-	totalProp64Convictions      int
-	numDOJConvictions           map[string]int
-	DOJEligibilityByCodeSection map[string]map[string]int
+	totalConvictions             int
+	totalCountyConvictions       int
+	totalCountyProp64Convictions int
+	totalProp64Convictions       int
+	total11357Convictions        int
+	total11358Convictions        int
+	total11359Convictions        int
+	total11360Convictions        int
+	county11357Convictions       int
+	county11358Convictions       int
+	county11359Convictions       int
+	county11360Convictions       int
+	numDOJConvictions            map[string]int
+	DOJEligibilityByCodeSection  map[string]map[string]int
 }
 
 type dataProcessorStats struct {
@@ -69,9 +87,6 @@ func NewDataProcessor(
 func (d *DataProcessor) Process(county string) {
 	fmt.Printf("Processing Histories\n")
 	for _, history := range d.dojInformation.Histories {
-		d.convictionStats.totalConvictions += len(history.Convictions)
-		d.convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
-		d.convictionStats.totalProp64Convictions += history.NumberOfProp64Convictions()
 		var feloniesDismissed = 0
 		var feloniesReduced = 0
 		var misdemeanorsDismissed = 0
@@ -79,15 +94,71 @@ func (d *DataProcessor) Process(county string) {
 		var misdemeanorsDismissedLast7Years = 0
 		var totalConvictionsLast7Years = 0
 
+		d.convictionStats.totalConvictions += len(history.Convictions)
+		d.convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
+
 		for _, conviction := range history.Convictions {
 			var last7years = false
 			eligibility, ok := d.dojInformation.Eligibilities[conviction.Index]
+			fmt.Printf("code_section: %#v", conviction.CodeSection)
+
+			if strings.HasPrefix(conviction.CodeSection, "11357") {
+				d.convictionStats.total11357Convictions++
+				if conviction.County == county {
+					d.convictionStats.county11357Convictions++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Dismissal"{
+					d.clearanceStats.numberDismissed11357++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Reduction"{
+					d.clearanceStats.numberReduced11357++
+				}
+			}
+
+			if strings.HasPrefix(conviction.CodeSection, "11358") {
+				d.convictionStats.total11358Convictions++
+				if conviction.County == county {
+					d.convictionStats.county11358Convictions++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Dismissal"{
+					d.clearanceStats.numberDismissed11358++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Reduction"{
+					d.clearanceStats.numberReduced11358++
+				}
+			}
+
+			if strings.HasPrefix(conviction.CodeSection, "11359") {
+				d.convictionStats.total11359Convictions++
+				if conviction.County == county {
+					d.convictionStats.county11359Convictions++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Dismissal"{
+					d.clearanceStats.numberDismissed11359++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Reduction"{
+					d.clearanceStats.numberReduced11359++
+				}
+			}
+
+			if strings.HasPrefix(conviction.CodeSection, "11360") {
+				d.convictionStats.total11360Convictions++
+				if conviction.County == county {
+					d.convictionStats.county11360Convictions++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Dismissal"{
+					d.clearanceStats.numberDismissed11360++
+				}
+				if ok && eligibility.EligibilityDetermination == "Eligible for Reduction"{
+					d.clearanceStats.numberReduced11360++
+				}
+
+			}
 
 			if ok {
 				if time.Since(conviction.DispositionDate).Hours() <= 61320 {
 					last7years = true
 					totalConvictionsLast7Years ++
-					fmt.Printf("in last 7 years %#v", last7years)
 				}
 
 				switch eligibility.EligibilityReason {
@@ -134,10 +205,6 @@ func (d *DataProcessor) Process(county string) {
 			d.clearanceStats.numberClearedRecordsLast7Years++
 		}
 	}
-
-	fmt.Printf("Found %d Total Convictions in DOJ file\n", d.convictionStats.totalConvictions)
-	fmt.Printf("Found %d SAN FRANCISCO County Convictions in DOJ file\n", d.convictionStats.totalCountyConvictions)
-	fmt.Printf("Found %d SAN FRANCISCO County Prop64 Convictions in DOJ file\n", d.convictionStats.totalProp64Convictions)
 
 	//for _, value := range d.dojInformation.Eligibilities{
 	//	fmt.Printf("eligibilities map %#v \n", value.EligibilityDetermination)
@@ -197,10 +264,38 @@ func (d *DataProcessor) Process(county string) {
 
 		}
 	}
+
 	d.outputDOJWriter.Flush()
 
+
+	d.convictionStats.totalProp64Convictions = d.convictionStats.total11357Convictions + d.convictionStats.total11358Convictions + d.convictionStats.total11359Convictions + d.convictionStats.total11360Convictions
+	d.convictionStats.totalCountyProp64Convictions = d.convictionStats.county11357Convictions + d.convictionStats.county11358Convictions + d.convictionStats.county11359Convictions + d.convictionStats.county11360Convictions
+	fmt.Printf("Found %d Total Convictions in DOJ file\n", d.convictionStats.totalConvictions)
+	fmt.Printf("Found %d Total Prop64 Convictions in DOJ file\n", d.convictionStats.totalProp64Convictions)
+	fmt.Printf("Found %d HS 11357 Convictions total in DOJ file\n", d.convictionStats.total11357Convictions)
+	fmt.Printf("Found %d HS 11358 Convictions total in DOJ file\n", d.convictionStats.total11358Convictions)
+	fmt.Printf("Found %d HS 11359 Convictions total in DOJ file\n", d.convictionStats.total11359Convictions)
+	fmt.Printf("Found %d HS 11360 Convictions total in DOJ file\n", d.convictionStats.total11360Convictions)
+
+	fmt.Printf("Found %d County Convictions in DOJ file\n", d.convictionStats.totalCountyConvictions)
+	fmt.Printf("Found %d County Prop64 Convictions in DOJ file\n", d.convictionStats.totalCountyProp64Convictions)
+	fmt.Printf("Found %d HS 11357 Convictions in this county in DOJ file\n", d.convictionStats.county11357Convictions)
+	fmt.Printf("Found %d HS 11358 Convictions in this county in DOJ file\n", d.convictionStats.county11358Convictions)
+	fmt.Printf("Found %d HS 11359 Convictions in this county in DOJ file\n", d.convictionStats.county11359Convictions)
+	fmt.Printf("Found %d HS 11360 Convictions in this county in DOJ file\n", d.convictionStats.county11360Convictions)
+
 	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedCounts)
+	fmt.Printf("Found %d HS 11357 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissed11357)
+	fmt.Printf("Found %d HS 11358 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissed11358)
+	fmt.Printf("Found %d HS 11359 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissed11359)
+	fmt.Printf("Found %d HS 11360 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissed11360)
+
 	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedCounts)
+	fmt.Printf("Found %d HS 11357 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReduced11357)
+	fmt.Printf("Found %d HS 11358 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReduced11358)
+	fmt.Printf("Found %d HS 11359 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReduced11359)
+	fmt.Printf("Found %d HS 11360 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReduced11360)
+
 	fmt.Printf("Found %d Prop64 Convictions in this county that are not eligible in DOJ file\n", d.clearanceStats.numberIneligibleCounts)
 
 	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file because of Misdemeanor or Infraction\n", d.clearanceStats.numberDismissedMisdemeanor)

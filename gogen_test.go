@@ -38,13 +38,33 @@ var _ = Describe("gogen", func() {
 		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
-		//Eventually(session.Out).Should(gbytes.Say(`Found 8 convictions in DOJ data \(8 felonies, 0 misdemeanors\)`))
+
 		Eventually(session.Out).Should(gbytes.Say(`Found 24 Total Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 21 SAN FRANCISCO County Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 18 SAN FRANCISCO County Prop64 Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 18 Total Prop64 Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11357 Convictions total in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 10 HS 11358 Convictions total in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 5 HS 11359 Convictions total in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions total in DOJ file`))
+
+		Eventually(session.Out).Should(gbytes.Say(`Found 21 County Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 15 County Prop64 Convictions in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11357 Convictions in this county in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 8 HS 11358 Convictions in this county in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 4 HS 11359 Convictions in this county in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions in this county in DOJ file`))
 
 		Eventually(session.Out).Should(gbytes.Say(`Found 7 Prop64 Convictions in this county that are eligible for dismissal in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 2 HS 11357 Convictions in this county that are eligible for dismissal in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 4 HS 11358 Convictions in this county that are eligible for dismissal in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 1 HS 11359 Convictions in this county that are eligible for dismissal in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions in this county that are eligible for dismissal in DOJ file`))
+
 		Eventually(session.Out).Should(gbytes.Say(`Found 7 Prop64 Convictions in this county that are eligible for reduction in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 1 HS 11357 Convictions in this county that are eligible for reduction in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11358 Convictions in this county that are eligible for reduction in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11359 Convictions in this county that are eligible for reduction in DOJ file`))
+		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions in this county that are eligible for reduction in DOJ file`))
+
 		Eventually(session.Out).Should(gbytes.Say(`Found 1 Prop64 Convictions in this county that are not eligible in DOJ file`))
 
 		Eventually(session.Out).Should(gbytes.Say(`Found 2 Prop64 Convictions in this county that are eligible for dismissal in DOJ file because of Misdemeanor or Infraction`))
