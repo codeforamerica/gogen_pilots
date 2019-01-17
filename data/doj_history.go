@@ -63,7 +63,7 @@ func (history *DOJHistory) NumberOfConvictionsInCounty(county string) int {
 	result := 0
 	for _, row := range history.Convictions {
 		if row.County == county {
-			result ++
+			result++
 		}
 	}
 	return result
@@ -73,7 +73,7 @@ func (history *DOJHistory) NumberOfFelonies() int {
 	felonies := 0
 	for _, row := range history.Convictions {
 		if row.Felony {
-			felonies ++
+			felonies++
 		}
 	}
 	return felonies

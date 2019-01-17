@@ -35,7 +35,6 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 		info.YearsSinceMostRecentConviction = info.yearsSinceEvent(mostRecentConvictionDate)
 	}
 
-
 	info.NumberOfConvictionsOnRecord = len(history.Convictions)
 	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions()
 	info.NumberOfConvictionsInCounty = history.NumberOfConvictionsInCounty(county)
