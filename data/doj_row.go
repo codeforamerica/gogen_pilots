@@ -29,6 +29,7 @@ type DOJRow struct {
 	CountOrder        string
 	Index             int
 	SentenceEndDate   time.Time
+	SentencePartDuration time.Duration
 }
 
 const dateFormat = "20060102"
@@ -55,21 +56,31 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 		CountOrder:        rawRow[CNT_ORDER],
 		Index:             index,
 		SentenceEndDate:   getSentenceEndDate(rawRow),
+		SentencePartDuration: getSentencePartDuration(rawRow),
 	}
 }
 
 func getSentenceEndDate(rawRow []string) time.Time {
 	dispDate := parseDate(dateFormat, rawRow[STP_EVENT_DATE])
+	return dispDate.Add(getSentencePartDuration(rawRow))
+}
+
+func getSentencePartDuration(rawRow []string) time.Duration {
 	sentenceLength, _ := strconv.Atoi(rawRow[SENT_LENGTH])
+
+	days := time.Duration(24)* (time.Hour)
+	years := time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC).Sub(time.Date(2011, 03, 04, 0, 0, 0, 0, time.UTC))
+	months := years / 12
+
 	switch rawRow[SENT_TIME_CODE] {
 	case "D":
-		return dispDate.AddDate(0, 0, sentenceLength)
+		return time.Duration(sentenceLength) * days
 	case "M":
-		return dispDate.AddDate(0, sentenceLength, 0)
+		return time.Duration(sentenceLength) * months
 	case "Y":
-		return dispDate.AddDate(sentenceLength, 0, 0)
+		return time.Duration(sentenceLength) * years
 	}
-	return dispDate
+	return time.Duration(0)
 }
 
 func findCodeSection(rawRow []string) string {
