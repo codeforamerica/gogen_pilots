@@ -11,9 +11,9 @@ func parseDate(format string, date string) time.Time {
 	if err != nil {
 		t = time.Time{}
 	}
-	if time.Now().Before(t) {
-		t = t.AddDate(-100, 0, 0)
-	}
+	//if time.Now().Before(t) {
+	//	t = t.AddDate(-100, 0, 0)
+	//}
 	return t
 }
 

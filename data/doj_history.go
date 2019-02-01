@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -29,6 +30,16 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.SSN = row.SSN
 		history.CDL = row.CDL
 		history.seenConvictions = make(map[string]bool)
+	}
+
+	if row.Convicted && history.seenConvictions[row.CountOrder]{
+		fmt.Printf("IN LOOP FOR CONVICTION: %v !!!!!!!!!\n",history.seenConvictions[row.CountOrder])
+		lastConviction := history.Convictions[len(history.Convictions)-1]
+		fmt.Printf("last conviction: %v \n",lastConviction)
+		fmt.Printf("Original end date: %v\n",lastConviction.SentenceEndDate)
+		newEndDate := lastConviction.SentenceEndDate.Add(row.SentencePartDuration)
+		lastConviction.SentenceEndDate = newEndDate
+		fmt.Printf("conviction end date: %v\n \n",lastConviction.SentenceEndDate)
 	}
 
 	if row.Convicted && !history.seenConvictions[row.CountOrder] {
