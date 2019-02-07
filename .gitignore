@@ -2,3 +2,4 @@ gogen
 /.idea/
 input_files
 results/
+.DS_Store
