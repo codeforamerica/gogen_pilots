@@ -8,27 +8,27 @@ import (
 )
 
 type DOJRow struct {
-	Name              string
-	WeakName          string
-	SubjectID         string
-	CII               string
-	SSN               string
-	DOB               time.Time
-	CDL               string
-	Convicted         bool
-	CodeSection       string
-	DispositionDate   time.Time
-	OFN               string
-	PC290Registration bool
-	County            string
-	Felony            bool
-	NumCrtCase        string
-	CycleDate         time.Time
-	RawRow            []string
-	CourtNoParts      []string
-	CountOrder        string
-	Index             int
-	SentenceEndDate   time.Time
+	Name                 string
+	WeakName             string
+	SubjectID            string
+	CII                  string
+	SSN                  string
+	DOB                  time.Time
+	CDL                  string
+	Convicted            bool
+	CodeSection          string
+	DispositionDate      time.Time
+	OFN                  string
+	PC290Registration    bool
+	County               string
+	Felony               bool
+	NumCrtCase           string
+	CycleDate            time.Time
+	RawRow               []string
+	CourtNoParts         []string
+	CountOrder           string
+	Index                int
+	SentenceEndDate      time.Time
 	SentencePartDuration time.Duration
 }
 
@@ -37,25 +37,25 @@ const dateFormat = "20060102"
 func NewDOJRow(rawRow []string, index int) DOJRow {
 
 	return DOJRow{
-		Name:              rawRow[PRI_NAME],
-		WeakName:          strings.Split(rawRow[PRI_NAME], " ")[0],
-		SubjectID:         rawRow[SUBJECT_ID],
-		CII:               rawRow[CII_NUMBER],
-		SSN:               rawRow[PRI_SSN],
-		DOB:               parseDate(dateFormat, rawRow[PRI_DOB]),
-		CDL:               rawRow[PRI_CDL],
-		Convicted:         strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
-		CodeSection:       findCodeSection(rawRow),
-		DispositionDate:   parseDate(dateFormat, rawRow[STP_EVENT_DATE]),
-		OFN:               rawRow[OFN],
-		NumCrtCase:        rawRow[FE_NUM_CRT_CASE],
-		CycleDate:         parseDate(dateFormat, rawRow[CYC_DATE]),
-		PC290Registration: rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
-		County:            rawRow[STP_ORI_CNTY_NAME],
-		Felony:            rawRow[CONV_STAT_DESCR] == "FELONY",
-		CountOrder:        rawRow[CNT_ORDER],
-		Index:             index,
-		SentenceEndDate:   getSentenceEndDate(rawRow),
+		Name:                 rawRow[PRI_NAME],
+		WeakName:             strings.Split(rawRow[PRI_NAME], " ")[0],
+		SubjectID:            rawRow[SUBJECT_ID],
+		CII:                  rawRow[CII_NUMBER],
+		SSN:                  rawRow[PRI_SSN],
+		DOB:                  parseDate(dateFormat, rawRow[PRI_DOB]),
+		CDL:                  rawRow[PRI_CDL],
+		Convicted:            strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
+		CodeSection:          findCodeSection(rawRow),
+		DispositionDate:      parseDate(dateFormat, rawRow[STP_EVENT_DATE]),
+		OFN:                  rawRow[OFN],
+		NumCrtCase:           rawRow[FE_NUM_CRT_CASE],
+		CycleDate:            parseDate(dateFormat, rawRow[CYC_DATE]),
+		PC290Registration:    rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
+		County:               rawRow[STP_ORI_CNTY_NAME],
+		Felony:               rawRow[CONV_STAT_DESCR] == "FELONY",
+		CountOrder:           rawRow[CNT_ORDER],
+		Index:                index,
+		SentenceEndDate:      getSentenceEndDate(rawRow),
 		SentencePartDuration: getSentencePartDuration(rawRow),
 	}
 }
@@ -68,7 +68,7 @@ func getSentenceEndDate(rawRow []string) time.Time {
 func getSentencePartDuration(rawRow []string) time.Duration {
 	sentenceLength, _ := strconv.Atoi(rawRow[SENT_LENGTH])
 
-	days := time.Duration(24)* (time.Hour)
+	days := time.Duration(24) * (time.Hour)
 	years := time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC).Sub(time.Date(2011, 03, 04, 0, 0, 0, 0, time.UTC))
 	months := years / 12
 

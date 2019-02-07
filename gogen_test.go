@@ -39,49 +39,48 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session.Out).Should(gbytes.Say(`Found 24 Total Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 18 Total Prop64 Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11357 Convictions total in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 10 HS 11358 Convictions total in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 5 HS 11359 Convictions total in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions total in DOJ file`))
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 21 County Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 15 County Prop64 Convictions in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11357 Convictions in this county in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 8 HS 11358 Convictions in this county in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 4 HS 11359 Convictions in this county in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions in this county in DOJ file`))
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 7 Prop64 Convictions in this county that are eligible for dismissal in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 2 HS 11357 Convictions in this county that are eligible for dismissal in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 4 HS 11358 Convictions in this county that are eligible for dismissal in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 HS 11359 Convictions in this county that are eligible for dismissal in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions in this county that are eligible for dismissal in DOJ file`))
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 7 Prop64 Convictions in this county that are eligible for reduction in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 HS 11357 Convictions in this county that are eligible for reduction in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11358 Convictions in this county that are eligible for reduction in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 3 HS 11359 Convictions in this county that are eligible for reduction in DOJ file`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 0 HS 11360 Convictions in this county that are eligible for reduction in DOJ file`))
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 Prop64 Convictions in this county that are not eligible in DOJ file`))
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 2 Prop64 Convictions in this county that are eligible for dismissal in DOJ file because of Misdemeanor or Infraction`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 Prop64 Convictions in this county that are eligible for dismissal in DOJ file because of HS 11357b`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 3 Prop64 Convictions in this county that are eligible for dismissal in DOJ file because final conviction older than 10 years`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 5 Prop64 Convictions in this county that are eligible for reduction in DOJ file because there are later convictions`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 Prop64 Convictions in this county that are eligible for reduction in DOJ file because they did not complete their sentence`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 Prop64 Convictions in this county that are eligible for dismissal in DOJ file because they completed their sentence`))
-		Eventually(session.Out).Should(gbytes.Say(`Found 1 Prop64 Convictions in this county that are not eligible because after November 9 2016`))
-
-		Eventually(session.Out).Should(gbytes.Say(`Found 2 Prop64 Convictions in this county that need sentence data checked`))
-
-		Eventually(session.Out).Should(gbytes.Say(`2 individuals will no longer have a felony on their record`))
-		Eventually(session.Out).Should(gbytes.Say(`1 individuals will no longer have any convictions on their record`))
-		Eventually(session.Out).Should(gbytes.Say(`6 individuals will no longer have any convictions on their record in the last 7 years`))
-
 		Eventually(session).Should(gexec.Exit())
+
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 24 Total Convictions in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 18 Total Prop64 Convictions in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 3 HS 11357 Convictions total in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 10 HS 11358 Convictions total in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 5 HS 11359 Convictions total in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 0 HS 11360 Convictions total in DOJ file"))
+
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 21 County Convictions in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 15 County Prop64 Convictions in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 3 HS 11357 Convictions in this county in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 8 HS 11358 Convictions in this county in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 4 HS 11359 Convictions in this county in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 0 HS 11360 Convictions in this county in DOJ file"))
+
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 7 Prop64 Convictions in this county that are eligible for dismissal in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 2 HS 11357 Convictions in this county that are eligible for dismissal in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 4 HS 11358 Convictions in this county that are eligible for dismissal in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 HS 11359 Convictions in this county that are eligible for dismissal in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 0 HS 11360 Convictions in this county that are eligible for dismissal in DOJ file"))
+
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 7 Prop64 Convictions in this county that are eligible for reduction in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 HS 11357 Convictions in this county that are eligible for reduction in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 3 HS 11358 Convictions in this county that are eligible for reduction in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 3 HS 11359 Convictions in this county that are eligible for reduction in DOJ file"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 0 HS 11360 Convictions in this county that are eligible for reduction in DOJ file"))
+
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 Prop64 Convictions in this county that are not eligible in DOJ file"))
+
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 2 Prop64 Convictions in this county with eligibility reason: Misdemeanor or Infraction"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 Prop64 Convictions in this county with eligibility reason: HS 11357(b)"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 3 Prop64 Convictions in this county with eligibility reason: Final Conviction older than 10 years"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 5 Prop64 Convictions in this county with eligibility reason: Later Convictions"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 Prop64 Convictions in this county with eligibility reason: Sentence not Completed"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 Prop64 Convictions in this county with eligibility reason: Sentence Completed"))
+		Expect(session.Out.Contents()).To(ContainSubstring("Found 1 Prop64 Convictions in this county with eligibility reason: Occurred after 11/09/2016"))
+
+		Expect(session.Out.Contents()).To(ContainSubstring("2 individuals will no longer have a felony on their record"))
+		Expect(session.Out.Contents()).To(ContainSubstring("1 individuals will no longer have any convictions on their record"))
+		Expect(session.Out.Contents()).To(ContainSubstring("6 individuals will no longer have any convictions on their record in the last 7 years"))
+
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 	})
 })

@@ -30,7 +30,7 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.CDL = row.CDL
 		history.seenConvictions = make(map[string]bool)
 	}
-	if row.Convicted && history.seenConvictions[row.CountOrder]{
+	if row.Convicted && history.seenConvictions[row.CountOrder] {
 		lastConviction := history.Convictions[len(history.Convictions)-1]
 		newEndDate := lastConviction.SentenceEndDate.Add(row.SentencePartDuration)
 		lastConviction.SentenceEndDate = newEndDate
