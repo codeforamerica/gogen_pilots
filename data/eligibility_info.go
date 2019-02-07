@@ -11,8 +11,6 @@ type EligibilityInfo struct {
 	YearsSinceThisConviction       float64
 	YearsSinceMostRecentConviction float64
 	NumberOfProp64Convictions      int
-	NumberOfConvictionsInCounty    int
-	NoFeloniesLeft                 bool
 	comparisonTime                 time.Time
 	EligibilityDetermination       string
 	EligibilityReason              string
@@ -37,7 +35,6 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 
 	info.NumberOfConvictionsOnRecord = len(history.Convictions)
 	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions()
-	info.NumberOfConvictionsInCounty = history.NumberOfConvictionsInCounty(county)
 	info.DateOfConviction = row.DispositionDate
 
 	info.BeginEligibilityFlow(row)
