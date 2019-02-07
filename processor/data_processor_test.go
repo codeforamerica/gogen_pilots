@@ -2,6 +2,7 @@ package processor_test
 
 import (
 	"encoding/csv"
+	//"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
@@ -34,7 +35,7 @@ var _ = Describe("DataProcessor", func() {
 
 		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SAN FRANCISCO")
+		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SACRAMENTO")
 
 		dojWriter := NewDOJWriter(path.Join(outputDir, "doj_results.csv"))
 
@@ -42,7 +43,7 @@ var _ = Describe("DataProcessor", func() {
 	})
 
 	It("runs and has output", func() {
-		dataProcessor.Process("SAN FRANCISCO")
+		dataProcessor.Process("SACRAMENTO")
 		format.TruncatedDiff = false
 
 		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_results.csv"))
