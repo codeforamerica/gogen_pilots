@@ -21,53 +21,108 @@ var _ = Describe("DataProcessor", func() {
 		err           error
 	)
 
-	BeforeEach(func() {
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
-		Expect(err).ToNot(HaveOccurred())
+	Describe("Sacramento", func() {
+		BeforeEach(func() {
+			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "cadoj.csv"))
-		Expect(err).ToNot(HaveOccurred())
+			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "sacramento", "cadoj_sacramento.csv"))
+			Expect(err).ToNot(HaveOccurred())
 
-		dojFile, err := os.Open(pathToDOJ)
-		if err != nil {
-			panic(err)
-		}
+			dojFile, err := os.Open(pathToDOJ)
+			if err != nil {
+				panic(err)
+			}
 
-		comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-		dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SACRAMENTO")
+			dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SACRAMENTO")
 
-		dojWriter := NewDOJWriter(path.Join(outputDir, "doj_results.csv"))
+			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_sacramento_results.csv"))
 
-		dataProcessor = NewDataProcessor(dojInformation, dojWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dojWriter)
+		})
+
+		It("runs and has output", func() {
+			dataProcessor.Process("SACRAMENTO")
+			format.TruncatedDiff = false
+
+			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_sacramento_results.csv"))
+			Expect(err).ToNot(HaveOccurred())
+			OutputDOJFile, err := os.Open(pathToDOJOutput)
+			Expect(err).ToNot(HaveOccurred())
+			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
+			Expect(err).ToNot(HaveOccurred())
+
+			pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "sacramento", "doj_sacramento_results.csv"))
+			Expect(err).ToNot(HaveOccurred())
+			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
+			Expect(err).ToNot(HaveOccurred())
+			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
+			Expect(err).ToNot(HaveOccurred())
+
+			for i, row := range outputDOJCSV {
+				//fmt.Printf("output file %#v", outputDOJCSV)
+				//for j, item := range row {
+				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
+				//}
+				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
+			}
+
+			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+		})
 	})
 
-	It("runs and has output", func() {
-		dataProcessor.Process("SACRAMENTO")
-		format.TruncatedDiff = false
+	Describe("San Joaquin", func() {
+		BeforeEach(func() {
+			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_results.csv"))
-		Expect(err).ToNot(HaveOccurred())
-		OutputDOJFile, err := os.Open(pathToDOJOutput)
-		Expect(err).ToNot(HaveOccurred())
-		outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-		Expect(err).ToNot(HaveOccurred())
+			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "san_joaquin", "cadoj_san_joaquin.csv"))
+			Expect(err).ToNot(HaveOccurred())
 
-		pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "doj_results.csv"))
-		Expect(err).ToNot(HaveOccurred())
-		ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-		Expect(err).ToNot(HaveOccurred())
-		expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-		Expect(err).ToNot(HaveOccurred())
+			dojFile, err := os.Open(pathToDOJ)
+			if err != nil {
+				panic(err)
+			}
 
-		for i, row := range outputDOJCSV {
-			//fmt.Printf("output file %#v", outputDOJCSV)
-			//for j, item := range row {
-			//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
-			//}
-			Expect(row).To(Equal(expectedDOJResultsCSV[i]))
-		}
+			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-		//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+			dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SAN JOAQUIN")
+
+			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_san_joaquin_results.csv"))
+
+			dataProcessor = NewDataProcessor(dojInformation, dojWriter)
+		})
+
+		It("runs and has output", func() {
+			dataProcessor.Process("SAN JOAQUIN")
+			format.TruncatedDiff = false
+
+			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_san_joaquin_results.csv"))
+			Expect(err).ToNot(HaveOccurred())
+			OutputDOJFile, err := os.Open(pathToDOJOutput)
+			Expect(err).ToNot(HaveOccurred())
+			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
+			Expect(err).ToNot(HaveOccurred())
+
+			pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "san_joaquin", "doj_san_joaquin_results.csv"))
+			Expect(err).ToNot(HaveOccurred())
+			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
+			Expect(err).ToNot(HaveOccurred())
+			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
+			Expect(err).ToNot(HaveOccurred())
+
+			for i, row := range outputDOJCSV {
+				//fmt.Printf("output file %#v", outputDOJCSV)
+				//for j, item := range row {
+				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
+				//}
+				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
+			}
+
+			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+		})
 	})
+
 })

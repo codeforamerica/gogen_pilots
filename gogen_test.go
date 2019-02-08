@@ -24,7 +24,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "cadoj.csv"))
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "sacramento", "cadoj_sacramento.csv"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
@@ -40,6 +40,7 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit())
+		Expect(session.Err).ToNot(gbytes.Say("required"))
 
 		Expect(session.Out.Contents()).To(ContainSubstring("Found 24 Total Convictions in DOJ file"))
 		Expect(session.Out.Contents()).To(ContainSubstring("Found 18 Total Prop64 Convictions in DOJ file"))
@@ -81,6 +82,5 @@ var _ = Describe("gogen", func() {
 		Expect(session.Out.Contents()).To(ContainSubstring("1 individuals will no longer have any convictions on their record"))
 		Expect(session.Out.Contents()).To(ContainSubstring("6 individuals will no longer have any convictions on their record in the last 7 years"))
 
-		Expect(session.Err).ToNot(gbytes.Say("required"))
 	})
 })
