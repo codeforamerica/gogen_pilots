@@ -36,6 +36,14 @@ const dateFormat = "20060102"
 
 func NewDOJRow(rawRow []string, index int) DOJRow {
 
+	var isFelony bool
+
+	if rawRow[CONV_STAT_DESCR] == "" {
+		isFelony = rawRow[OFFENSE_TOC] == "F"
+	} else {
+		isFelony = rawRow[CONV_STAT_DESCR] == "FELONY"
+	}
+
 	return DOJRow{
 		Name:                 rawRow[PRI_NAME],
 		WeakName:             strings.Split(rawRow[PRI_NAME], " ")[0],
@@ -52,7 +60,7 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 		CycleDate:            parseDate(dateFormat, rawRow[CYC_DATE]),
 		PC290Registration:    rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
 		County:               rawRow[STP_ORI_CNTY_NAME],
-		Felony:               rawRow[CONV_STAT_DESCR] == "FELONY",
+		Felony:               isFelony,
 		CountOrder:           rawRow[CNT_ORDER],
 		Index:                index,
 		SentenceEndDate:      getSentenceEndDate(rawRow),

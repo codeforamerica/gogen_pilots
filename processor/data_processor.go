@@ -40,6 +40,9 @@ type convictionStats struct {
 	totalCountyConvictions         int
 	totalCountyProp64Convictions   int
 	totalProp64Convictions         int
+	totalHasFelony                 int
+	totalHasConvictionLast7Years   int
+	totalHasConvictions int
 	totalConvictionsByCodeSection  map[string]int
 	countyConvictionsByCodeSection map[string]int
 	DOJEligibilityByCodeSection    map[string]map[string]int
@@ -149,14 +152,28 @@ func (d *DataProcessor) Process(county string) {
 			}
 		}
 
-		if history.NumberOfFelonies() == (feloniesDismissed + feloniesReduced) {
-			d.clearanceStats.numberNoLongerHaveFelony++
+		if history.NumberOfFelonies() > 0 {
+			d.convictionStats.totalHasFelony++
+
+			if history.NumberOfFelonies() == (feloniesDismissed + feloniesReduced) {
+				d.clearanceStats.numberNoLongerHaveFelony++
+			}
 		}
-		if len(history.Convictions) == (feloniesDismissed + misdemeanorsDismissed) {
-			d.clearanceStats.numberNoMoreConvictions++
+
+		if len(history.Convictions) > 0 {
+			d.convictionStats.totalHasConvictions++
+
+			if len(history.Convictions) == (feloniesDismissed + misdemeanorsDismissed) {
+				d.clearanceStats.numberNoMoreConvictions++
+			}
 		}
-		if totalConvictionsLast7Years == (feloniesDismissedLast7Years + misdemeanorsDismissedLast7Years) {
-			d.clearanceStats.numberClearedRecordsLast7Years++
+
+		if totalConvictionsLast7Years > 0 {
+			d.convictionStats.totalHasConvictionLast7Years++
+
+			if totalConvictionsLast7Years == (feloniesDismissedLast7Years + misdemeanorsDismissedLast7Years) {
+				d.clearanceStats.numberClearedRecordsLast7Years++
+			}
 		}
 	}
 
@@ -205,7 +222,10 @@ func (d *DataProcessor) Process(county string) {
 		fmt.Printf("Found %d Prop64 Convictions in this county with eligibility reason: %s\n", val, key)
 	}
 
+	fmt.Printf("%d individuals had a felony on their record\n", d.convictionStats.totalHasFelony)
 	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.clearanceStats.numberNoLongerHaveFelony)
+	fmt.Printf("%d individuals had convictions on their record\n", d.convictionStats.totalHasConvictions)
 	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.clearanceStats.numberNoMoreConvictions)
+	fmt.Printf("%d individuals had convictions on their record in the last 7 years\n", d.convictionStats.totalHasConvictionLast7Years)
 	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.clearanceStats.numberClearedRecordsLast7Years)
 }
