@@ -40,6 +40,11 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.Convictions = append(history.Convictions, &row)
 		history.seenConvictions[row.CountOrder] = true
 	}
+
+	if (hasProp64Charge(row)) {
+		// loop through convicitons
+		// if conviction cycle matches row.cycle, update conviction.hasPro64Charge in Cycle = true
+	}
 }
 
 func (history *DOJHistory) MostRecentConvictionDate() time.Time {

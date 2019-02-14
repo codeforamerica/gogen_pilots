@@ -8,28 +8,29 @@ import (
 )
 
 type DOJRow struct {
-	Name                 string
-	WeakName             string
-	SubjectID            string
-	CII                  string
-	SSN                  string
-	DOB                  time.Time
-	CDL                  string
-	Convicted            bool
-	CodeSection          string
-	DispositionDate      time.Time
-	OFN                  string
-	PC290Registration    bool
-	County               string
-	Felony               bool
-	NumCrtCase           string
-	CycleDate            time.Time
-	RawRow               []string
-	CourtNoParts         []string
-	CountOrder           string
-	Index                int
-	SentenceEndDate      time.Time
-	SentencePartDuration time.Duration
+	Name                   string
+	WeakName               string
+	SubjectID              string
+	CII                    string
+	SSN                    string
+	DOB                    time.Time
+	CDL                    string
+	Convicted              bool
+	CodeSection            string
+	DispositionDate        time.Time
+	OFN                    string
+	PC290Registration      bool
+	County                 string
+	Felony                 bool
+	NumCrtCase             string
+	CycleDate              time.Time
+	RawRow                 []string
+	CourtNoParts           []string
+	CountOrder             string
+	Index                  int
+	SentenceEndDate        time.Time
+	SentencePartDuration   time.Duration
+	HasProp64ChargeInCycle bool
 }
 
 const dateFormat = "20060102"
