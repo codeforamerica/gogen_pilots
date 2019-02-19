@@ -1,11 +1,23 @@
 package data
 
 import (
+	"regexp"
 	"strings"
 	"time"
 )
 
-type sanJoaquinEligibilityFlow struct{}
+type sanJoaquinEligibilityFlow struct{
+	prop64Matcher *regexp.Regexp
+	relatedChargeMatcher *regexp.Regexp
+}
+
+func (ef sanJoaquinEligibilityFlow) IsProp64Charge(codeSection string) bool {
+	return ef.prop64Matcher.Match([]byte(codeSection))
+}
+
+func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
+	return ef.relatedChargeMatcher.Match([]byte(codeSection))
+}
 
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
 	ef.ConvictionBeforeNovNine2016(info, row)
@@ -21,6 +33,11 @@ func (ef sanJoaquinEligibilityFlow) EligibleReduction(info *EligibilityInfo, rea
 	info.EligibilityReason = reason
 }
 
+func (ef sanJoaquinEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason string) {
+	info.EligibilityDetermination = "Maybe Eligible"
+	info.EligibilityReason = reason
+}
+
 func (ef sanJoaquinEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
 	info.EligibilityDetermination = "Not eligible"
 	info.EligibilityReason = reason
@@ -28,9 +45,17 @@ func (ef sanJoaquinEligibilityFlow) NotEligible(info *EligibilityInfo, reason st
 
 func (ef sanJoaquinEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow) {
 	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
-		ef.ConvictionIsNotFelony(info, row)
+		ef.convictionIsRelatedCharge(info, row)
 	} else {
 		ef.NotEligible(info, "Occurred after 11/09/2016")
+	}
+}
+
+func (ef sanJoaquinEligibilityFlow) convictionIsRelatedCharge(info *EligibilityInfo, row *DOJRow) {
+	if ef.isRelatedCharge(row.CodeSection) {
+		ef.hasProp64ChargeInCycle(info, row)
+	} else {
+		ef.ConvictionIsNotFelony(info, row)
 	}
 }
 
@@ -79,5 +104,21 @@ func (ef sanJoaquinEligibilityFlow) FinalConvictionOnRecord(info *EligibilityInf
 		ef.EligibleDismissal(info, "Final Conviction older than 5 years")
 	} else {
 		ef.EligibleReduction(info, "Later Convictions")
+	}
+}
+
+func (ef sanJoaquinEligibilityFlow) hasProp64ChargeInCycle(info *EligibilityInfo, row *DOJRow) {
+	if row.HasProp64ChargeInCycle {
+		ef.isBP4060Charge(info, row)
+	} else {
+		ef.MaybeEligible(info, "No Related Prop64 Charges")
+	}
+}
+
+func (ef sanJoaquinEligibilityFlow) isBP4060Charge(info *EligibilityInfo, row *DOJRow) {
+	if row.CodeSection == "4060 BP" {
+		ef.MaybeEligible(info, "4060 BP")
+	} else {
+		ef.EligibleDismissal(info, row.CodeSection)
 	}
 }

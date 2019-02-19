@@ -34,7 +34,7 @@ var _ = Describe("DOJHistory", func() {
 		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5, conviction5Prison}
 		history = data.DOJHistory{}
 		for _, row := range rows {
-			history.PushRow(row)
+			history.PushRow(row, "SACRAMENTO")
 		}
 	})
 

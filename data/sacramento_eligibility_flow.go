@@ -1,11 +1,17 @@
 package data
 
 import (
+	"regexp"
 	"strings"
 	"time"
 )
 
-type sacramentoEligibilityFlow struct{}
+type sacramentoEligibilityFlow struct{	prop64Matcher *regexp.Regexp
+}
+
+func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
+	return ef.prop64Matcher.Match([]byte(codeSection))
+}
 
 func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
 	ef.ConvictionBeforeNovNine2016(info, row)

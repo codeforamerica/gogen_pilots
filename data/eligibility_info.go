@@ -33,7 +33,7 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	}
 
 	info.NumberOfConvictionsOnRecord = len(history.Convictions)
-	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions()
+	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions(county)
 	info.DateOfConviction = row.DispositionDate
 
 	eligibilityFlows[county].BeginEligibilityFlow(info, row)

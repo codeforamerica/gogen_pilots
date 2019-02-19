@@ -14,7 +14,7 @@ type DOJInformation struct {
 	comparisonTime time.Time
 }
 
-func (i *DOJInformation) generateHistories() {
+func (i *DOJInformation) generateHistories(county string) {
 	currentRowIndex := 0.0
 	totalRows := float64(len(i.Rows))
 
@@ -28,7 +28,7 @@ func (i *DOJInformation) generateHistories() {
 		if i.Histories[dojRow.SubjectID] == nil {
 			i.Histories[dojRow.SubjectID] = new(DOJHistory)
 		}
-		i.Histories[dojRow.SubjectID].PushRow(dojRow)
+		i.Histories[dojRow.SubjectID].PushRow(dojRow, county)
 		currentRowIndex++
 
 		totalTime += time.Since(startTime)
@@ -57,7 +57,7 @@ func NewDOJInformation(sourceCSV *csv.Reader, comparisonTime time.Time, county s
 		comparisonTime: comparisonTime,
 	}
 
-	info.generateHistories()
+	info.generateHistories(county)
 	info.determineEligibility(county)
 	return &info, nil
 }

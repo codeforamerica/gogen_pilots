@@ -18,7 +18,7 @@ type DOJHistory struct {
 	OriginalCII     string
 }
 
-func (history *DOJHistory) PushRow(row DOJRow) {
+func (history *DOJHistory) PushRow(row DOJRow, county string) {
 	if history.SubjectID == "" {
 		history.SubjectID = row.SubjectID
 		history.Name = row.Name
@@ -41,9 +41,12 @@ func (history *DOJHistory) PushRow(row DOJRow) {
 		history.seenConvictions[row.CountOrder] = true
 	}
 
-	if (hasProp64Charge(row)) {
-		// loop through convicitons
-		// if conviction cycle matches row.cycle, update conviction.hasPro64Charge in Cycle = true
+	if eligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+		for _, conviction := range history.Convictions {
+			if conviction.CountOrder[0:3] == row.CountOrder[0:3] {
+				conviction.HasProp64ChargeInCycle = true
+			}
+		}
 	}
 }
 
@@ -60,10 +63,10 @@ func (history *DOJHistory) MostRecentConvictionDate() time.Time {
 	return latestDate
 }
 
-func (history *DOJHistory) NumberOfProp64Convictions() int {
+func (history *DOJHistory) NumberOfProp64Convictions(county string) int {
 	result := 0
 	for _, row := range history.Convictions {
-		if IsProp64Charge(row.CodeSection) {
+		if eligibilityFlows[county].IsProp64Charge(row.CodeSection) {
 			result++
 		}
 	}
@@ -91,7 +94,7 @@ func (history *DOJHistory) NumberOfFelonies() int {
 
 func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time, county string) {
 	for _, row := range history.Convictions {
-		if IsProp64Charge(row.CodeSection) && row.County == county {
+		if eligibilityFlows[county].IsProp64Charge(row.CodeSection) && row.County == county {
 			infos[row.Index] = NewEligibilityInfo(row, history, comparisonTime, county)
 		}
 	}
