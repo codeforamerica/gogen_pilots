@@ -42,7 +42,7 @@ type convictionStats struct {
 	totalProp64Convictions         int
 	totalHasFelony                 int
 	totalHasConvictionLast7Years   int
-	totalHasConvictions int
+	totalHasConvictions            int
 	totalConvictionsByCodeSection  map[string]int
 	countyConvictionsByCodeSection map[string]int
 	DOJEligibilityByCodeSection    map[string]map[string]int

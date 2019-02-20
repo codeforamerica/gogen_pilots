@@ -6,7 +6,8 @@ import (
 	"time"
 )
 
-type sacramentoEligibilityFlow struct{	prop64Matcher *regexp.Regexp
+type sacramentoEligibilityFlow struct {
+	prop64Matcher *regexp.Regexp
 }
 
 func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
@@ -14,7 +15,9 @@ func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
 }
 
 func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
-	ef.ConvictionBeforeNovNine2016(info, row)
+	if ef.IsProp64Charge(row.CodeSection) {
+		ef.ConvictionBeforeNovNine2016(info, row)
+	}
 }
 
 func (ef sacramentoEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {

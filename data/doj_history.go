@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -41,9 +42,19 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		history.seenConvictions[row.CountOrder] = true
 	}
 
+	fmt.Printf("pushing row %s with cycle=%s (%s)", row.CountOrder, row.CountOrder[0:3], row.CodeSection)
+
+	// hash key=cycle val=hasProp64 charge
+
+	// if conviction
+	//    if prevProp64Hash[cycle]
+	//         conviction.HasProp64ChargeInCycle = true
 	if eligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+		fmt.Printf("     this is a prop64 charge!\n")
 		for _, conviction := range history.Convictions {
+
 			if conviction.CountOrder[0:3] == row.CountOrder[0:3] {
+				fmt.Printf("!!found related charge for %s\n", conviction.CodeSection)
 				conviction.HasProp64ChargeInCycle = true
 			}
 		}
@@ -94,8 +105,11 @@ func (history *DOJHistory) NumberOfFelonies() int {
 
 func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time, county string) {
 	for _, row := range history.Convictions {
-		if eligibilityFlows[county].IsProp64Charge(row.CodeSection) && row.County == county {
-			infos[row.Index] = NewEligibilityInfo(row, history, comparisonTime, county)
+		if row.County == county {
+			eligibilityInfo := NewEligibilityInfo(row, history, comparisonTime, county)
+			if eligibilityInfo != nil {
+				infos[row.Index] = eligibilityInfo
+			}
 		}
 	}
 }

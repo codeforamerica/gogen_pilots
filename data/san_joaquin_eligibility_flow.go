@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-type sanJoaquinEligibilityFlow struct{
-	prop64Matcher *regexp.Regexp
+type sanJoaquinEligibilityFlow struct {
+	prop64Matcher        *regexp.Regexp
 	relatedChargeMatcher *regexp.Regexp
 }
 
@@ -20,7 +20,9 @@ func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
 }
 
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
-	ef.ConvictionBeforeNovNine2016(info, row)
+	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
+		ef.ConvictionBeforeNovNine2016(info, row)
+	}
 }
 
 func (ef sanJoaquinEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
