@@ -38,7 +38,11 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 
 	eligibilityFlows[county].BeginEligibilityFlow(info, row)
 
-	return info
+	if info.EligibilityReason != "" {
+		return info
+	} else {
+		return nil
+	}
 }
 
 func (info *EligibilityInfo) yearsSinceEvent(date time.Time) float64 {

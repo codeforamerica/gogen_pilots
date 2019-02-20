@@ -1,21 +1,23 @@
 package data
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
 
 type DOJHistory struct {
-	SubjectID       string
-	Name            string
-	WeakName        string
-	CII             string
-	DOB             time.Time
-	SSN             string
-	CDL             string
-	Convictions     []*DOJRow
-	seenConvictions map[string]bool
-	OriginalCII     string
+	SubjectID               string
+	Name                    string
+	WeakName                string
+	CII                     string
+	DOB                     time.Time
+	SSN                     string
+	CDL                     string
+	Convictions             []*DOJRow
+	seenConvictions         map[string]bool
+	OriginalCII             string
+	CyclesWithProp64Charges map[string]bool
 }
 
 func (history *DOJHistory) PushRow(row DOJRow, county string) {
@@ -29,6 +31,7 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		history.SSN = row.SSN
 		history.CDL = row.CDL
 		history.seenConvictions = make(map[string]bool)
+		history.CyclesWithProp64Charges = make(map[string]bool)
 	}
 	if row.Convicted && history.seenConvictions[row.CountOrder] {
 		lastConviction := history.Convictions[len(history.Convictions)-1]
@@ -37,11 +40,15 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 	}
 
 	if row.Convicted && !history.seenConvictions[row.CountOrder] {
+		row.HasProp64ChargeInCycle = history.CyclesWithProp64Charges[row.CountOrder[0:3]]
 		history.Convictions = append(history.Convictions, &row)
 		history.seenConvictions[row.CountOrder] = true
 	}
 
+	fmt.Printf("pushing row %s with cycle=%s (%s)", row.CountOrder, row.CountOrder[0:3], row.CodeSection)
+
 	if eligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+		history.CyclesWithProp64Charges[row.CountOrder[0:3]] = true
 		for _, conviction := range history.Convictions {
 			if conviction.CountOrder[0:3] == row.CountOrder[0:3] {
 				conviction.HasProp64ChargeInCycle = true
@@ -94,8 +101,11 @@ func (history *DOJHistory) NumberOfFelonies() int {
 
 func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time, county string) {
 	for _, row := range history.Convictions {
-		if eligibilityFlows[county].IsProp64Charge(row.CodeSection) && row.County == county {
-			infos[row.Index] = NewEligibilityInfo(row, history, comparisonTime, county)
+		if row.County == county {
+			eligibilityInfo := NewEligibilityInfo(row, history, comparisonTime, county)
+			if eligibilityInfo != nil {
+				infos[row.Index] = eligibilityInfo
+			}
 		}
 	}
 }

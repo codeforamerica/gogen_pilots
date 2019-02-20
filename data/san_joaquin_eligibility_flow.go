@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-type sanJoaquinEligibilityFlow struct{
-	prop64Matcher *regexp.Regexp
+type sanJoaquinEligibilityFlow struct {
+	prop64Matcher        *regexp.Regexp
 	relatedChargeMatcher *regexp.Regexp
 }
 
@@ -20,27 +20,29 @@ func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
 }
 
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
-	ef.ConvictionBeforeNovNine2016(info, row)
+	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
+		ef.ConvictionBeforeNovNine2016(info, row)
+	}
 }
 
 func (ef sanJoaquinEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
 	info.EligibilityDetermination = "Eligible for Dismissal"
-	info.EligibilityReason = reason
+	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) EligibleReduction(info *EligibilityInfo, reason string) {
 	info.EligibilityDetermination = "Eligible for Reduction"
-	info.EligibilityReason = reason
+	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason string) {
 	info.EligibilityDetermination = "Maybe Eligible"
-	info.EligibilityReason = reason
+	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
 	info.EligibilityDetermination = "Not eligible"
-	info.EligibilityReason = reason
+	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow) {
@@ -69,7 +71,7 @@ func (ef sanJoaquinEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo,
 
 func (ef sanJoaquinEligibilityFlow) Is11357(info *EligibilityInfo, row *DOJRow) {
 	if strings.HasPrefix(row.CodeSection, "11357") {
-		ef.EligibleDismissal(info, "HS 11357")
+		ef.EligibleDismissal(info, "11357 HS")
 	} else {
 		ef.MoreThanOneConviction(info, row)
 	}
