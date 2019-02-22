@@ -15,6 +15,20 @@ func (ef sanJoaquinEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return ef.prop64Matcher.Match([]byte(codeSection))
 }
 
+func (ef sanJoaquinEligibilityFlow) MatchedCodeSection(codeSection string) string {
+	prop64Matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
+	if len(prop64Matches) > 0 {
+		return prop64Matches[1]
+	}
+
+	relatedChargeMatches := ef.relatedChargeMatcher.FindStringSubmatch(codeSection)
+	if len(relatedChargeMatches) > 0 {
+		return relatedChargeMatches[1]
+	}
+
+	return ""
+}
+
 func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
 	return ef.relatedChargeMatcher.Match([]byte(codeSection))
 }

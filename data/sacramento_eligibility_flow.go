@@ -14,6 +14,14 @@ func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return ef.prop64Matcher.Match([]byte(codeSection))
 }
 
+func (ef sacramentoEligibilityFlow) MatchedCodeSection(codeSection string) string {
+	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
+	if len(matches) > 0 {
+		return matches[1]
+	}
+	return ""
+}
+
 func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
 	if ef.IsProp64Charge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)

@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	"strings"
 	"time"
 )
@@ -45,9 +44,7 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		history.seenConvictions[row.CountOrder] = true
 	}
 
-	fmt.Printf("pushing row %s with cycle=%s (%s)", row.CountOrder, row.CountOrder[0:3], row.CodeSection)
-
-	if eligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+	if EligibilityFlows[county].IsProp64Charge(row.CodeSection) {
 		history.CyclesWithProp64Charges[row.CountOrder[0:3]] = true
 		for _, conviction := range history.Convictions {
 			if conviction.CountOrder[0:3] == row.CountOrder[0:3] {
@@ -73,7 +70,7 @@ func (history *DOJHistory) MostRecentConvictionDate() time.Time {
 func (history *DOJHistory) NumberOfProp64Convictions(county string) int {
 	result := 0
 	for _, row := range history.Convictions {
-		if eligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+		if EligibilityFlows[county].IsProp64Charge(row.CodeSection) {
 			result++
 		}
 	}

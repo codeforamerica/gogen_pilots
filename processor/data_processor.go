@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gogen/data"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -19,9 +18,6 @@ type DataProcessor struct {
 
 type clearanceStats struct {
 	numberFullyClearedRecords                 int
-	numberDismissedCounts                     int
-	numberReducedCounts                       int
-	numberIneligibleCounts                    int
 	numberClearedRecordsLast7Years            int
 	numberHistoriesWithConvictionInLast7Years int
 	numberRecordsNoFelonies                   int
@@ -29,17 +25,15 @@ type clearanceStats struct {
 	numberEligibilityByReason                 map[string]int
 	numberDismissedByCodeSection              map[string]int
 	numberReducedByCodeSection                map[string]int
+	numberIneligibleByCodeSection             map[string]int
+	numberMaybeEligibleByCodeSection          map[string]int
 	numberNoLongerHaveFelony                  int
 	numberNoMoreConvictions                   int
 }
 
-var Prop64CodeSections = []string{"11357", "11358", "11359", "11360"}
-
 type convictionStats struct {
 	totalConvictions               int
 	totalCountyConvictions         int
-	totalCountyProp64Convictions   int
-	totalProp64Convictions         int
 	totalHasFelony                 int
 	totalHasConvictionLast7Years   int
 	totalHasConvictions            int
@@ -63,9 +57,11 @@ func NewDataProcessor(
 		dojInformation:  dojInformation,
 		outputDOJWriter: outputDOJWriter,
 		clearanceStats: clearanceStats{
-			numberEligibilityByReason:    make(map[string]int),
-			numberDismissedByCodeSection: make(map[string]int),
-			numberReducedByCodeSection:   make(map[string]int),
+			numberEligibilityByReason:        make(map[string]int),
+			numberDismissedByCodeSection:     make(map[string]int),
+			numberReducedByCodeSection:       make(map[string]int),
+			numberIneligibleByCodeSection:    make(map[string]int),
+			numberMaybeEligibleByCodeSection: make(map[string]int),
 		},
 		convictionStats: convictionStats{
 			totalConvictionsByCodeSection:  make(map[string]int),
@@ -74,29 +70,14 @@ func NewDataProcessor(
 	}
 }
 
-func (d *DataProcessor) incrementConvictions(conviction *data.DOJRow, county string) {
-	for _, codeSection := range Prop64CodeSections {
-		if strings.HasPrefix(conviction.CodeSection, codeSection) {
-			d.convictionStats.totalConvictionsByCodeSection[codeSection]++
-			if conviction.County == county {
-				d.convictionStats.countyConvictionsByCodeSection[codeSection]++
-			}
+func (d *DataProcessor) incrementConvictions(conviction *data.DOJRow, county string, matchedCodeSection string) {
+	if matchedCodeSection != "" {
+		d.convictionStats.totalConvictionsByCodeSection[matchedCodeSection]++
+		if conviction.County == county {
+			d.convictionStats.countyConvictionsByCodeSection[matchedCodeSection]++
 		}
 	}
 
-}
-
-func (d *DataProcessor) incrementClearanceStats(conviction *data.DOJRow, determination string) {
-	for _, codeSection := range Prop64CodeSections {
-		if strings.HasPrefix(conviction.CodeSection, codeSection) {
-			if determination == "Eligible for Dismissal" {
-				d.clearanceStats.numberDismissedByCodeSection[codeSection]++
-			}
-			if determination == "Eligible for Reduction" {
-				d.clearanceStats.numberReducedByCodeSection[codeSection]++
-			}
-		}
-	}
 }
 
 func (d *DataProcessor) Process(county string) {
@@ -113,13 +94,13 @@ func (d *DataProcessor) Process(county string) {
 		d.convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
 
 		for _, conviction := range history.Convictions {
+			matchedCodeSection := data.EligibilityFlows[county].MatchedCodeSection(conviction.CodeSection)
+
 			var last7years = false
 			eligibility, ok := d.dojInformation.Eligibilities[conviction.Index]
 
-			d.incrementConvictions(conviction, county)
-			if ok {
-				d.incrementClearanceStats(conviction, eligibility.EligibilityDetermination)
-
+			d.incrementConvictions(conviction, county, matchedCodeSection)
+			if ok && matchedCodeSection != "" {
 				if time.Since(conviction.DispositionDate).Hours() <= 61320 {
 					last7years = true
 					totalConvictionsLast7Years++
@@ -127,7 +108,7 @@ func (d *DataProcessor) Process(county string) {
 
 				switch eligibility.EligibilityDetermination {
 				case "Eligible for Dismissal":
-					d.clearanceStats.numberDismissedCounts++
+					d.clearanceStats.numberDismissedByCodeSection[matchedCodeSection]++
 					if conviction.Felony {
 						feloniesDismissed++
 						if last7years {
@@ -141,11 +122,14 @@ func (d *DataProcessor) Process(county string) {
 					}
 
 				case "Eligible for Reduction":
-					d.clearanceStats.numberReducedCounts++
+					d.clearanceStats.numberReducedByCodeSection[matchedCodeSection]++
 					feloniesReduced++
 
 				case "Not eligible":
-					d.clearanceStats.numberIneligibleCounts++
+					d.clearanceStats.numberIneligibleByCodeSection[matchedCodeSection]++
+
+				case "Maybe Eligible":
+					d.clearanceStats.numberMaybeEligibleByCodeSection[matchedCodeSection]++
 				}
 
 				d.clearanceStats.numberEligibilityByReason[eligibility.EligibilityReason]++
@@ -183,49 +167,48 @@ func (d *DataProcessor) Process(county string) {
 
 	d.outputDOJWriter.Flush()
 
-	for _, val := range d.convictionStats.totalConvictionsByCodeSection {
-		d.convictionStats.totalProp64Convictions += val
-	}
+	fmt.Println()
+	fmt.Println("----------- Overall summary of DOJ file --------------------")
+	fmt.Printf("Found %d Total rows in DOJ file\n", len(d.dojInformation.Rows))
+	fmt.Printf("Found %d Total individuals in DOJ file\n", len(d.dojInformation.Histories))
+	fmt.Printf("Found %d Total convictions in DOJ file\n", d.convictionStats.totalConvictions)
+	fmt.Printf("Found %d convictions in this county\n", d.convictionStats.totalCountyConvictions)
 
-	for _, val := range d.convictionStats.countyConvictionsByCodeSection {
-		d.convictionStats.totalCountyProp64Convictions += val
-	}
+	fmt.Println()
+	fmt.Printf("----------- Prop64 and Related Convictions --------------------")
+	printSummaryByCodeSection("total", d.convictionStats.totalConvictionsByCodeSection)
+	printSummaryByCodeSection("in this county", d.convictionStats.countyConvictionsByCodeSection)
+	printSummaryByCodeSection("that are eligible for dismissal", d.clearanceStats.numberDismissedByCodeSection)
+	printSummaryByCodeSection("that are eligible for reduction", d.clearanceStats.numberReducedByCodeSection)
+	printSummaryByCodeSection("that are maybe eligible", d.clearanceStats.numberMaybeEligibleByCodeSection)
+	printSummaryByCodeSection("that are not eligible", d.clearanceStats.numberIneligibleByCodeSection)
 
-	fmt.Printf("Found %d Total Convictions in DOJ file\n", d.convictionStats.totalConvictions)
-	fmt.Printf("Found %d Total Prop64 Convictions in DOJ file\n", d.convictionStats.totalProp64Convictions)
-	for _, codeSection := range Prop64CodeSections {
-		fmt.Printf("Found %d HS %s Convictions total in DOJ file\n", d.convictionStats.totalConvictionsByCodeSection[codeSection], codeSection)
-	}
-
-	fmt.Printf("Found %d County Convictions in DOJ file\n", d.convictionStats.totalCountyConvictions)
-	fmt.Printf("Found %d County Prop64 Convictions in DOJ file\n", d.convictionStats.totalCountyProp64Convictions)
-
-	for _, codeSection := range Prop64CodeSections {
-		fmt.Printf("Found %d HS %s Convictions in this county in DOJ file\n", d.convictionStats.countyConvictionsByCodeSection[codeSection], codeSection)
-	}
-
-	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedCounts)
-
-	for _, codeSection := range Prop64CodeSections {
-		fmt.Printf("Found %d HS %s Convictions in this county that are eligible for dismissal in DOJ file\n", d.clearanceStats.numberDismissedByCodeSection[codeSection], codeSection)
-	}
-
-	fmt.Printf("Found %d Prop64 Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedCounts)
-
-	for _, codeSection := range Prop64CodeSections {
-		fmt.Printf("Found %d HS %s Convictions in this county that are eligible for reduction in DOJ file\n", d.clearanceStats.numberReducedByCodeSection[codeSection], codeSection)
-	}
-
-	fmt.Printf("Found %d Prop64 Convictions in this county that are not eligible in DOJ file\n", d.clearanceStats.numberIneligibleCounts)
-
+	fmt.Println()
+	fmt.Println("----------- Eligibility Reasons --------------------")
 	for key, val := range d.clearanceStats.numberEligibilityByReason {
-		fmt.Printf("Found %d Prop64 Convictions in this county with eligibility reason: %s\n", val, key)
+		fmt.Printf("Found %d convictions in this county with eligibility reason: %s\n", val, key)
 	}
-
-	fmt.Printf("%d individuals had a felony on their record\n", d.convictionStats.totalHasFelony)
+	fmt.Println()
+	fmt.Println("----------- Impact to individuals --------------------")
+	fmt.Printf("%d individuals currently have a felony on their record\n", d.convictionStats.totalHasFelony)
 	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.clearanceStats.numberNoLongerHaveFelony)
-	fmt.Printf("%d individuals had convictions on their record\n", d.convictionStats.totalHasConvictions)
+	fmt.Printf("%d individuals currently have convictions on their record\n", d.convictionStats.totalHasConvictions)
 	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.clearanceStats.numberNoMoreConvictions)
-	fmt.Printf("%d individuals had convictions on their record in the last 7 years\n", d.convictionStats.totalHasConvictionLast7Years)
+	fmt.Printf("%d individuals currently have convictions on their record in the last 7 years\n", d.convictionStats.totalHasConvictionLast7Years)
 	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.clearanceStats.numberClearedRecordsLast7Years)
+}
+
+func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {
+	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
+	for codeSection, number := range resultsByCodeSection {
+		fmt.Printf("Found %d %s convictions %s\n", number, codeSection, description)
+	}
+}
+
+func sumValues(mapOfInts map[string]int) int {
+	total := 0
+	for _, value := range mapOfInts {
+		total += value
+	}
+	return total
 }
