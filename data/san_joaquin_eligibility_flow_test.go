@@ -23,6 +23,7 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			Expect(flow.MatchedCodeSection("148.9 PC")).To(Equal("148.9 PC"))
 			Expect(flow.MatchedCodeSection("4060    BP")).To(Equal("4060    BP"))
 			Expect(flow.MatchedCodeSection("--40508 VC--")).To(Equal("40508 VC"))
+			Expect(flow.MatchedCodeSection("1320(a) PC")).To(Equal("1320(a) PC"))
 		})
 
 		It("returns empty string if there is no match", func() {
