@@ -132,11 +132,13 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 1 148 PC convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are eligible for dismissal"))
 
-		Expect(sessionString).To(ContainSubstring("Found 6 convictions that are eligible for reduction"))
-		Expect(sessionString).To(ContainSubstring("Found 3 11358 convictions that are eligible for reduction"))
-		Expect(sessionString).To(ContainSubstring("Found 3 11359 convictions that are eligible for reduction"))
+		Expect(sessionString).To(ContainSubstring("Found 4 convictions that are eligible for reduction"))
+		Expect(sessionString).To(ContainSubstring("Found 2 11358 convictions that are eligible for reduction"))
+		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are eligible for reduction"))
 
-		Expect(sessionString).To(ContainSubstring("Found 2 convictions that are maybe eligible"))
+		Expect(sessionString).To(ContainSubstring("Found 4 convictions that are maybe eligible"))
+		Expect(sessionString).To(ContainSubstring("Found 1 11358 BP convictions that are maybe eligible"))
+		Expect(sessionString).To(ContainSubstring("Found 1 11359 BP convictions that are maybe eligible"))
 		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are maybe eligible"))
 		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions that are maybe eligible"))
 

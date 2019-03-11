@@ -103,7 +103,7 @@ func (ef sanJoaquinEligibilityFlow) ThisConvictionOlderThan5Years(info *Eligibil
 	if info.YearsSinceThisConviction > 5 {
 		ef.FinalConvictionOnRecord(info, row)
 	} else {
-		ef.EligibleReduction(info, "Occurred in last 5 years")
+		ef.MaybeEligible(info, "Occurred in last 5 years")
 	}
 }
 
@@ -111,7 +111,7 @@ func (ef sanJoaquinEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 	if row.SentenceEndDate.Before(info.comparisonTime) {
 		ef.EligibleDismissal(info, "Sentence Completed")
 	} else {
-		ef.EligibleReduction(info, "Sentence not Completed")
+		ef.MaybeEligible(info, "Sentence not Completed")
 	}
 }
 
