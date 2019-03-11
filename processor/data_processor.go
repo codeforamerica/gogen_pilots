@@ -27,6 +27,7 @@ type clearanceStats struct {
 	numberReducedByCodeSection                map[string]int
 	numberIneligibleByCodeSection             map[string]int
 	numberMaybeEligibleByCodeSection          map[string]int
+	numberFlagForReviewByCodeSection          map[string]int
 	numberNoLongerHaveFelony                  int
 	numberNoMoreConvictions                   int
 }
@@ -62,6 +63,7 @@ func NewDataProcessor(
 			numberReducedByCodeSection:       make(map[string]int),
 			numberIneligibleByCodeSection:    make(map[string]int),
 			numberMaybeEligibleByCodeSection: make(map[string]int),
+			numberFlagForReviewByCodeSection: make(map[string]int),
 		},
 		convictionStats: convictionStats{
 			totalConvictionsByCodeSection:  make(map[string]int),
@@ -130,6 +132,9 @@ func (d *DataProcessor) Process(county string) {
 
 				case "Maybe Eligible":
 					d.clearanceStats.numberMaybeEligibleByCodeSection[matchedCodeSection]++
+
+				case "Maybe Eligible - Flag for Review":
+					d.clearanceStats.numberFlagForReviewByCodeSection[matchedCodeSection]++
 				}
 
 				d.clearanceStats.numberEligibilityByReason[eligibility.EligibilityReason]++
@@ -181,6 +186,7 @@ func (d *DataProcessor) Process(county string) {
 	printSummaryByCodeSection("that are eligible for dismissal", d.clearanceStats.numberDismissedByCodeSection)
 	printSummaryByCodeSection("that are eligible for reduction", d.clearanceStats.numberReducedByCodeSection)
 	printSummaryByCodeSection("that are maybe eligible", d.clearanceStats.numberMaybeEligibleByCodeSection)
+	printSummaryByCodeSection("that are flagged for review", d.clearanceStats.numberFlagForReviewByCodeSection)
 	printSummaryByCodeSection("that are not eligible", d.clearanceStats.numberIneligibleByCodeSection)
 
 	fmt.Println()

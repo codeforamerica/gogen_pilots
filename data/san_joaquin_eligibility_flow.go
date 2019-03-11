@@ -50,7 +50,7 @@ func (ef sanJoaquinEligibilityFlow) EligibleReduction(info *EligibilityInfo, rea
 }
 
 func (ef sanJoaquinEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Maybe Eligible"
+	info.EligibilityDetermination = "Maybe Eligible - Flag for Review"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
@@ -101,7 +101,7 @@ func (ef sanJoaquinEligibilityFlow) MoreThanOneConviction(info *EligibilityInfo,
 
 func (ef sanJoaquinEligibilityFlow) ThisConvictionOlderThan5Years(info *EligibilityInfo, row *DOJRow) {
 	if info.YearsSinceThisConviction > 5 {
-		ef.FinalConvictionOnRecord(info, row)
+		ef.EligibleDismissal(info, "Conviction older than 5 years")
 	} else {
 		ef.MaybeEligible(info, "Occurred in last 5 years")
 	}
@@ -115,13 +115,6 @@ func (ef sanJoaquinEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 	}
 }
 
-func (ef sanJoaquinEligibilityFlow) FinalConvictionOnRecord(info *EligibilityInfo, row *DOJRow) {
-	if info.YearsSinceMostRecentConviction == info.YearsSinceThisConviction {
-		ef.EligibleDismissal(info, "Final Conviction older than 5 years")
-	} else {
-		ef.EligibleReduction(info, "Later Convictions")
-	}
-}
 
 func (ef sanJoaquinEligibilityFlow) hasProp64ChargeInCycle(info *EligibilityInfo, row *DOJRow) {
 	if row.HasProp64ChargeInCycle {
