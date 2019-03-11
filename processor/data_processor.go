@@ -26,8 +26,7 @@ type clearanceStats struct {
 	numberDismissedByCodeSection              map[string]int
 	numberReducedByCodeSection                map[string]int
 	numberIneligibleByCodeSection             map[string]int
-	numberMaybeEligibleByCodeSection          map[string]int
-	numberFlagForReviewByCodeSection          map[string]int
+	numberMaybeEligibleFlagForReviewByCodeSection          map[string]int
 	numberNoLongerHaveFelony                  int
 	numberNoMoreConvictions                   int
 }
@@ -62,8 +61,7 @@ func NewDataProcessor(
 			numberDismissedByCodeSection:     make(map[string]int),
 			numberReducedByCodeSection:       make(map[string]int),
 			numberIneligibleByCodeSection:    make(map[string]int),
-			numberMaybeEligibleByCodeSection: make(map[string]int),
-			numberFlagForReviewByCodeSection: make(map[string]int),
+			numberMaybeEligibleFlagForReviewByCodeSection: make(map[string]int),
 		},
 		convictionStats: convictionStats{
 			totalConvictionsByCodeSection:  make(map[string]int),
@@ -130,11 +128,8 @@ func (d *DataProcessor) Process(county string) {
 				case "Not eligible":
 					d.clearanceStats.numberIneligibleByCodeSection[matchedCodeSection]++
 
-				case "Maybe Eligible":
-					d.clearanceStats.numberMaybeEligibleByCodeSection[matchedCodeSection]++
-
 				case "Maybe Eligible - Flag for Review":
-					d.clearanceStats.numberFlagForReviewByCodeSection[matchedCodeSection]++
+					d.clearanceStats.numberMaybeEligibleFlagForReviewByCodeSection[matchedCodeSection]++
 				}
 
 				d.clearanceStats.numberEligibilityByReason[eligibility.EligibilityReason]++
@@ -185,8 +180,7 @@ func (d *DataProcessor) Process(county string) {
 	printSummaryByCodeSection("in this county", d.convictionStats.countyConvictionsByCodeSection)
 	printSummaryByCodeSection("that are eligible for dismissal", d.clearanceStats.numberDismissedByCodeSection)
 	printSummaryByCodeSection("that are eligible for reduction", d.clearanceStats.numberReducedByCodeSection)
-	printSummaryByCodeSection("that are maybe eligible", d.clearanceStats.numberMaybeEligibleByCodeSection)
-	printSummaryByCodeSection("that are flagged for review", d.clearanceStats.numberFlagForReviewByCodeSection)
+	printSummaryByCodeSection("that are flagged for review", d.clearanceStats.numberMaybeEligibleFlagForReviewByCodeSection)
 	printSummaryByCodeSection("that are not eligible", d.clearanceStats.numberIneligibleByCodeSection)
 
 	fmt.Println()

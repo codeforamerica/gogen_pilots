@@ -77,7 +77,7 @@ func (ef sacramentoEligibilityFlow) MoreThanOneConviction(info *EligibilityInfo,
 
 func (ef sacramentoEligibilityFlow) ThisConvictionOlderThan10Years(info *EligibilityInfo, row *DOJRow) {
 	if info.YearsSinceThisConviction > 10 {
-		ef.FinalConvictionOnRecord(info, row)
+		ef.EligibleDismissal(info, "Conviction older than 10 years")
 	} else {
 		ef.EligibleReduction(info, "Occurred in last 10 years")
 	}
@@ -91,10 +91,3 @@ func (ef sacramentoEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 	}
 }
 
-func (ef sacramentoEligibilityFlow) FinalConvictionOnRecord(info *EligibilityInfo, row *DOJRow) {
-	if info.YearsSinceMostRecentConviction == info.YearsSinceThisConviction {
-		ef.EligibleDismissal(info, "Final Conviction older than 10 years")
-	} else {
-		ef.EligibleReduction(info, "Later Convictions")
-	}
-}
