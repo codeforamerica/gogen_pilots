@@ -19,6 +19,7 @@ type DOJRow struct {
 	CodeSection            string
 	DispositionDate        time.Time
 	OFN                    string
+	Type                   string
 	PC290Registration      bool
 	County                 string
 	Felony                 bool
@@ -59,6 +60,7 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 		OFN:                  rawRow[OFN],
 		NumCrtCase:           rawRow[FE_NUM_CRT_CASE],
 		CycleDate:            parseDate(dateFormat, rawRow[CYC_DATE]),
+		Type:                 rawRow[STP_TYPE_DESCR],
 		PC290Registration:    rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
 		County:               rawRow[STP_ORI_CNTY_NAME],
 		Felony:               isFelony,

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"strings"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type EligibilityInfo struct {
 	comparisonTime                 time.Time
 	EligibilityDetermination       string
 	EligibilityReason              string
+	CaseNumber                     string
 }
 
 func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Time, county string) *EligibilityInfo {
@@ -35,6 +37,7 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	info.NumberOfConvictionsOnRecord = len(history.Convictions)
 	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions(county)
 	info.DateOfConviction = row.DispositionDate
+	info.CaseNumber = strings.Join(history.CaseNumbers[row.CountOrder[0:6]], "; ")
 
 	EligibilityFlows[county].BeginEligibilityFlow(info, row)
 

@@ -17,6 +17,7 @@ type DOJHistory struct {
 	seenConvictions         map[string]bool
 	OriginalCII             string
 	CyclesWithProp64Charges map[string]bool
+	CaseNumbers             map[string][]string
 }
 
 func (history *DOJHistory) PushRow(row DOJRow, county string) {
@@ -31,11 +32,16 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		history.CDL = row.CDL
 		history.seenConvictions = make(map[string]bool)
 		history.CyclesWithProp64Charges = make(map[string]bool)
+		history.CaseNumbers = make(map[string][]string)
 	}
 	if row.Convicted && history.seenConvictions[row.CountOrder] {
 		lastConviction := history.Convictions[len(history.Convictions)-1]
 		newEndDate := lastConviction.SentenceEndDate.Add(row.SentencePartDuration)
 		lastConviction.SentenceEndDate = newEndDate
+	}
+
+	if row.Type == "COURT ACTION" && row.OFN != "" {
+		history.CaseNumbers[row.CountOrder[0:6]] = append(history.CaseNumbers[row.CountOrder[0:6]], row.OFN)
 	}
 
 	if row.Convicted && !history.seenConvictions[row.CountOrder] {

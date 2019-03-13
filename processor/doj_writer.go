@@ -9,6 +9,7 @@ import (
 )
 
 var eligiblityHeaders = []string{
+	"case number",
 	"# of convictions on record",
 	"Date of Conviction",
 	"Years Since This Conviction",
@@ -151,6 +152,7 @@ func (cw csvWriter) WriteDOJEntry(entry []string, info *data.EligibilityInfo) {
 
 	if info != nil {
 		eligibilityCols = []string{
+			info.CaseNumber,
 			writeInt(info.NumberOfConvictionsOnRecord),
 			writeDate(info.DateOfConviction),
 			writeFloat(info.YearsSinceThisConviction),
