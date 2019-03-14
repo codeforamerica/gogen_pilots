@@ -41,7 +41,7 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 	}
 
 	if row.Type == "COURT ACTION" && row.OFN != "" {
-		history.CaseNumbers[row.CountOrder[0:6]] = append(history.CaseNumbers[row.CountOrder[0:6]], row.OFN)
+		history.CaseNumbers[row.CountOrder[0:6]] = setAppend(history.CaseNumbers[row.CountOrder[0:6]], row.OFN)
 	}
 
 	if row.Convicted && !history.seenConvictions[row.CountOrder] {
@@ -100,6 +100,15 @@ func (history *DOJHistory) NumberOfFelonies() int {
 		}
 	}
 	return felonies
+}
+
+func setAppend(arr []string, item string) []string {
+	for _, el := range arr {
+		if el == item {
+			return arr
+		}
+	}
+	return append(arr, item)
 }
 
 func (history *DOJHistory) computeEligibilities(infos map[int]*EligibilityInfo, comparisonTime time.Time, county string) {
