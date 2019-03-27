@@ -18,6 +18,7 @@ type DOJHistory struct {
 	OriginalCII             string
 	CyclesWithProp64Charges map[string]bool
 	CaseNumbers             map[string][]string
+	IsDeceased              bool
 }
 
 func (history *DOJHistory) PushRow(row DOJRow, county string) {
@@ -38,6 +39,10 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		lastConviction := history.Convictions[len(history.Convictions)-1]
 		newEndDate := lastConviction.SentenceEndDate.Add(row.SentencePartDuration)
 		lastConviction.SentenceEndDate = newEndDate
+	}
+
+	if row.Type == "DECEASED" {
+		history.IsDeceased = true
 	}
 
 	if row.Type == "COURT ACTION" && row.OFN != "" {

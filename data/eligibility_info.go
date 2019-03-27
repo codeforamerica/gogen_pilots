@@ -15,6 +15,7 @@ type EligibilityInfo struct {
 	EligibilityDetermination       string
 	EligibilityReason              string
 	CaseNumber                     string
+	Deceased                       string
 }
 
 func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Time, county string) *EligibilityInfo {
@@ -26,7 +27,11 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	} else {
 		info.YearsSinceThisConviction = info.yearsSinceEvent(row.DispositionDate)
 	}
-
+	if history.IsDeceased {
+		info.Deceased = "Deceased"
+	} else {
+		info.Deceased = "-"
+	}
 	mostRecentConvictionDate := history.MostRecentConvictionDate()
 	if (mostRecentConvictionDate == time.Time{}) {
 		info.YearsSinceMostRecentConviction = -1.0
