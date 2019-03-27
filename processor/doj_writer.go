@@ -9,7 +9,7 @@ import (
 )
 
 var eligiblityHeaders = []string{
-	"case number",
+	"Case Number",
 	"# of convictions on record",
 	"Date of Conviction",
 	"Years Since This Conviction",
