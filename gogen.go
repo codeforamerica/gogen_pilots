@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/csv"
 	. "gogen/data"
 	. "gogen/processor"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -24,12 +22,7 @@ func main() {
 		panic(err)
 	}
 
-	dojFile, err := os.Open(opts.DOJFile)
-	if err != nil {
-		panic(err)
-	}
-
-	dojInformation, _ := NewDOJInformation(csv.NewReader(dojFile), time.Now(), opts.County)
+	dojInformation, _ := NewDOJInformation(opts.DOJFile, time.Now(), opts.County)
 
 	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
 

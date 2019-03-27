@@ -29,14 +29,9 @@ var _ = Describe("DataProcessor", func() {
 			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "sacramento", "cadoj_sacramento.csv"))
 			Expect(err).ToNot(HaveOccurred())
 
-			dojFile, err := os.Open(pathToDOJ)
-			if err != nil {
-				panic(err)
-			}
-
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SACRAMENTO")
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "SACRAMENTO")
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_sacramento_results.csv"))
 
@@ -81,14 +76,9 @@ var _ = Describe("DataProcessor", func() {
 			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "san_joaquin", "cadoj_san_joaquin.csv"))
 			Expect(err).ToNot(HaveOccurred())
 
-			dojFile, err := os.Open(pathToDOJ)
-			if err != nil {
-				panic(err)
-			}
-
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation, _ := data.NewDOJInformation(csv.NewReader(dojFile), comparisonTime, "SAN JOAQUIN")
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "SAN JOAQUIN")
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_san_joaquin_results.csv"))
 

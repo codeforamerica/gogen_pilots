@@ -1,9 +1,11 @@
 package data
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"gogen/utilities"
+	"os"
 	"time"
 )
 
@@ -44,12 +46,20 @@ func (i *DOJInformation) determineEligibility(county string) {
 	}
 }
 
-func NewDOJInformation(sourceCSV *csv.Reader, comparisonTime time.Time, county string) (*DOJInformation, error) {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) (*DOJInformation, error) {
+	dojFile, err := os.Open(dojFileName)
+	if err != nil {
+		panic(err)
+	}
+
+	bufferedReader := bufio.NewReader(dojFile)
+	bufferedReader.ReadLine() // read and discard header row
+
+	sourceCSV := csv.NewReader(bufferedReader)
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
 		panic(err)
 	}
-	rows = rows[1:]
 	info := DOJInformation{
 		Rows:           rows,
 		Histories:      make(map[string]*DOJHistory),
