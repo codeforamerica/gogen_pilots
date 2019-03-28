@@ -93,17 +93,17 @@ func (ef sanJoaquinEligibilityFlow) Is11357(info *EligibilityInfo, row *DOJRow) 
 
 func (ef sanJoaquinEligibilityFlow) MoreThanOneConviction(info *EligibilityInfo, row *DOJRow) {
 	if info.NumberOfConvictionsOnRecord > 1 {
-		ef.ThisConvictionOlderThan5Years(info, row)
+		ef.HasConvictionsInPast5Years(info, row)
 	} else {
 		ef.CurrentlyServingSentence(info, row)
 	}
 }
 
-func (ef sanJoaquinEligibilityFlow) ThisConvictionOlderThan5Years(info *EligibilityInfo, row *DOJRow) {
-	if info.YearsSinceThisConviction > 5 {
-		ef.EligibleDismissal(info, "Conviction older than 5 years")
+func (ef sanJoaquinEligibilityFlow) HasConvictionsInPast5Years(info *EligibilityInfo, row *DOJRow) {
+	if info.YearsSinceMostRecentConviction > 5 {
+		ef.EligibleDismissal(info, "No convictions in past 5 years")
 	} else {
-		ef.MaybeEligible(info, "Occurred in last 5 years")
+		ef.MaybeEligible(info, "Has convictions in past 5 years")
 	}
 }
 
