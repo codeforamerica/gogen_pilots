@@ -115,4 +115,51 @@ var _ = Describe("DataProcessor", func() {
 		})
 	})
 
+	Describe("Contra Costa", func() {
+		BeforeEach(func() {
+			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			Expect(err).ToNot(HaveOccurred())
+
+			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa.csv"))
+			Expect(err).ToNot(HaveOccurred())
+
+			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA")
+
+			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_contra_costa_results.csv"))
+
+			dataProcessor = NewDataProcessor(dojInformation, dojWriter)
+		})
+
+		It("runs and has output", func() {
+			dataProcessor.Process("CONTRA COSTA")
+			format.TruncatedDiff = false
+
+			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_contra_costa_results.csv"))
+			Expect(err).ToNot(HaveOccurred())
+			OutputDOJFile, err := os.Open(pathToDOJOutput)
+			Expect(err).ToNot(HaveOccurred())
+			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
+			Expect(err).ToNot(HaveOccurred())
+
+			pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "contra_costa", "doj_contra_costa_results.csv"))
+			Expect(err).ToNot(HaveOccurred())
+			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
+			Expect(err).ToNot(HaveOccurred())
+			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
+			Expect(err).ToNot(HaveOccurred())
+
+			for i, row := range outputDOJCSV {
+				//fmt.Printf("output file %#v", outputDOJCSV)
+				//for j, item := range row {
+				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
+				//}
+				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
+			}
+
+			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+		})
+	})
+
 })
