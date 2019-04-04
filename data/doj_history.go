@@ -198,31 +198,35 @@ var superstrikesPatterns = []string{
 }
 
 var pc290Patterns = []*regexp.Regexp{
-	regexp.MustCompile(`290(.*) PC`),
-	regexp.MustCompile(`236\.1\([BC]\)(.*) PC`),
-	regexp.MustCompile(`243\.4(.*) PC`),
-	regexp.MustCompile(`261(.*) PC`),
+	regexp.MustCompile(`290 PC`),//
+	regexp.MustCompile(`290(\(|\.|[a-zA-Z])+(.*) PC`),//
+	regexp.MustCompile(`236\.1\([BC]\)(.*) PC`),//
+	regexp.MustCompile(`243\.4(.*) PC`),//
+	regexp.MustCompile(`261 PC`),//
+	regexp.MustCompile(`261(\(|\.|[a-zA-Z])+(.*) PC`),//
 	regexp.MustCompile(`262\(A\)\(1\) PC`),
-	regexp.MustCompile(`264\.1(.*) PC`),
-	regexp.MustCompile(`266 PC`),
-	regexp.MustCompile(`266C PC`),
+	regexp.MustCompile(`264\.1(.*) PC`),//
+	regexp.MustCompile(`266 PC`),//
+	regexp.MustCompile(`266C PC`),//
 	regexp.MustCompile(`266H\(B\)(.*) PC`),
 	regexp.MustCompile(`266I\(B\)(.*) PC`),
-	regexp.MustCompile(`266J(.*) PC`),
-	regexp.MustCompile(`267 PC`),
-	regexp.MustCompile(`269(.*) PC`),
-	regexp.MustCompile(`285 PC`),
+	regexp.MustCompile(`266J(.*) PC`),//
+	regexp.MustCompile(`267 PC`),//
+	regexp.MustCompile(`269 PC`),//
+	regexp.MustCompile(`269(\(|\.|[a-zA-Z])+(.*) PC`),//
+	regexp.MustCompile(`285 PC`),//
 	regexp.MustCompile(`286([^\.]*) PC`),
-	regexp.MustCompile(`288 PC`),
+	regexp.MustCompile(`288 PC`),//
 	regexp.MustCompile(`288\(([^\.]*) PC`),
 	regexp.MustCompile(`288A(.*) PC`),
 	regexp.MustCompile(`288\.[23457](.*) PC`),
 	regexp.MustCompile(`289([^\.]*) PC`),
-	regexp.MustCompile(`311\.1(.*) PC`),
+	regexp.MustCompile(`311\.1(.*) PC`),//
 	regexp.MustCompile(`311\.2\([BCD]\) PC`),
 	regexp.MustCompile(`311\.([34]|10|11)(.*) PC`),
-	regexp.MustCompile(`314(.*) PC`),
-	regexp.MustCompile(`647\.6(.*) PC`),
-	regexp.MustCompile(`647A(.*) PC`),
+	regexp.MustCompile(`314 PC`),//
+	regexp.MustCompile(`314(\(|\.|[a-zA-Z])+(.*) PC`),//
+	regexp.MustCompile(`647\.6(.*) PC`),//
+	regexp.MustCompile(`647A(.*) PC`),//
 	regexp.MustCompile(`653F\(C\) PC`),
 }
