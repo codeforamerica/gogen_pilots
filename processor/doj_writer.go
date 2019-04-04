@@ -11,6 +11,9 @@ import (
 var eligiblityHeaders = []string{
 	"Case Number",
 	"# of convictions on record",
+	"Superstrike Code Section(s)",
+	"PC290 Code Section(s)",
+	"PC290 Registration",
 	"Date of Conviction",
 	"Years Since This Conviction",
 	"Years Since Any Conviction",
@@ -155,6 +158,9 @@ func (cw csvWriter) WriteDOJEntry(entry []string, info *data.EligibilityInfo) {
 		eligibilityCols = []string{
 			info.CaseNumber,
 			writeInt(info.NumberOfConvictionsOnRecord),
+			info.Superstrikes,
+			info.PC290CodeSections,
+			info.PC290Registration,
 			writeDate(info.DateOfConviction),
 			writeFloat(info.YearsSinceThisConviction),
 			writeFloat(info.YearsSinceMostRecentConviction),

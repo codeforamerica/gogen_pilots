@@ -85,7 +85,7 @@ var _ = Describe("DataProcessor", func() {
 			dataProcessor = NewDataProcessor(dojInformation, dojWriter)
 		})
 
-		It("runs and has output", func() {
+		FIt("runs and has output", func() {
 			dataProcessor.Process("SAN JOAQUIN")
 			format.TruncatedDiff = false
 
