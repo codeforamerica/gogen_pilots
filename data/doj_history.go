@@ -91,10 +91,6 @@ func (history *DOJHistory) SuperstrikeCodeSections() []string {
 			}
 		}
 	}
-
-	if len(result) == 0 {
-		return append(result, "-")
-	}
 	return result
 }
 
@@ -107,10 +103,6 @@ func (history *DOJHistory) PC290CodeSections() []string {
 				result = append(result, row.CodeSection)
 			}
 		}
-	}
-
-	if len(result) == 0 {
-		return append(result, "-")
 	}
 	return result
 }

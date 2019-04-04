@@ -30,16 +30,31 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	} else {
 		info.YearsSinceThisConviction = info.yearsSinceEvent(row.DispositionDate)
 	}
+
 	if history.IsDeceased {
 		info.Deceased = "Deceased"
 	} else {
 		info.Deceased = "-"
 	}
+
 	if history.PC290Registration {
 		info.PC290Registration = "Yes"
 	} else {
 		info.PC290Registration = "-"
 	}
+
+	if len(history.PC290CodeSections()) > 0 {
+		info.PC290CodeSections = strings.Join(history.PC290CodeSections(), ";")
+	} else {
+		info.PC290CodeSections = "-"
+	}
+
+	if len(history.SuperstrikeCodeSections()) > 0 {
+		info.Superstrikes = strings.Join(history.SuperstrikeCodeSections(), ";")
+	} else {
+		info.Superstrikes = "-"
+	}
+
 	mostRecentConvictionDate := history.MostRecentConvictionDate()
 	if (mostRecentConvictionDate == time.Time{}) {
 		info.YearsSinceMostRecentConviction = -1.0
@@ -48,8 +63,6 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	}
 
 	info.NumberOfConvictionsOnRecord = len(history.Convictions)
-	info.Superstrikes = strings.Join(history.SuperstrikeCodeSections(), ";")
-	info.PC290CodeSections = strings.Join(history.PC290CodeSections(), ";")
 	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions(county)
 	info.DateOfConviction = row.DispositionDate
 	info.CaseNumber = strings.Join(history.CaseNumbers[row.CountOrder[0:6]], "; ")
