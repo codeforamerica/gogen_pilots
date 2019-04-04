@@ -43,10 +43,10 @@ var _ = Describe("gogen", func() {
 
 		sessionString := string(session.Out.Contents())
 
-		Expect(sessionString).To(ContainSubstring("Found 31 Total rows in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 32 Total rows in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 9 Total individuals in DOJ file"))
-		Expect(sessionString).To(ContainSubstring("Found 24 Total convictions in DOJ file"))
-		Expect(sessionString).To(ContainSubstring("Found 21 convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 25 Total convictions in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 22 convictions in this county"))
 
 		Expect(sessionString).To(ContainSubstring("Found 18 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
@@ -107,10 +107,10 @@ var _ = Describe("gogen", func() {
 
 		sessionString := string(session.Out.Contents())
 
-		Expect(sessionString).To(ContainSubstring("Found 38 Total rows in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 39 Total rows in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 11 Total individuals in DOJ file"))
-		Expect(sessionString).To(ContainSubstring("Found 28 Total convictions in DOJ file"))
-		Expect(sessionString).To(ContainSubstring("Found 25 convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 29 Total convictions in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 26 convictions in this county"))
 
 		Expect(sessionString).To(ContainSubstring("Found 22 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
@@ -184,10 +184,10 @@ var _ = Describe("gogen", func() {
 
 		sessionString := string(session.Out.Contents())
 
-		Expect(sessionString).To(ContainSubstring("Found 38 Total rows in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 39 Total rows in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 11 Total individuals in DOJ file"))
-		Expect(sessionString).To(ContainSubstring("Found 28 Total convictions in DOJ file"))
-		Expect(sessionString).To(ContainSubstring("Found 25 convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 29 Total convictions in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 26 convictions in this county"))
 
 		Expect(sessionString).To(ContainSubstring("Found 22 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
