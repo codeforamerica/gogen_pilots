@@ -382,8 +382,6 @@ var _ = Describe("DOJHistory", func() {
 				for _, row := range extraRows {
 					history.PushRow(row, "SACRAMENTO")
 				}
-
-				Expect(len(history.Convictions)).To(Equal(15))
 			})
 
 			It("returns code sections for matched codes", func() {
@@ -419,8 +417,6 @@ var _ = Describe("DOJHistory", func() {
 				for _, row := range extraRows {
 					history.PushRow(row, "SACRAMENTO")
 				}
-
-				Expect(len(history.Convictions)).To(Equal(15))
 			})
 
 			It("returns code sections for matched codes", func() {
