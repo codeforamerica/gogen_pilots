@@ -184,16 +184,19 @@ var _ = Describe("gogen", func() {
 
 		sessionString := string(session.Out.Contents())
 
+		Expect(sessionString).To(ContainSubstring("----------- Overall summary of DOJ file --------------------"))
 		Expect(sessionString).To(ContainSubstring("Found 39 Total rows in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 11 Total individuals in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 29 Total convictions in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 26 convictions in this county"))
 
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions Overall--------------------"))
 		Expect(sessionString).To(ContainSubstring("Found 22 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 10 11358 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 5 11359 convictions total"))
 
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions In This County --------------------"))
 		Expect(sessionString).To(ContainSubstring("Found 19 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 8 11358 convictions in this county"))
@@ -217,6 +220,7 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions that are not eligible"))
 		Expect(sessionString).To(ContainSubstring("Found 1 11358 convictions that are not eligible"))
 
+		Expect(sessionString).To(ContainSubstring("----------- Eligibility Reasons --------------------"))
 		Expect(sessionString).To(ContainSubstring("Found 2 convictions in this county with eligibility reason: Misdemeanor or Infraction"))
 		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county with eligibility reason: No convictions in past 5 years"))
 		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county with eligibility reason: Has convictions in past 5 years"))
@@ -229,12 +233,20 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: 148 PC"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Occurred after 11/09/2016"))
 
+		Expect(sessionString).To(ContainSubstring("----------- Impact to individuals --------------------"))
 		Expect(sessionString).To(ContainSubstring("9 individuals currently have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("11 individuals currently have convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("6 individuals currently have convictions on their record in the last 7 years"))
+
+		Expect(sessionString).To(ContainSubstring("----------- Based on the current eligibility logic --------------------"))
+		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have any convictions on their record in the last 7 years"))
+
+		Expect(sessionString).To(ContainSubstring("----------- If all convictions are dismissed and sealed--------------------"))
+		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("6 individuals will no longer have any convictions on their record in the last 7 years"))
 
 	})
 
