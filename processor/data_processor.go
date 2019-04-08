@@ -10,6 +10,7 @@ import (
 type DataProcessor struct {
 	dojInformation  *data.DOJInformation
 	outputDOJWriter DOJWriter
+	outputCondensedDOJWriter DOJWriter
 	prop64Matcher   *regexp.Regexp
 	stats           dataProcessorStats
 	clearanceStats  clearanceStats
@@ -52,10 +53,12 @@ type dataProcessorStats struct {
 func NewDataProcessor(
 	dojInformation *data.DOJInformation,
 	outputDOJWriter DOJWriter,
+	outputCondensedDOJWriter DOJWriter,
 ) DataProcessor {
 	return DataProcessor{
 		dojInformation:  dojInformation,
 		outputDOJWriter: outputDOJWriter,
+		outputCondensedDOJWriter: outputCondensedDOJWriter,
 		clearanceStats: clearanceStats{
 			numberEligibilityByReason:        make(map[string]int),
 			numberDismissedByCodeSection:     make(map[string]int),
@@ -78,6 +81,31 @@ func (d *DataProcessor) incrementConvictions(conviction *data.DOJRow, county str
 		}
 	}
 
+}
+
+func condenseRow(row []string) []string{
+	var condensedRow  []string
+	condensedRow = append(condensedRow, row[11])
+	condensedRow = append(condensedRow, row[12])
+	condensedRow = append(condensedRow, row[13])
+	condensedRow = append(condensedRow, row[14])
+	condensedRow = append(condensedRow, row[22])
+	condensedRow = append(condensedRow, row[37])
+	condensedRow = append(condensedRow, row[40])
+	condensedRow = append(condensedRow, row[46])
+	condensedRow = append(condensedRow, row[48])
+	condensedRow = append(condensedRow, row[51])
+	condensedRow = append(condensedRow, row[52])
+	condensedRow = append(condensedRow, row[54])
+	condensedRow = append(condensedRow, row[80])
+	condensedRow = append(condensedRow, row[82])
+	condensedRow = append(condensedRow, row[86])
+	condensedRow = append(condensedRow, row[87])
+	condensedRow = append(condensedRow, row[88])
+	condensedRow = append(condensedRow, row[90])
+	condensedRow = append(condensedRow, row[93])
+	condensedRow = append(condensedRow, row[94])
+	return condensedRow
 }
 
 func (d *DataProcessor) Process(county string) {
@@ -163,9 +191,12 @@ func (d *DataProcessor) Process(county string) {
 
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteDOJEntry(row, d.dojInformation.Eligibilities[i])
+		var condensedRow = condenseRow(row)
+		d.outputCondensedDOJWriter.WriteDOJEntry(condensedRow, d.dojInformation.Eligibilities[i])
 	}
 
 	d.outputDOJWriter.Flush()
+	d.outputCondensedDOJWriter.Flush()
 
 	fmt.Println()
 	fmt.Println("----------- Overall summary of DOJ file --------------------")

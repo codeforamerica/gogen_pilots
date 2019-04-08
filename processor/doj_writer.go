@@ -35,10 +35,10 @@ var dojFullHeaders = []string{
 	"REQ_CDL",
 	"REQ_SSN",
 	"PII_SEG_SEP",
-	"CII_NUMBER",
-	"PRI_NAME",
-	"GENDER",
-	"PRI_DOB",
+	"CII_NUMBER",//11
+	"PRI_NAME",//12
+	"GENDER",//13
+	"PRI_DOB",//14
 	"PRI_SSN",
 	"PRI_CDL",
 	"PRI_IDN",
@@ -46,7 +46,7 @@ var dojFullHeaders = []string{
 	"FBI_NUMBER",
 	"PDR_SEG_SEP",
 	"RACE_CODE",
-	"RACE_DESCR",
+	"RACE_DESCR",//22
 	"EYE_COLOR_CODE",
 	"EYE_COLOR_DESCR",
 	"HAIR_COLOR_CODE",
@@ -61,24 +61,24 @@ var dojFullHeaders = []string{
 	"CITIZENSHIP_LIST",
 	"CYC_SEG_SEP",
 	"CYC_ORDER",
-	"CYC_DATE",
+	"CYC_DATE",//37
 	"STP_SEG_SEP",
 	"STP_ORDER",
-	"STP_EVENT_DATE",
+	"STP_EVENT_DATE",//40
 	"STP_TYPE_CODE",
 	"STP_TYPE_DESCR",
 	"STP_ORI_TYPE",
 	"STP_ORI_TYPE_DESCR",
 	"STP_ORI_CODE",
-	"STP_ORI_DESCR",
+	"STP_ORI_DESCR",//46
 	"STP_ORI_CNTY_CODE",
-	"STP_ORI_CNTY_NAME",
+	"STP_ORI_CNTY_NAME",//48
 	"CNT_SEG_SEP",
 	"CNT_ORDER",
-	"DISP_DATE",
-	"OFN",
+	"DISP_DATE",//51
+	"OFN",//52
 	"OFFENSE_CODE",
-	"OFFENSE_DESCR",
+	"OFFENSE_DESCR",//54
 	"OFFENSE_TOC",
 	"OFFENSE_QUAL_LST",
 	"DISP_OFFENSE_CODE",
@@ -104,19 +104,41 @@ var dojFullHeaders = []string{
 	"FE_NUM_WARRANT",
 	"DISP_ORDER",
 	"DISP_CODE",
-	"DISP_DESCR",
+	"DISP_DESCR",//80
 	"CONV_STAT_CODE",
-	"CONV_STAT_DESCR",
+	"CONV_STAT_DESCR",//82
 	"SENT_SEG_SEP",
 	"SENT_ORDER",
 	"SENT_LOC_CODE",
+	"SENT_LOC_DESCR",//86
+	"SENT_LENGTH",//87
+	"SENT_TIME_CODE",//88
+	"SENT_TIME_DESCR",
+	"CYC_AGE",//90
+	"CII_TYPE",
+	"CII_TYPE_ALPHA",
+	"COMMENT_TEXT",//93
+	"END_OF_REC",//94
+}
+	var dojCondensedHeaders = []string{
+	"CII_NUMBER",
+	"PRI_NAME",
+	"GENDER",
+	"PRI_DOB",
+	"RACE_DESCR",
+	"CYC_DATE",
+	"STP_EVENT_DATE",
+	"STP_ORI_DESCR",
+	"STP_ORI_CNTY_NAME",
+	"DISP_DATE",
+	"OFN",
+	"OFFENSE_DESCR",
+	"DISP_DESCR",
+	"CONV_STAT_DESCR",
 	"SENT_LOC_DESCR",
 	"SENT_LENGTH",
 	"SENT_TIME_CODE",
-	"SENT_TIME_DESCR",
 	"CYC_AGE",
-	"CII_TYPE",
-	"CII_TYPE_ALPHA",
 	"COMMENT_TEXT",
 	"END_OF_REC",
 }
@@ -142,6 +164,26 @@ func NewDOJWriter(outputFilePath string) DOJWriter {
 	w.filename = outputFilePath
 
 	headers := append(dojFullHeaders, eligiblityHeaders...)
+
+	err = w.outputFileWriter.Write(headers)
+	if err != nil {
+		panic(err)
+	}
+
+	return w
+}
+
+func NewCondensedDOJWriter(outputFilePath string) DOJWriter {
+	outputFile, err := os.Create(outputFilePath)
+	if err != nil {
+		panic(err)
+	}
+
+	w := new(csvWriter)
+	w.outputFileWriter = csv.NewWriter(outputFile)
+	w.filename = outputFilePath
+
+	headers := append(dojCondensedHeaders, eligiblityHeaders...)
 
 	err = w.outputFileWriter.Write(headers)
 	if err != nil {
