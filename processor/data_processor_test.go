@@ -168,6 +168,28 @@ var _ = Describe("DataProcessor", func() {
 
 			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
 		})
+	})
+	
+	Describe("Condensed output file", func() {
+		BeforeEach(func() {
+			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			Expect(err).ToNot(HaveOccurred())
+
+			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_condensed_input.csv"))
+			Expect(err).ToNot(HaveOccurred())
+
+			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA")
+
+			dojResultsPath := path.Join(outputDir, "doj_contra_costa_results.csv")
+			dojCondensedResultsPath := path.Join(outputDir, "doj_contra_costa_results_condensed.csv")
+
+			dojWriter := NewDOJWriter(dojResultsPath)
+			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
+
+			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter)
+		})
 
 		It("runs and has condensed output", func() {
 			dataProcessor.Process("CONTRA COSTA")
@@ -188,14 +210,8 @@ var _ = Describe("DataProcessor", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			for i, row := range outputDOJCSV {
-				//fmt.Printf("output file %#v", outputDOJCSV)
-				//for j, item := range row {
-				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
-				//}
 				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
 			}
-
-			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
 		})
 	})
 
