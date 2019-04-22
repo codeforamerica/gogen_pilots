@@ -130,18 +130,18 @@ func (d *DataProcessor) Process(county string) {
 		d.convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
 
 		for _, conviction := range history.Convictions {
+			var last7years = false
+			if time.Since(conviction.DispositionDate).Hours() <= 61320 {
+				last7years = true
+				totalConvictionsLast7Years++
+			}
+
 			matchedCodeSection := data.EligibilityFlows[county].MatchedCodeSection(conviction.CodeSection)
 
-			var last7years = false
 			eligibility, ok := d.dojInformation.Eligibilities[conviction.Index]
 
 			d.incrementConvictions(conviction, county, matchedCodeSection)
 			if ok && matchedCodeSection != "" {
-				if time.Since(conviction.DispositionDate).Hours() <= 61320 {
-					last7years = true
-					totalConvictionsLast7Years++
-				}
-
 				switch eligibility.EligibilityDetermination {
 				case "Eligible for Dismissal":
 					d.clearanceStats.numberDismissedByCodeSection[matchedCodeSection]++
