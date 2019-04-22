@@ -46,6 +46,20 @@ type convictionStats struct {
 	DOJEligibilityByCodeSection    map[string]map[string]int
 }
 
+type historySummaryStats struct {
+	feloniesDismissed int
+	feloniesReduced int
+	maybeEligibleFelonies int
+	notEligibleFelonies int
+	misdemeanorsDismissed int
+	feloniesDismissedLast7Years int
+	feloniesReducedLast7Years int
+	maybeEligibleFeloniesLast7Years int
+	notEligibleFeloniesLast7Years int
+	misdemeanorsDismissedLast7Years int
+	totalConvictionsLast7Years int
+}
+
 type dataProcessorStats struct {
 	nDOJProp64Convictions int
 	nDOJSubjects          int
@@ -86,6 +100,85 @@ func (d *DataProcessor) incrementConvictions(conviction *data.DOJRow, county str
 
 }
 
+func (d *DataProcessor) incrementEligibilities(eligibility *data.EligibilityInfo, conviction *data.DOJRow, county string, matchedCodeSection string, last7years bool, historyStats *historySummaryStats) {
+	switch eligibility.EligibilityDetermination {
+		case "Eligible for Dismissal":
+			d.clearanceStats.numberDismissedByCodeSection[matchedCodeSection]++
+			if conviction.Felony {
+				historyStats.feloniesDismissed++
+				if last7years {
+					historyStats.feloniesDismissedLast7Years++
+				}
+			} else {
+				historyStats.misdemeanorsDismissed++
+				if last7years {
+					historyStats.misdemeanorsDismissedLast7Years++
+				}
+			}
+
+		case "Eligible for Reduction":
+			d.clearanceStats.numberReducedByCodeSection[matchedCodeSection]++
+			historyStats.feloniesReduced++
+			if last7years {
+				historyStats.feloniesReducedLast7Years++
+			}
+
+		case "Not eligible":
+			d.clearanceStats.numberIneligibleByCodeSection[matchedCodeSection]++
+			historyStats.notEligibleFelonies++
+			if last7years {
+				historyStats.notEligibleFeloniesLast7Years++
+			}
+
+		case "Maybe Eligible - Flag for Review":
+			d.clearanceStats.numberMaybeEligibleFlagForReviewByCodeSection[matchedCodeSection]++
+			historyStats.maybeEligibleFelonies++
+			if last7years {
+				historyStats.maybeEligibleFeloniesLast7Years++
+			}
+		}
+
+	d.clearanceStats.numberEligibilityByReason[eligibility.EligibilityReason]++
+}
+
+func (d *DataProcessor) incrementClearanceStats(history *data.DOJHistory, historyStats *historySummaryStats) {
+	if history.NumberOfFelonies() > 0 {
+		d.convictionStats.totalHasFelony++
+
+		if history.NumberOfFelonies() == (historyStats.feloniesDismissed + historyStats.feloniesReduced) {
+			d.clearanceStats.numberNoLongerHaveFelony++
+		}
+
+		if history.NumberOfFelonies() == (historyStats.feloniesDismissed + historyStats.feloniesReduced + historyStats.maybeEligibleFelonies + historyStats.notEligibleFelonies) {
+			d.clearanceStats.numberNoLongerHaveFelonyIfAllSealed++
+		}
+	}
+
+	if len(history.Convictions) > 0 {
+		d.convictionStats.totalHasConvictions++
+
+		if len(history.Convictions) == (historyStats.feloniesDismissed + historyStats.misdemeanorsDismissed) {
+			d.clearanceStats.numberNoMoreConvictions++
+		}
+
+		if len(history.Convictions) == (historyStats.feloniesDismissed + historyStats.feloniesReduced + historyStats.maybeEligibleFelonies + historyStats.notEligibleFelonies + historyStats.misdemeanorsDismissed) {
+			d.clearanceStats.numberNoMoreConvictionsIfAllSealed++
+		}
+	}
+
+	if historyStats.totalConvictionsLast7Years > 0 {
+		d.convictionStats.totalHasConvictionLast7Years++
+
+		if historyStats.totalConvictionsLast7Years == (historyStats.feloniesDismissedLast7Years + historyStats.misdemeanorsDismissedLast7Years) {
+			d.clearanceStats.numberClearedRecordsLast7Years++
+		}
+
+		if historyStats.totalConvictionsLast7Years == (historyStats.feloniesDismissedLast7Years + historyStats.feloniesReducedLast7Years + historyStats.maybeEligibleFeloniesLast7Years + historyStats.notEligibleFeloniesLast7Years + historyStats.misdemeanorsDismissedLast7Years) {
+			d.clearanceStats.numberClearedRecordsLast7YearsIfAllSealed++
+		}
+	}
+}
+
 func condenseRow(row []string) []string{
 	var condensedRow  []string
 	condensedRow = append(condensedRow, row[11])
@@ -114,17 +207,8 @@ func condenseRow(row []string) []string{
 func (d *DataProcessor) Process(county string) {
 	fmt.Printf("Processing Histories\n")
 	for _, history := range d.dojInformation.Histories {
-		var feloniesDismissed = 0
-		var feloniesReduced = 0
-		var maybeEligibleFelonies = 0
-		var notEligibleFelonies = 0
-		var misdemeanorsDismissed = 0
-		var feloniesDismissedLast7Years = 0
-		var feloniesReducedLast7Years = 0
-		var maybeEligibleFeloniesLast7Years = 0
-		var notEligibleFeloniesLast7Years = 0
-		var misdemeanorsDismissedLast7Years = 0
-		var totalConvictionsLast7Years = 0
+
+		historyStats := historySummaryStats{}
 
 		d.convictionStats.totalConvictions += len(history.Convictions)
 		d.convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
@@ -133,7 +217,7 @@ func (d *DataProcessor) Process(county string) {
 			var last7years = false
 			if time.Since(conviction.DispositionDate).Hours() <= 61320 {
 				last7years = true
-				totalConvictionsLast7Years++
+				historyStats.totalConvictionsLast7Years++
 			}
 
 			matchedCodeSection := data.EligibilityFlows[county].MatchedCodeSection(conviction.CodeSection)
@@ -141,83 +225,13 @@ func (d *DataProcessor) Process(county string) {
 			eligibility, ok := d.dojInformation.Eligibilities[conviction.Index]
 
 			d.incrementConvictions(conviction, county, matchedCodeSection)
+
 			if ok && matchedCodeSection != "" {
-				switch eligibility.EligibilityDetermination {
-				case "Eligible for Dismissal":
-					d.clearanceStats.numberDismissedByCodeSection[matchedCodeSection]++
-					if conviction.Felony {
-						feloniesDismissed++
-						if last7years {
-							feloniesDismissedLast7Years++
-						}
-					} else {
-						misdemeanorsDismissed++
-						if last7years {
-							misdemeanorsDismissedLast7Years++
-						}
-					}
-
-				case "Eligible for Reduction":
-					d.clearanceStats.numberReducedByCodeSection[matchedCodeSection]++
-					feloniesReduced++
-					if last7years {
-						feloniesReducedLast7Years++
-					}
-
-				case "Not eligible":
-					d.clearanceStats.numberIneligibleByCodeSection[matchedCodeSection]++
-					notEligibleFelonies++
-					if last7years {
-						notEligibleFeloniesLast7Years++
-					}
-
-				case "Maybe Eligible - Flag for Review":
-					d.clearanceStats.numberMaybeEligibleFlagForReviewByCodeSection[matchedCodeSection]++
-					maybeEligibleFelonies++
-					if last7years {
-						maybeEligibleFeloniesLast7Years++
-					}
-				}
-
-				d.clearanceStats.numberEligibilityByReason[eligibility.EligibilityReason]++
+				d.incrementEligibilities(eligibility, conviction, county, matchedCodeSection, last7years, &historyStats)
 			}
 		}
 
-		if history.NumberOfFelonies() > 0 {
-			d.convictionStats.totalHasFelony++
-
-			if history.NumberOfFelonies() == (feloniesDismissed + feloniesReduced) {
-				d.clearanceStats.numberNoLongerHaveFelony++
-			}
-
-			if history.NumberOfFelonies() == (feloniesDismissed + feloniesReduced + maybeEligibleFelonies + notEligibleFelonies) {
-				d.clearanceStats.numberNoLongerHaveFelonyIfAllSealed++
-			}
-		}
-
-		if len(history.Convictions) > 0 {
-			d.convictionStats.totalHasConvictions++
-
-			if len(history.Convictions) == (feloniesDismissed + misdemeanorsDismissed) {
-				d.clearanceStats.numberNoMoreConvictions++
-			}
-
-			if len(history.Convictions) == (feloniesDismissed + feloniesReduced + maybeEligibleFelonies + notEligibleFelonies + misdemeanorsDismissed) {
-				d.clearanceStats.numberNoMoreConvictionsIfAllSealed++
-			}
-		}
-
-		if totalConvictionsLast7Years > 0 {
-			d.convictionStats.totalHasConvictionLast7Years++
-
-			if totalConvictionsLast7Years == (feloniesDismissedLast7Years + misdemeanorsDismissedLast7Years) {
-				d.clearanceStats.numberClearedRecordsLast7Years++
-			}
-
-			if totalConvictionsLast7Years == (feloniesDismissedLast7Years + feloniesReducedLast7Years + maybeEligibleFeloniesLast7Years + notEligibleFeloniesLast7Years + misdemeanorsDismissedLast7Years) {
-				d.clearanceStats.numberClearedRecordsLast7YearsIfAllSealed++
-			}
-		}
+		d.incrementClearanceStats(history, &historyStats)
 	}
 
 	for i, row := range d.dojInformation.Rows {
