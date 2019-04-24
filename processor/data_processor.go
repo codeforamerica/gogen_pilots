@@ -22,14 +22,12 @@ type DataProcessor struct {
 }
 
 type totalClearanceResults struct {
-	numberFullyClearedRecords                     int
-	numberClearedRecordsLast7Years                int
-	numberClearedRecordsLast7YearsIfAllSealed     int
-	numberHistoriesWithConvictionInLast7Years     int
-	numberRecordsNoFelonies                       int
 	numberHistoriesWithFelonies                   int
+	numberHistoriesWithConvictionInLast7Years     int
 	numberNoLongerHaveFelony                      int
 	numberNoLongerHaveFelonyIfAllSealed           int
+	numberClearedRecordsLast7Years                int
+	numberClearedRecordsLast7YearsIfAllSealed     int
 	numberNoMoreConvictions                       int
 	numberNoMoreConvictionsIfAllSealed            int
 }
@@ -334,7 +332,6 @@ func (d *DataProcessor) Process(county string) {
 	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7Years)
 	fmt.Println()
 	fmt.Println("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
-
 	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealed)
 	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictionsIfAllSealed)
 	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7YearsIfAllSealed )
