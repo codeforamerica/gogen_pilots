@@ -51,4 +51,34 @@ var _ = Describe("DojRow", func() {
 			Expect(row.MatchingCourtNumber("140189")).To(BeTrue())
 		})
 	})
+
+	Describe("OccurredInLast7Years", func() {
+		Context("when the disposition date occurred in the last 7 years", func() {
+			BeforeEach(func() {
+				rawRow = []string{
+					"x", "x", "18675309", "#", "1008675309", "x", "x", "x", "x", "x", "#", "1008675309", "SKYWALKER,LUKE S", "x", "19600314", "123456789", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "20160525", "x", "ARREST/DETAINED/CITED", "x", "x", "x", "CAPDSAN FRANCISCO", "x", "SAN FRANCISCO", "x", "x", "20160525", "12 140189-B", "x", "503 VC-TAKE CAR W/OUT OWNERS CONSENT", "F", "              ", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "REL/TOT OTHER JURIS/AUTH", "", "FELONY", "#", "", "", "", "", "", "                  ", "23", "", "", "", "#", "",
+				}
+			})
+			It("returns true", func() {
+				row := NewDOJRow(rawRow, 1)
+
+				Expect(row.DispositionDate).To(Equal(time.Date(2016, time.May, 25, 0, 0, 0, 0, time.UTC)))
+				Expect(row.OccurredInLast7Years()).To(BeTrue())
+			})
+		})
+
+		Context("when the disposition date occurred in the last 7 years", func() {
+			BeforeEach(func() {
+				rawRow = []string{
+					"x", "x", "18675309", "#", "1008675309", "x", "x", "x", "x", "x", "#", "1008675309", "SKYWALKER,LUKE S", "x", "19600314", "123456789", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "19790525", "x", "ARREST/DETAINED/CITED", "x", "x", "x", "CAPDSAN FRANCISCO", "x", "SAN FRANCISCO", "x", "x", "19790525", "12 140189-B", "x", "503 VC-TAKE CAR W/OUT OWNERS CONSENT", "F", "              ", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "REL/TOT OTHER JURIS/AUTH", "", "FELONY", "#", "", "", "", "", "", "                  ", "23", "", "", "", "#", "",
+				}
+			})
+			It("returns true", func() {
+				row := NewDOJRow(rawRow, 1)
+
+				Expect(row.DispositionDate).To(Equal(time.Date(1979, time.May, 25, 0, 0, 0, 0, time.UTC)))
+				Expect(row.OccurredInLast7Years()).To(BeFalse())
+			})
+		})
+	})
 })

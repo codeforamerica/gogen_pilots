@@ -120,6 +120,16 @@ func (row *DOJRow) MatchingCourtNumber(courtNumber string) bool {
 	return false
 }
 
+func (row *DOJRow) OccurredInLast7Years() bool {
+	sevenYearsAgo := time.Now().AddDate(-7,0,0)
+
+	if row.DispositionDate.After(sevenYearsAgo) {
+		return true
+	} else {
+		return false
+	}
+}
+
 const (
 	RECORD_ID = iota
 	SUBJECT_STATUS

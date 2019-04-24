@@ -137,6 +137,18 @@ func (history *DOJHistory) NumberOfFelonies() int {
 	return felonies
 }
 
+func (history *DOJHistory) NumberOfConvictionsInLast7Years() int {
+	convictionsInRange := 0
+
+	for _, conviction := range history.Convictions {
+		if conviction.OccurredInLast7Years() {
+			convictionsInRange++
+		}
+	}
+
+	return convictionsInRange
+}
+
 func setAppend(arr []string, item string) []string {
 	for _, el := range arr {
 		if el == item {

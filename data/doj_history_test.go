@@ -93,6 +93,26 @@ var _ = Describe("DOJHistory", func() {
 		})
 	})
 
+	Describe("NumberOfConvictionsInLast7Years", func() {
+		Describe("when at least one conviction occurred within the last 7 years", func() {
+			BeforeEach(func() {
+				conviction6 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "187 PC", Convicted: true, CycleDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "102001003300", DispositionDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+				conviction7 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "191.5 PC", Convicted: true, CycleDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "103001004300", DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+
+				history.PushRow(conviction6, "SACRAMENTO")
+				history.PushRow(conviction7, "SACRAMENTO")
+			})
+
+			It("returns the number of convictions that occurred in the last 7 years", func() {
+				Expect(history.NumberOfConvictionsInLast7Years()).To(Equal(2))
+			})
+		})
+
+		It("returns 0 if no convictions occurred in the last 7 years", func() {
+			Expect(history.NumberOfConvictionsInLast7Years()).To(Equal(0))
+		})
+	})
+
 	Describe("SuperstrikeCodeSections", func() {
 		Describe("codes between 187 and 220", func() {
 			BeforeEach(func() {
