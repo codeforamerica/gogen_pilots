@@ -6,6 +6,7 @@ type EligibilityFlow interface {
 	BeginEligibilityFlow(info *EligibilityInfo, conviction *DOJRow)
 	IsProp64Charge(codeSection string) (result bool)
 	MatchedCodeSection(codeSection string) (matchedCodeSection string)
+	MatchedRelatedCodeSection(codeSection string) (matchedCodeSection string)
 }
 
 var EligibilityFlows = map[string]EligibilityFlow{

@@ -22,6 +22,10 @@ func (ef sacramentoEligibilityFlow) MatchedCodeSection(codeSection string) strin
 	return ""
 }
 
+func (ef sacramentoEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
+	return ""
+}
+
 func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
 	if ef.IsProp64Charge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)

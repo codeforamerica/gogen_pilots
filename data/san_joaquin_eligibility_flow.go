@@ -21,6 +21,10 @@ func (ef sanJoaquinEligibilityFlow) MatchedCodeSection(codeSection string) strin
 		return prop64Matches[1]
 	}
 
+	return ""
+}
+
+func (ef sanJoaquinEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
 	relatedChargeMatches := ef.relatedChargeMatcher.FindStringSubmatch(codeSection)
 	if len(relatedChargeMatches) > 0 {
 		return relatedChargeMatches[1]

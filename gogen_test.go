@@ -48,13 +48,13 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 25 Total convictions in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 22 convictions in this county"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions Overall--------------------"))
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Convictions Overall--------------------"))
 		Expect(sessionString).To(ContainSubstring("Found 18 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 10 11358 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 5 11359 convictions total"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions In This County --------------------"))
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Convictions In This County --------------------"))
 		Expect(sessionString).To(ContainSubstring("Found 15 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 8 11358 convictions in this county"))
@@ -80,17 +80,27 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Sentence Completed"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Occurred after 11/09/2016"))
 
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Related Convictions In This County --------------------"))
+
+		Expect(sessionString).To(ContainSubstring("Found 0 convictions in this county"))//Sacramento did not include related charges
+
+		Expect(sessionString).To(ContainSubstring("Found 0 convictions that are eligible for dismissal"))
+
+		Expect(sessionString).To(ContainSubstring("Found 0 convictions that are flagged for review"))
+
+		Expect(sessionString).To(ContainSubstring("Found 0 convictions that are not eligible"))
+
 		Expect(sessionString).To(ContainSubstring("----------- Impact to individuals --------------------"))
 		Expect(sessionString).To(ContainSubstring("9 individuals currently have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("9 individuals currently have convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("4 individuals currently have convictions on their record in the last 7 years"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Based on the current eligibility logic --------------------"))
+		Expect(sessionString).To(ContainSubstring("----------- If ELIGIBLE Prop 64 convictions are dismissed or reduced --------------------"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have any convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have any convictions on their record in the last 7 years"))
 
-		Expect(sessionString).To(ContainSubstring("----------- If all convictions are dismissed and sealed--------------------"))
+		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have any convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record in the last 7 years"))
@@ -124,47 +134,57 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 31 Total convictions in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 28 convictions in this county"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions Overall--------------------"))
-		Expect(sessionString).To(ContainSubstring("Found 23 convictions total"))
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Convictions Overall--------------------"))
+		Expect(sessionString).To(ContainSubstring("Found 19 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 11 11358 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 5 11359 convictions total"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions In This County --------------------"))
-		Expect(sessionString).To(ContainSubstring("Found 20 convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Convictions In This County --------------------"))
+		Expect(sessionString).To(ContainSubstring("Found 16 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 9 11358 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 4 11359 convictions in this county"))
-		Expect(sessionString).To(ContainSubstring("Found 2 4149 BP convictions in this county"))
-		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions in this county"))
 
-		Expect(sessionString).To(ContainSubstring("Found 11 convictions that are eligible for dismissal"))
+		Expect(sessionString).To(ContainSubstring("Found 9 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 4 11358 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are eligible for dismissal"))
+
+		Expect(sessionString).To(ContainSubstring("Found 6 convictions that are flagged for review"))
+		Expect(sessionString).To(ContainSubstring("Found 4 11358 convictions that are flagged for review"))
+		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are flagged for review"))
+
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Related Convictions In This County --------------------"))
+		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county"))//until we start ignoring charges with no matching prop 64 charge
+		Expect(sessionString).To(ContainSubstring("Found 2 4149 BP convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 1 148 PC convictions in this county"))
+
+		Expect(sessionString).To(ContainSubstring("Found 2 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 1 148 PC convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are eligible for dismissal"))
 
-		Expect(sessionString).To(ContainSubstring("Found 8 convictions that are flagged for review"))
-		Expect(sessionString).To(ContainSubstring("Found 4 11358 convictions that are flagged for review"))
-		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are flagged for review"))
+		Expect(sessionString).To(ContainSubstring("Found 2 convictions that are flagged for review"))
 		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are flagged for review"))
 		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions that are flagged for review"))
+
+		Expect(sessionString).To(ContainSubstring("Found 0 convictions that are not eligible"))
 
 		Expect(sessionString).To(ContainSubstring("----------- Impact to individuals --------------------"))
 		Expect(sessionString).To(ContainSubstring("10 individuals currently have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("12 individuals currently have convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("7 individuals currently have convictions on their record in the last 7 years"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Based on the current eligibility logic --------------------"))
+		Expect(sessionString).To(ContainSubstring("----------- If ELIGIBLE Prop 64 convictions are dismissed or reduced --------------------"))
 		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have any convictions on their record in the last 7 years"))
 
-		Expect(sessionString).To(ContainSubstring("----------- If all convictions are dismissed and sealed--------------------"))
-		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("5 individuals will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("runs and has output for Contra Costa", func() {
@@ -196,32 +216,26 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 29 Total convictions in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 26 convictions in this county"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions Overall--------------------"))
-		Expect(sessionString).To(ContainSubstring("Found 22 convictions total"))
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Convictions Overall--------------------"))
+		Expect(sessionString).To(ContainSubstring("Found 18 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 10 11358 convictions total"))
 		Expect(sessionString).To(ContainSubstring("Found 5 11359 convictions total"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Prop64 and Related Convictions In This County --------------------"))
-		Expect(sessionString).To(ContainSubstring("Found 19 convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Convictions In This County --------------------"))
+		Expect(sessionString).To(ContainSubstring("Found 15 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 8 11358 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 4 11359 convictions in this county"))
-		Expect(sessionString).To(ContainSubstring("Found 2 4149 BP convictions in this county"))
-		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions in this county"))
 
-		Expect(sessionString).To(ContainSubstring("Found 11 convictions that are eligible for dismissal"))
+		Expect(sessionString).To(ContainSubstring("Found 9 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11357 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 4 11358 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are eligible for dismissal"))
-		Expect(sessionString).To(ContainSubstring("Found 1 148 PC convictions that are eligible for dismissal"))
-		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are eligible for dismissal"))
 
-		Expect(sessionString).To(ContainSubstring("Found 7 convictions that are flagged for review"))
+		Expect(sessionString).To(ContainSubstring("Found 5 convictions that are flagged for review"))
 		Expect(sessionString).To(ContainSubstring("Found 3 11358 convictions that are flagged for review"))
 		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are flagged for review"))
-		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are flagged for review"))
-		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions that are flagged for review"))
 
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions that are not eligible"))
 		Expect(sessionString).To(ContainSubstring("Found 1 11358 convictions that are not eligible"))
@@ -232,28 +246,39 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county with eligibility reason: Has convictions in past 5 years"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Sentence not Completed"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Sentence Completed"))
-		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: No Related Prop64 Charges"))
-		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: 4060 BP"))
-		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: 4149 BP"))
 		Expect(sessionString).To(ContainSubstring("Found 2 convictions in this county with eligibility reason: 11357 HS"))
-		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: 148 PC"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Occurred after 11/09/2016"))
+
+		Expect(sessionString).To(ContainSubstring("----------- Prop64 Related Convictions In This County --------------------"))
+		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county"))//until we start ignoring charges with no matching prop 64 charge
+		Expect(sessionString).To(ContainSubstring("Found 2 4149 BP convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions in this county"))
+		Expect(sessionString).To(ContainSubstring("Found 1 148 PC convictions in this county"))
+
+		Expect(sessionString).To(ContainSubstring("Found 2 convictions that are eligible for dismissal"))
+		Expect(sessionString).To(ContainSubstring("Found 1 148 PC convictions that are eligible for dismissal"))
+		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are eligible for dismissal"))
+
+		Expect(sessionString).To(ContainSubstring("Found 2 convictions that are flagged for review"))
+		Expect(sessionString).To(ContainSubstring("Found 1 4149 BP convictions that are flagged for review"))
+		Expect(sessionString).To(ContainSubstring("Found 1 4060 BP convictions that are flagged for review"))
+
+		Expect(sessionString).To(ContainSubstring("Found 0 convictions that are not eligible"))
 
 		Expect(sessionString).To(ContainSubstring("----------- Impact to individuals --------------------"))
 		Expect(sessionString).To(ContainSubstring("9 individuals currently have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("11 individuals currently have convictions on their record"))
 		Expect(sessionString).To(ContainSubstring("6 individuals currently have convictions on their record in the last 7 years"))
 
-		Expect(sessionString).To(ContainSubstring("----------- Based on the current eligibility logic --------------------"))
+		Expect(sessionString).To(ContainSubstring("----------- If ELIGIBLE Prop 64 convictions are dismissed or reduced --------------------"))
 		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("1 individuals will no longer have any convictions on their record in the last 7 years"))
 
-		Expect(sessionString).To(ContainSubstring("----------- If all convictions are dismissed and sealed--------------------"))
-		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("5 individuals will no longer have any convictions on their record in the last 7 years"))
-
+		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("can handle a csv with extra comma at the end of headers", func() {
