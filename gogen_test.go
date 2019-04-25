@@ -192,9 +192,9 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have a felony on their record"))
 		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("5 individuals will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("runs and has output for Contra Costa", func() {
@@ -291,9 +291,9 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have a felony on their record\n4 individuals"))//to differentiate from the same content in Prop64 only stats
 		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("5 individuals will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("4 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("can handle a csv with extra comma at the end of headers", func() {

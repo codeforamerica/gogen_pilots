@@ -200,7 +200,7 @@ func (d *DataProcessor) incrementConvictionAndClearanceStats(
 
 		if history.NumberOfFelonies() == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced +
 			prop64HistoryStats.maybeEligibleFelonies + prop64HistoryStats.notEligibleFelonies +
-			relatedChargeHistoryStats.feloniesDismissed + relatedChargeHistoryStats.maybeEligibleFelonies + relatedChargeHistoryStats.notEligibleFelonies) {
+			relatedChargeHistoryStats.feloniesDismissed + relatedChargeHistoryStats.notEligibleFelonies) {
 			clearanceStats.numberNoLongerHaveFelonyIfAllSealedIncludingRelated++
 		}
 	}
@@ -218,7 +218,7 @@ func (d *DataProcessor) incrementConvictionAndClearanceStats(
 
 		if len(history.Convictions) == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced +
 			prop64HistoryStats.maybeEligibleFelonies + prop64HistoryStats.notEligibleFelonies + prop64HistoryStats.misdemeanorsDismissed +
-			relatedChargeHistoryStats.feloniesDismissed + relatedChargeHistoryStats.maybeEligibleFelonies + relatedChargeHistoryStats.notEligibleFelonies + relatedChargeHistoryStats.misdemeanorsDismissed) {
+			relatedChargeHistoryStats.feloniesDismissed + relatedChargeHistoryStats.misdemeanorsDismissed) {
 			clearanceStats.numberNoMoreConvictionsIfAllSealedIncludingRelated++
 		}
 	}
@@ -236,7 +236,7 @@ func (d *DataProcessor) incrementConvictionAndClearanceStats(
 
 		if history.NumberOfConvictionsInLast7Years() == (prop64HistoryStats.feloniesDismissedLast7Years + prop64HistoryStats.feloniesReducedLast7Years +
 			prop64HistoryStats.maybeEligibleFeloniesLast7Years + prop64HistoryStats.notEligibleFeloniesLast7Years + prop64HistoryStats.misdemeanorsDismissedLast7Years +
-			relatedChargeHistoryStats.feloniesDismissedLast7Years + relatedChargeHistoryStats.maybeEligibleFeloniesLast7Years + relatedChargeHistoryStats.notEligibleFeloniesLast7Years + relatedChargeHistoryStats.misdemeanorsDismissedLast7Years) {
+			relatedChargeHistoryStats.feloniesDismissedLast7Years + relatedChargeHistoryStats.notEligibleFeloniesLast7Years + relatedChargeHistoryStats.misdemeanorsDismissedLast7Years) {
 			clearanceStats.numberClearedRecordsLast7YearsIfAllSealedIncludingRelated++
 		}
 	}
