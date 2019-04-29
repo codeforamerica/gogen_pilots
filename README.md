@@ -5,7 +5,7 @@ The output is a CSV file that contains all the original data from the DOJ as wel
 
 ## Prerequisites
 
- - [Golang]() install with `brew install golang`
+ - [Golang](https://golang.org/) install with `brew install golang`
  
 ## Cloning the project
 
@@ -16,8 +16,10 @@ We recommend you add `../go/bin` to your path so you can run certain go tools fr
 
 ## Setup
 
- - Install project dependencies with `cd ~/go/src/gogen` followed by `go get ./...`
+ - Change to project root directory `cd ~/go/src/gogen`
+ - Install project dependencies with `go get ./...`
  - Install the Ginkgo test library with `go get github.com/onsi/ginkgo/ginkgo`
+ - Install project test dependencies with `go get -t ./...`
  - Verify the tests are passing with `ginkgo -r`
  
 ## Running locally
