@@ -153,7 +153,7 @@ type csvWriter struct {
 	filename         string
 }
 
-func NewDOJWriter(outputFilePath string) DOJWriter {
+func NewWriter(outputFilePath string, headers []string) DOJWriter {
 	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
 		panic(err)
@@ -162,8 +162,6 @@ func NewDOJWriter(outputFilePath string) DOJWriter {
 	w := new(csvWriter)
 	w.outputFileWriter = csv.NewWriter(outputFile)
 	w.filename = outputFilePath
-
-	headers := append(dojFullHeaders, eligiblityHeaders...)
 
 	err = w.outputFileWriter.Write(headers)
 	if err != nil {
@@ -173,24 +171,14 @@ func NewDOJWriter(outputFilePath string) DOJWriter {
 	return w
 }
 
+func NewDOJWriter(outputFilePath string) DOJWriter {
+	headers := append(dojFullHeaders, eligiblityHeaders...)
+	return NewWriter(outputFilePath, headers)
+}
+
 func NewCondensedDOJWriter(outputFilePath string) DOJWriter {
-	outputFile, err := os.Create(outputFilePath)
-	if err != nil {
-		panic(err)
-	}
-
-	w := new(csvWriter)
-	w.outputFileWriter = csv.NewWriter(outputFile)
-	w.filename = outputFilePath
-
 	headers := append(dojCondensedHeaders, eligiblityHeaders...)
-
-	err = w.outputFileWriter.Write(headers)
-	if err != nil {
-		panic(err)
-	}
-
-	return w
+	return NewWriter(outputFilePath, headers)
 }
 
 func (cw csvWriter) WriteDOJEntry(entry []string, info *data.EligibilityInfo) {
