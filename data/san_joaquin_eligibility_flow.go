@@ -119,7 +119,6 @@ func (ef sanJoaquinEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 	}
 }
 
-
 func (ef sanJoaquinEligibilityFlow) hasProp64ChargeInCycle(info *EligibilityInfo, row *DOJRow) {
 	if row.HasProp64ChargeInCycle {
 		ef.isBP4060Charge(info, row)

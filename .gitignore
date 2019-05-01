@@ -3,3 +3,5 @@ gogen
 input_files
 results/
 .DS_Store
+generate_test_data/generate_test_data
+generated_test_data.csv

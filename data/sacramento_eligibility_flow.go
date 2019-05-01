@@ -94,4 +94,3 @@ func (ef sacramentoEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 		ef.EligibleReduction(info, "Sentence not Completed")
 	}
 }
-

@@ -23,7 +23,7 @@ var eligiblityHeaders = []string{
 	"Eligibility Reason",
 }
 
-var dojFullHeaders = []string{
+var DojFullHeaders = []string{
 	"RECORD_ID",
 	"SUBJECT_STATUS",
 	"SUBJECT_ID",
@@ -35,10 +35,10 @@ var dojFullHeaders = []string{
 	"REQ_CDL",
 	"REQ_SSN",
 	"PII_SEG_SEP",
-	"CII_NUMBER",//11
-	"PRI_NAME",//12
-	"GENDER",//13
-	"PRI_DOB",//14
+	"CII_NUMBER", //11
+	"PRI_NAME",   //12
+	"GENDER",     //13
+	"PRI_DOB",    //14
 	"PRI_SSN",
 	"PRI_CDL",
 	"PRI_IDN",
@@ -46,7 +46,7 @@ var dojFullHeaders = []string{
 	"FBI_NUMBER",
 	"PDR_SEG_SEP",
 	"RACE_CODE",
-	"RACE_DESCR",//22
+	"RACE_DESCR", //22
 	"EYE_COLOR_CODE",
 	"EYE_COLOR_DESCR",
 	"HAIR_COLOR_CODE",
@@ -61,24 +61,24 @@ var dojFullHeaders = []string{
 	"CITIZENSHIP_LIST",
 	"CYC_SEG_SEP",
 	"CYC_ORDER",
-	"CYC_DATE",//37
+	"CYC_DATE", //37
 	"STP_SEG_SEP",
 	"STP_ORDER",
-	"STP_EVENT_DATE",//40
+	"STP_EVENT_DATE", //40
 	"STP_TYPE_CODE",
 	"STP_TYPE_DESCR",
 	"STP_ORI_TYPE",
 	"STP_ORI_TYPE_DESCR",
 	"STP_ORI_CODE",
-	"STP_ORI_DESCR",//46
+	"STP_ORI_DESCR", //46
 	"STP_ORI_CNTY_CODE",
-	"STP_ORI_CNTY_NAME",//48
+	"STP_ORI_CNTY_NAME", //48
 	"CNT_SEG_SEP",
 	"CNT_ORDER",
-	"DISP_DATE",//51
-	"OFN",//52
+	"DISP_DATE", //51
+	"OFN",       //52
 	"OFFENSE_CODE",
-	"OFFENSE_DESCR",//54
+	"OFFENSE_DESCR", //54
 	"OFFENSE_TOC",
 	"OFFENSE_QUAL_LST",
 	"DISP_OFFENSE_CODE",
@@ -104,23 +104,23 @@ var dojFullHeaders = []string{
 	"FE_NUM_WARRANT",
 	"DISP_ORDER",
 	"DISP_CODE",
-	"DISP_DESCR",//80
+	"DISP_DESCR", //80
 	"CONV_STAT_CODE",
-	"CONV_STAT_DESCR",//82
+	"CONV_STAT_DESCR", //82
 	"SENT_SEG_SEP",
 	"SENT_ORDER",
 	"SENT_LOC_CODE",
-	"SENT_LOC_DESCR",//86
-	"SENT_LENGTH",//87
-	"SENT_TIME_CODE",//88
+	"SENT_LOC_DESCR", //86
+	"SENT_LENGTH",    //87
+	"SENT_TIME_CODE", //88
 	"SENT_TIME_DESCR",
-	"CYC_AGE",//90
+	"CYC_AGE", //90
 	"CII_TYPE",
 	"CII_TYPE_ALPHA",
-	"COMMENT_TEXT",//93
-	"END_OF_REC",//94
+	"COMMENT_TEXT", //93
+	"END_OF_REC",   //94
 }
-	var dojCondensedHeaders = []string{
+var dojCondensedHeaders = []string{
 	"CII_NUMBER",
 	"PRI_NAME",
 	"GENDER",
@@ -144,7 +144,8 @@ var dojFullHeaders = []string{
 }
 
 type DOJWriter interface {
-	WriteDOJEntry([]string, *data.EligibilityInfo)
+	WriteEntryWithEligibilityInfo([]string, *data.EligibilityInfo)
+	Write([]string)
 	Flush()
 }
 
@@ -172,7 +173,7 @@ func NewWriter(outputFilePath string, headers []string) DOJWriter {
 }
 
 func NewDOJWriter(outputFilePath string) DOJWriter {
-	headers := append(dojFullHeaders, eligiblityHeaders...)
+	headers := append(DojFullHeaders, eligiblityHeaders...)
 	return NewWriter(outputFilePath, headers)
 }
 
@@ -181,7 +182,7 @@ func NewCondensedDOJWriter(outputFilePath string) DOJWriter {
 	return NewWriter(outputFilePath, headers)
 }
 
-func (cw csvWriter) WriteDOJEntry(entry []string, info *data.EligibilityInfo) {
+func (cw csvWriter) WriteEntryWithEligibilityInfo(entry []string, info *data.EligibilityInfo) {
 	var eligibilityCols []string
 
 	if info != nil {
@@ -212,6 +213,10 @@ func writeDate(val time.Time) string {
 
 func (cw csvWriter) Flush() {
 	cw.outputFileWriter.Flush()
+}
+
+func (cw csvWriter) Write(line []string) {
+	cw.outputFileWriter.Write(line)
 }
 
 func writeFloat(val float64) string {

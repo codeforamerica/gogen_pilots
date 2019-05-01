@@ -121,7 +121,7 @@ func (row *DOJRow) MatchingCourtNumber(courtNumber string) bool {
 }
 
 func (row *DOJRow) OccurredInLast7Years() bool {
-	sevenYearsAgo := time.Now().AddDate(-7,0,0)
+	sevenYearsAgo := time.Now().AddDate(-7, 0, 0)
 
 	if row.DispositionDate.After(sevenYearsAgo) {
 		return true

@@ -157,7 +157,6 @@ var _ = Describe("DataProcessor", func() {
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-
 			for i, row := range outputDOJCSV {
 				//fmt.Printf("output file %#v", outputDOJCSV)
 				//for j, item := range row {
@@ -169,7 +168,7 @@ var _ = Describe("DataProcessor", func() {
 			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
 		})
 	})
-	
+
 	Describe("Condensed output file", func() {
 		BeforeEach(func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")

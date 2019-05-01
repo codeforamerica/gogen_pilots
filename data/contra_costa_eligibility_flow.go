@@ -119,7 +119,6 @@ func (ef contraCostaEligibilityFlow) CurrentlyServingSentence(info *EligibilityI
 	}
 }
 
-
 func (ef contraCostaEligibilityFlow) hasProp64ChargeInCycle(info *EligibilityInfo, row *DOJRow) {
 	if row.HasProp64ChargeInCycle {
 		ef.isBP4060Charge(info, row)
