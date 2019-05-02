@@ -49,25 +49,57 @@ func generateHistory() [][]string {
 	var rows [][]string
 
 	personalInfos := generatePersonalInfos()
-
-	randomNumber := rand.Float64()
-	numberOfProp64Convictions := 1
-	if randomNumber > 0.95 {
-		numberOfProp64Convictions = 3
-	} else if randomNumber > 0.8 {
-		numberOfProp64Convictions = 2
-	}
+	numberOfProp64Convictions := getNumberOfProp64Convictions()
+	numberOfOtherConvictions := getNumberOfOtherConvictions()
+	numberOfNonConvictions := getNumberOfNonConvictions()
 
 	for i := 0; i < numberOfProp64Convictions; i++ {
-		rows = append(rows, generateProp64Row(personalInfos))
+		rows = append(rows, generateCase(personalInfos, true, true)...)
+	}
+
+	for i := 0; i < numberOfOtherConvictions; i++ {
+		rows = append(rows, generateCase(personalInfos, false, true)...)
+	}
+
+	for i := 0; i < numberOfNonConvictions; i++ {
+		rows = append(rows, generateCase(personalInfos, false, false)...)
 	}
 
 	return rows
 }
 
-func generateProp64Row(infos PersonalInfos) []string {
+func getNumberOfProp64Convictions() int {
+	randomNumber := rand.Float64()
+	result := 1
+	if randomNumber > 0.95 {
+		result = 3
+	} else if randomNumber > 0.8 {
+		result = 2
+	}
+	return result
+}
+
+func getNumberOfOtherConvictions() int {
+	return int(math.Round(6 * rand.ExpFloat64()))
+}
+
+func getNumberOfNonConvictions() int {
+	return int(math.Round(10 * rand.ExpFloat64()))
+}
+
+func generateCase(infos PersonalInfos, prop64 bool, conviction bool) [][]string {
 	numberOfColumns := len(DojFullHeaders)
 	row := make([]string, numberOfColumns)
+
+	disposition := "DISMISSED"
+	if conviction {
+		disposition = "CONVICTED"
+	}
+
+	offense := "123 PC-OTHER OFFENSE"
+	if prop64 {
+		offense = "11357 HS-POSSESSION OF MARIJUANA"
+	}
 
 	row[SUBJECT_ID] = infos.SubjectId
 	row[CII_NUMBER] = infos.CII
@@ -80,16 +112,16 @@ func generateProp64Row(infos PersonalInfos) []string {
 	row[STP_TYPE_DESCR] = "COURT"
 	row[STP_ORI_CNTY_NAME] = opts.County
 	row[CNT_ORDER] = "001002004000"
-	row[OFN] = "1234K5n3"
-	row[OFFENSE_DESCR] = "11357 HS-POSSESSION OF MARIJUANA"
+	row[OFN] = randomNDigitNumber(8)
+	row[OFFENSE_DESCR] = offense
 	row[OFFENSE_TOC] = "F"
-	row[FE_NUM_CRT_CASE] = "2342H8a8J"
-	row[DISP_DESCR] = "CONVICTED"
-	row[CONV_STAT_DESCR] = "M"
+	row[FE_NUM_CRT_CASE] = randomNDigitNumber(10)
+	row[DISP_DESCR] = disposition
+	row[CONV_STAT_DESCR] = randomSeverity()
 	row[SENT_LENGTH] = "45"
 	row[SENT_TIME_CODE] = "D"
 	row[COMMENT_TEXT] = "THIS IS A COMMENT"
-	return row
+	return [][]string{row}
 }
 
 func generatePersonalInfos() PersonalInfos {
@@ -102,6 +134,14 @@ func generatePersonalInfos() PersonalInfos {
 		DOB:       randomDate(time.Date(1950, 1, 0, 0, 0, 0, 0, time.UTC), time.Date(2001, 1, 0, 0, 0, 0, 0, time.UTC)),
 		SSN:       randomNDigitNumber(9),
 		CDL:       randomLetter() + randomNDigitNumber(7),
+	}
+}
+
+func randomSeverity() string {
+	if rand.Float32() > 0.5 {
+		return "FELONY"
+	} else {
+		return "MISDEMEANOR"
 	}
 }
 
