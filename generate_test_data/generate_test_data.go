@@ -110,6 +110,10 @@ func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) 
 
 func generateRow(countOrder string, infos PersonalInfos, conviction bool, prop64 bool) []string {
 	row := make([]string, numberOfColumns)
+	for i := range row {
+		row[i] = "  -  "
+	}
+	
 	disposition := "DISMISSED"
 	if conviction {
 		disposition = "CONVICTED"
