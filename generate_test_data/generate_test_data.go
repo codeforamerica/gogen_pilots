@@ -22,6 +22,8 @@ var counters struct {
 	SubjectId int
 }
 
+var numberOfColumns = len(DojFullHeaders)
+
 func main() {
 	_, err := flags.Parse(&opts)
 	if err != nil {
@@ -53,16 +55,21 @@ func generateHistory() [][]string {
 	numberOfOtherConvictions := getNumberOfOtherConvictions()
 	numberOfNonConvictions := getNumberOfNonConvictions()
 
+	cycleCounter := 101
+
 	for i := 0; i < numberOfProp64Convictions; i++ {
-		rows = append(rows, generateCase(personalInfos, true, true)...)
+		rows = append(rows, generateCase(cycleCounter, personalInfos, true, true)...)
+		cycleCounter++
 	}
 
 	for i := 0; i < numberOfOtherConvictions; i++ {
-		rows = append(rows, generateCase(personalInfos, false, true)...)
+		rows = append(rows, generateCase(cycleCounter, personalInfos, false, true)...)
+		cycleCounter++
 	}
 
 	for i := 0; i < numberOfNonConvictions; i++ {
-		rows = append(rows, generateCase(personalInfos, false, false)...)
+		rows = append(rows, generateCase(cycleCounter, personalInfos, false, false)...)
+		cycleCounter++
 	}
 
 	return rows
@@ -87,20 +94,30 @@ func getNumberOfNonConvictions() int {
 	return int(math.Round(10 * rand.ExpFloat64()))
 }
 
-func generateCase(infos PersonalInfos, prop64 bool, conviction bool) [][]string {
-	numberOfColumns := len(DojFullHeaders)
-	row := make([]string, numberOfColumns)
+func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) [][]string {
+	var rows [][]string
+	numberOfCounts := 1 + rand.Intn(4)
 
+	step := 1
+
+	for i:=0; i<numberOfCounts; i++ {
+		countOrder := fmt.Sprintf("%03d%03d%03d000", cycle, step, i)
+		rows = append(rows, generateRow(countOrder, infos, conviction, prop64))
+	}
+
+	return rows
+}
+
+func generateRow(countOrder string, infos PersonalInfos, conviction bool, prop64 bool) []string {
+	row := make([]string, numberOfColumns)
 	disposition := "DISMISSED"
 	if conviction {
 		disposition = "CONVICTED"
 	}
-
-	offense := "123 PC-OTHER OFFENSE"
+	offense := randomChoice(otherOffenses)
 	if prop64 {
-		offense = "11357 HS-POSSESSION OF MARIJUANA"
+		offense = randomChoice(prop64Offenses)
 	}
-
 	row[SUBJECT_ID] = infos.SubjectId
 	row[CII_NUMBER] = infos.CII
 	row[PRI_NAME] = infos.Name
@@ -111,7 +128,7 @@ func generateCase(infos PersonalInfos, prop64 bool, conviction bool) [][]string 
 	row[STP_EVENT_DATE] = "20050621"
 	row[STP_TYPE_DESCR] = "COURT"
 	row[STP_ORI_CNTY_NAME] = opts.County
-	row[CNT_ORDER] = "001002004000"
+	row[CNT_ORDER] = countOrder
 	row[OFN] = randomNDigitNumber(8)
 	row[OFFENSE_DESCR] = offense
 	row[OFFENSE_TOC] = "F"
@@ -121,7 +138,7 @@ func generateCase(infos PersonalInfos, prop64 bool, conviction bool) [][]string 
 	row[SENT_LENGTH] = "45"
 	row[SENT_TIME_CODE] = "D"
 	row[COMMENT_TEXT] = "THIS IS A COMMENT"
-	return [][]string{row}
+	return row
 }
 
 func generatePersonalInfos() PersonalInfos {
@@ -177,6 +194,74 @@ type PersonalInfos struct {
 	SSN       string
 	CDL       string
 }
+
+var prop64Offenses = []string{
+	"11357 HS-POSSESSION OF MARIJUANA",
+	"11358 HS-CULTIVATION OF MARIJUANA",
+	"11359 HS-MARIJUANA POSSESS FOR SALE",
+	"11360 HS-SELL/TRANSPORT/ETC MARIJUANA/HASH",
+}
+
+var otherOffenses = []string{
+	"11350(a) HS-POSSESS NARC CONTROL SUBSTANCE",
+	"11351.5 HS-POSS/PURCHASE COCAINE BASE F/SALE",
+	"11352(a) HS-TRANSPORT/SELL NARC/CNTL SUB",
+	"3056 PC-VIOLATION OF PAROLE:FELONY",
+	"11364 HS-POSSESS CONTROL SUBSTANCE PARAPHERNA",
+	"459 PC-BURGLARY",
+	"166(a)(4) PC-CONTEMPT:DISOBEY COURT ORDER/ETC",
+	"496(a) PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
+	"14601.1(a) VC-DRIVE WHILE LIC SUSPEND/ETC",
+	"11377(a) HS-POSSESS CONTROLLED SUBSTANCE",
+	"245(a)(1) PC-FORCE/ADW NOT FIREARM:GBI LIKELY",
+	"182(a)(1) PC-CONSPIRACY:COMMIT CRIME",
+	"11352 HS-TRANSPORT/SELL NARCOTIC/CNTL SUB",
+	"1203.2(a) PC-PROBATION VIOL:REARREST/REVOKE",
+	"148.9(a) PC-FALSE ID TO SPECIFIC PEACE OFICERS",
+	"11360(a) HS-GIVE/ETC MARIJ OVER 1 OZ/28.5 GRM",
+	"148 PC-OBSTRUCTS/RESISTS PUBLIC OFFICER",
+	"182 PC-CRIMINAL CONSPIRACY",
+	"148(a)(1) PC-OBSTRUCT/ETC PUBLIC OFFICER/ETC",
+	"242 PC-BATTERY",
+	"459 PC-BURGLARY:SECOND DEGREE",
+	"11351 HS-POSS/PURCHASE FOR SALE NARC/CNTL SUB",
+	"148(a) PC-OBSTRUCTS/RESISTS PUBLIC OFFICER/ETC",
+	"853.7 PC-FAIL TO APPEAR AFTER WRITTEN PROMISE",
+	"11378 HS-POSSESS CONTROL SUBSTANCE FOR SALE",
+	"11350 HS-POSSESS NARCOTIC CONTROL SUBSTANCE",
+	"466 PC-POSSESS/ETC BURGLARY TOOLS",
+	"10851(a) VC-TAKE VEH W/O OWN CONSENT/VEH THEFT",
+	"23152(a) VC-DUI ALCOHOL/DRUGS",
+	"666 PC-PETTY THEFT W/PR JAIL:SPEC OFFENSES",
+	"422 PC-THREATEN CRIME WITH INTENT TO TERRORIZE",
+	"12500(a) VC-DRIVE W/O LICENSE",
+	"40508(a) VC-FAIL TO APPEAR:WRITTEN PROMISE",
+	"273.5 PC-INFLICT CORPORAL INJ ON SPOUSE/COHAB",
+	"211 PC-ROBBERY",
+	"647(f) PC-DISORDERLY CONDUCT:INTOX DRUG/ALCOH",
+	"11550(a) HS-USE/UNDER INFL CONTRLD SUBSTANCE",
+	"273.5(a) PC-INFLICT CORPORAL INJ SPOUSE/COHAB",
+	"1203.2 PC-PROBATION VIOL:REARREST/REVOKE",
+	"488 PC-PETTY THEFT",
+	"11550 HS-USE/UNDER INFLUENCE CONTROL SUBST",
+	"148.9 PC-FALSE IDENTIFICATION TO PEACE OFFICER",
+	"23152(b) VC-DUI ALCOHOL/0.08 PERCENT",
+	"243(e)(1) PC-BAT:SPOUSE/EX SP/DATE/ETC",
+	"212.5(c) PC-ROBBERY:SECOND DEGREE",
+	"32 PC-ACCESSORY",
+	"10851 VC-TAKE VEH W/O OWN CONSENT/VEH THEFT",
+	"11377(a) HS-POSSESS CNTL SUBSTANCE",
+	"4140 BP-POSSESS HYPODERMIC NEEDLE/SYRINGE",
+	"647(b) PC-DISORDERLY CONDUCT:PROSTITUTION",
+	"243(b) PC-BATTERY PEACE OFCR/EMERG PERSNL/ETC",
+	"484(a)/490.5 PC-THEFT/PETTY THEFT MERCHANDISE",
+	"496.1 PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
+	"25620 BP-POSS OPEN CONTAINER OF ALCOHOL:PUBLIC",
+	"602(l) PC-TRESPASS:OCCUPY PROPERTY W/O CONSENT",
+	"4149 BP-POSSESS HYPODERMIC NEEDLE/SYRINGE",
+	"496 PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
+}
+
 
 var firstNames = []string{
 	"MICHAEL",
