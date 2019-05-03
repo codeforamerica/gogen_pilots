@@ -97,23 +97,57 @@ func getNumberOfNonConvictions() int {
 func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) [][]string {
 	var rows [][]string
 	numberOfCounts := 1 + rand.Intn(4)
+	county := opts.County
+	if !prop64 && rand.Float32() > 0.75 {
+		county = "NARNIA"
+	}
 
 	step := 1
 
-	for i:=0; i<numberOfCounts; i++ {
-		countOrder := fmt.Sprintf("%03d%03d%03d000", cycle, step, i)
-		rows = append(rows, generateRow(countOrder, infos, conviction, prop64))
+	for i := 0; i < numberOfCounts; i++ {
+		countOrder := fmt.Sprintf("%03d%03d%03d000", cycle, step, i+1)
+		newRow := generateRow(countOrder, infos, county, conviction, prop64)
+
+		// only set OFN for first count in case
+		if i == 0 {
+			newRow[OFN] = randomNDigitNumber(8)
+		}
+
+		// only set sentence for last count in case
+		if conviction && i == numberOfCounts-1 {
+			numSentenceParts := rand.Intn(3) + 1
+			for j := 0; j < numSentenceParts; j++ {
+				sentenceRow := make([]string, numberOfColumns)
+				copy(sentenceRow, newRow)
+
+				choice := rand.Intn(3)
+				if choice == 0 {
+					sentenceRow[SENT_LENGTH] = strconv.Itoa(rand.Intn(100) + 1)
+					sentenceRow[SENT_TIME_CODE] = "D"
+				} else if choice == 1 {
+					sentenceRow[SENT_LENGTH] = strconv.Itoa(rand.Intn(24) + 1)
+					sentenceRow[SENT_TIME_CODE] = "M"
+				} else {
+					sentenceRow[SENT_LENGTH] = strconv.Itoa(rand.Intn(10) + 1)
+					sentenceRow[SENT_TIME_CODE] = "Y"
+				}
+
+				rows = append(rows, sentenceRow)
+			}
+		} else {
+			rows = append(rows, newRow)
+		}
 	}
 
 	return rows
 }
 
-func generateRow(countOrder string, infos PersonalInfos, conviction bool, prop64 bool) []string {
+func generateRow(countOrder string, infos PersonalInfos, county string, conviction bool, prop64 bool) []string {
 	row := make([]string, numberOfColumns)
 	for i := range row {
 		row[i] = "  -  "
 	}
-	
+
 	disposition := "DISMISSED"
 	if conviction {
 		disposition = "CONVICTED"
@@ -131,16 +165,16 @@ func generateRow(countOrder string, infos PersonalInfos, conviction bool, prop64
 	row[CYC_DATE] = "20040424"
 	row[STP_EVENT_DATE] = "20050621"
 	row[STP_TYPE_DESCR] = "COURT"
-	row[STP_ORI_CNTY_NAME] = opts.County
+	row[STP_ORI_CNTY_NAME] = county
 	row[CNT_ORDER] = countOrder
-	row[OFN] = randomNDigitNumber(8)
+	row[OFN] = ""
 	row[OFFENSE_DESCR] = offense
 	row[OFFENSE_TOC] = "F"
-	row[FE_NUM_CRT_CASE] = randomNDigitNumber(10)
+	row[FE_NUM_CRT_CASE] = ""
 	row[DISP_DESCR] = disposition
 	row[CONV_STAT_DESCR] = randomSeverity()
-	row[SENT_LENGTH] = "45"
-	row[SENT_TIME_CODE] = "D"
+	row[SENT_LENGTH] = ""
+	row[SENT_TIME_CODE] = ""
 	row[COMMENT_TEXT] = "THIS IS A COMMENT"
 	return row
 }
@@ -151,7 +185,7 @@ func generatePersonalInfos() PersonalInfos {
 	return PersonalInfos{
 		SubjectId: strconv.Itoa(counters.SubjectId),
 		CII:       randomNDigitNumber(10),
-		Name:      randomChoice(lastNames) + "," + randomChoice(firstNames),
+		Name:      randomChoice(lastNames) + "," + randomChoice(firstNames) + " " + randomLetter(),
 		DOB:       randomDate(time.Date(1950, 1, 0, 0, 0, 0, 0, time.UTC), time.Date(2001, 1, 0, 0, 0, 0, 0, time.UTC)),
 		SSN:       randomNDigitNumber(9),
 		CDL:       randomLetter() + randomNDigitNumber(7),
@@ -265,7 +299,6 @@ var otherOffenses = []string{
 	"4149 BP-POSSESS HYPODERMIC NEEDLE/SYRINGE",
 	"496 PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
 }
-
 
 var firstNames = []string{
 	"MICHAEL",
