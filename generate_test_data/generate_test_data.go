@@ -96,17 +96,20 @@ func getNumberOfNonConvictions() int {
 
 func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) [][]string {
 	var rows [][]string
-	numberOfCounts := 1 + rand.Intn(4)
-	county := opts.County
-	if !prop64 && rand.Float32() > 0.75 {
-		county = "NARNIA"
+
+	offenses := getOffenses(prop64)
+	county := getCounty(prop64)
+
+	// handle arrest lines
+	for i, offense := range offenses {
+		countOrder := getCountOrder(cycle, 1, i+1)
+		rows = append(rows, generateRow(countOrder, infos, county, false, conviction, offense))
 	}
 
-	step := 1
-
-	for i := 0; i < numberOfCounts; i++ {
-		countOrder := fmt.Sprintf("%03d%03d%03d000", cycle, step, i+1)
-		newRow := generateRow(countOrder, infos, county, conviction, prop64)
+	// handle court lines
+	for i, offense := range offenses {
+		countOrder := getCountOrder(cycle, 2, i+1)
+		newRow := generateRow(countOrder, infos, county, true, conviction, offense)
 
 		// only set OFN for first count in case
 		if i == 0 {
@@ -114,7 +117,7 @@ func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) 
 		}
 
 		// only set sentence for last count in case
-		if conviction && i == numberOfCounts-1 {
+		if conviction && i == len(offenses)-1 {
 			numSentenceParts := rand.Intn(3) + 1
 			for j := 0; j < numSentenceParts; j++ {
 				sentenceRow := make([]string, numberOfColumns)
@@ -142,20 +145,49 @@ func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) 
 	return rows
 }
 
-func generateRow(countOrder string, infos PersonalInfos, county string, conviction bool, prop64 bool) []string {
+func getCountOrder(cycle int, step int, count int) string {
+	countOrder := fmt.Sprintf("%03d%03d%03d000", cycle, step, count)
+	return countOrder
+}
+
+func getCounty(prop64 bool) string {
+	county := opts.County
+	if !prop64 && rand.Float32() > 0.75 {
+		county = "NARNIA"
+	}
+	return county
+}
+
+func getOffenses(prop64 bool) []string {
+	numberOfCounts := 1 + rand.Intn(4)
+	choices := otherOffenses
+	if prop64 {
+		choices = prop64Offenses
+	}
+	offenses := make([]string, numberOfCounts)
+	for i := range offenses {
+		offenses[i] = randomChoice(choices)
+	}
+	return offenses
+}
+
+func generateRow(countOrder string, infos PersonalInfos, county string, court bool, conviction bool, offense string) []string {
 	row := make([]string, numberOfColumns)
 	for i := range row {
 		row[i] = "  -  "
 	}
 
-	disposition := "DISMISSED"
-	if conviction {
-		disposition = "CONVICTED"
+	disposition := ""
+	eventType := "ARREST/DETAINED/CITED"
+	if court {
+		eventType = "COURT ACTION"
+		if conviction {
+			disposition = "CONVICTED"
+		} else {
+			disposition = "DISMISSED"
+		}
 	}
-	offense := randomChoice(otherOffenses)
-	if prop64 {
-		offense = randomChoice(prop64Offenses)
-	}
+
 	row[SUBJECT_ID] = infos.SubjectId
 	row[CII_NUMBER] = infos.CII
 	row[PRI_NAME] = infos.Name
@@ -164,7 +196,7 @@ func generateRow(countOrder string, infos PersonalInfos, county string, convicti
 	row[PRI_CDL] = infos.CDL
 	row[CYC_DATE] = "20040424"
 	row[STP_EVENT_DATE] = "20050621"
-	row[STP_TYPE_DESCR] = "COURT"
+	row[STP_TYPE_DESCR] = eventType
 	row[STP_ORI_CNTY_NAME] = county
 	row[CNT_ORDER] = countOrder
 	row[OFN] = ""
