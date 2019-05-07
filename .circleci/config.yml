@@ -13,24 +13,29 @@ jobs:
       - checkout
       - run: mkdir -p $TEST_RESULTS
 
-      - restore_cache:
-          keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
+#      - restore_cache:
+#          keys:
+#            - go-mod-v4-{{ checksum "go.sum" }}
+
+      - run:
+          name: install dependencies
+          command: |
+            go get ./...
+            go get github.com/onsi/ginkgo/ginkgo
+            go get -t ./...
+
 
       - run:
           name: Run unit tests
           environment:
 
           command: |
-            PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
+            ginkgo -r
 
-      - run: make # pull and build dependencies for the project
-
-      - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
+#      - save_cache:
+#          key: go-mod-v4-{{ checksum "go.sum" }}
+#          paths:
+#            - "/go/pkg/mod"
 
       - store_artifacts:
           path: /tmp/test-results
