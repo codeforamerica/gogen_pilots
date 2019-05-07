@@ -1,8 +1,8 @@
 package main
 
 import (
-	. "gogen/data"
-	. "gogen/processor"
+	"gogen/data"
+	"gogen/processor"
 	"path/filepath"
 	"time"
 
@@ -22,12 +22,12 @@ func main() {
 		panic(err)
 	}
 
-	dojInformation, _ := NewDOJInformation(opts.DOJFile, time.Now(), opts.County)
+	dojInformation, _ := data.NewDOJInformation(opts.DOJFile, time.Now(), opts.County)
 
-	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
-	condensedDojWriter := NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
+	dojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
+	condensedDojWriter := processor.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
 
-	dataProcessor := NewDataProcessor(dojInformation, dojWriter, condensedDojWriter)
+	dataProcessor := processor.NewDataProcessor(dojInformation, dojWriter, condensedDojWriter)
 
 	dataProcessor.Process(opts.County)
 }
