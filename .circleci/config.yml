@@ -20,9 +20,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            go get ./...
             go get github.com/onsi/ginkgo/ginkgo
-            go get -t ./...
 
 
       - run:
