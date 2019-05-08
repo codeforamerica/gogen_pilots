@@ -22,23 +22,25 @@ jobs:
       - run:
           name: Build mac executable
           command: |
-            echo "Hello, world!" > echo-output
+            GOOS="darwin" GOARCH="amd64" go build
 
 
       - run:
           name: Build windows executable
           command: |
-            echo "Skipped"
+            GOOS="windows" GOARCH="amd64" go build
 
       - run:
           name: Build test data generator
           command: |
-            echo "Skipped"
+            cd generate_test_data && GOOS="darwin" GOARCH="amd64" go build
 
       - persist_to_workspace:
           root: '.'
           paths:
-            - echo-output
+            - gogen
+            - gogen.exe
+            - generate_test_data/generate_test_data
 
   deploy:
     docker:
@@ -49,11 +51,7 @@ jobs:
           at: ./artifacts
 
       - run: |
-          if [[ `cat ./artifacts/echo-output` == "Hello, world!" ]]; then
-            echo "It worked!";
-          else
-            echo "Nope!"; exit 1
-          fi
+          ./artifacts/gogen
 
 workflows:
   version: 2
