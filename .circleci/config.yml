@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.12
+
+    working_directory: /go/src/gogen
+    steps:
+      - checkout
+
+
+      - run:
+          name: install dependencies
+          command: |
+            go get -t ./...
+            go get github.com/onsi/ginkgo/ginkgo
+
+      - run:
+          name: Run unit tests
+          environment:
+
+          command: |
+            ginkgo -r
+
+
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build
