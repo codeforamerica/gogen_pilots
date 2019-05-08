@@ -22,9 +22,19 @@ jobs:
           command: |
             ginkgo -r
 
+  deploy:
+    command: echo "Deployed"
+
 
 workflows:
   version: 2
   build-workflow:
     jobs:
       - build
+      - hold:
+          type: approval
+          requires:
+            -build
+      - deploy:
+          requires:
+            -hold
