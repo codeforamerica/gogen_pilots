@@ -33,14 +33,14 @@ jobs:
       - run:
           name: Build test data generator
           command: |
-            cd generate_test_data && GOOS="darwin" GOARCH="amd64" go build
+            cd generate_test_data && GOOS="darwin" GOARCH="amd64" go build && cp generate_test_data ../
 
       - persist_to_workspace:
           root: '.'
           paths:
             - gogen
             - gogen.exe
-            - generate_test_data/generate_test_data
+            - generate_test_data
 
   deploy:
     docker:
@@ -52,7 +52,8 @@ jobs:
 
       - run: |
           VERSION=${CIRCLE_SHA1}
-          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+          COMMIT_MESSAGE=\"$(git log --format=oneline -n 1 $CIRCLE_SHA1)\"
+          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -b ${COMMIT_MESSAGE} -delete ${VERSION} ./artifacts/
 
 workflows:
   version: 2
