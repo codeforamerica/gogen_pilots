@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -29,6 +30,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	rand.Seed(time.Now().UnixNano())
 
 	testWriter := NewWriter(filepath.Join(opts.OutputFolder, "generated_test_data.csv"), DojFullHeaders)
 
@@ -54,25 +57,56 @@ func generateHistory() [][]string {
 	numberOfProp64Convictions := getNumberOfProp64Convictions()
 	numberOfOtherConvictions := getNumberOfOtherConvictions()
 	numberOfNonConvictions := getNumberOfNonConvictions()
+	totalNumberOfCases := numberOfProp64Convictions + numberOfOtherConvictions + numberOfNonConvictions
 
-	cycleCounter := 101
+	dates := generateDates(totalNumberOfCases)
+	counter := 0
+
+	caseInfos := make(map[int]CaseInfos)
 
 	for i := 0; i < numberOfProp64Convictions; i++ {
-		rows = append(rows, generateCase(cycleCounter, personalInfos, true, true)...)
-		cycleCounter++
+		caseInfos[counter] = CaseInfos{isProp64:true, isConviction:true}
+		counter++
 	}
 
 	for i := 0; i < numberOfOtherConvictions; i++ {
-		rows = append(rows, generateCase(cycleCounter, personalInfos, false, true)...)
-		cycleCounter++
+		caseInfos[counter] = CaseInfos{isProp64:false, isConviction:true}
+		counter++
 	}
 
 	for i := 0; i < numberOfNonConvictions; i++ {
-		rows = append(rows, generateCase(cycleCounter, personalInfos, false, false)...)
-		cycleCounter++
+		caseInfos[counter] = CaseInfos{isProp64:false, isConviction:false}
+		counter++
+	}
+
+	counter = 0
+	for _, info := range caseInfos {
+		info.cycleNumber = counter+101
+		info.date = dates[counter]
+		rows = append(rows, generateCase(personalInfos, info)...)
+		counter++
 	}
 
 	return rows
+}
+
+func generateDates(n int) []time.Time {
+	randomNumbers := make([]float64, n)
+	dates := make([]time.Time, n)
+
+	for i := 0; i<n; i++ {
+		randomNumbers[i] = rand.Float64()
+	}
+
+	sort.Float64s(randomNumbers)
+
+	currentUnixTime := float64(time.Now().Unix())
+
+	for i := 0; i<n; i++ {
+		dates[i] = time.Unix(int64(randomNumbers[i]*currentUnixTime), 0)
+	}
+
+	return dates
 }
 
 func getNumberOfProp64Convictions() int {
@@ -94,22 +128,22 @@ func getNumberOfNonConvictions() int {
 	return int(math.Round(10 * rand.ExpFloat64()))
 }
 
-func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) [][]string {
+func generateCase(personalInfos PersonalInfos, caseInfos CaseInfos) [][]string {
 	var rows [][]string
 
-	offenses := getOffenses(prop64)
-	county := getCounty(prop64)
+	offenses := getOffenses(caseInfos.isProp64)
+	county := getCounty(caseInfos.isProp64)
 
 	// handle arrest lines
 	for i, offense := range offenses {
-		countOrder := getCountOrder(cycle, 1, i+1)
-		rows = append(rows, generateRow(countOrder, infos, county, false, conviction, offense))
+		countOrder := getCountOrder(caseInfos.cycleNumber, 1, i+1)
+		rows = append(rows, generateRow(countOrder, personalInfos, caseInfos.date, county, false, caseInfos.isConviction, offense))
 	}
 
 	// handle court lines
 	for i, offense := range offenses {
-		countOrder := getCountOrder(cycle, 2, i+1)
-		newRow := generateRow(countOrder, infos, county, true, conviction, offense)
+		countOrder := getCountOrder(caseInfos.cycleNumber, 2, i+1)
+		newRow := generateRow(countOrder, personalInfos, caseInfos.date, county, true, caseInfos.isConviction, offense)
 
 		// only set OFN for first count in case
 		if i == 0 {
@@ -117,7 +151,7 @@ func generateCase(cycle int, infos PersonalInfos, prop64 bool, conviction bool) 
 		}
 
 		// only set sentence for last count in case
-		if conviction && i == len(offenses)-1 {
+		if caseInfos.isConviction && i == len(offenses)-1 {
 			numSentenceParts := rand.Intn(3) + 1
 			for j := 0; j < numSentenceParts; j++ {
 				sentenceRow := make([]string, numberOfColumns)
@@ -171,7 +205,7 @@ func getOffenses(prop64 bool) []string {
 	return offenses
 }
 
-func generateRow(countOrder string, infos PersonalInfos, county string, court bool, conviction bool, offense string) []string {
+func generateRow(countOrder string, infos PersonalInfos, cycleDate time.Time, county string, court bool, conviction bool, offense string) []string {
 	row := make([]string, numberOfColumns)
 	for i := range row {
 		row[i] = "  -  "
@@ -179,7 +213,9 @@ func generateRow(countOrder string, infos PersonalInfos, county string, court bo
 
 	disposition := ""
 	eventType := "ARREST/DETAINED/CITED"
+	eventDate := cycleDate
 	if court {
+		eventDate = cycleDate.AddDate(0, 1, 0)
 		eventType = "COURT ACTION"
 		if conviction {
 			disposition = "CONVICTED"
@@ -194,8 +230,8 @@ func generateRow(countOrder string, infos PersonalInfos, county string, court bo
 	row[PRI_DOB] = infos.DOB
 	row[PRI_SSN] = infos.SSN
 	row[PRI_CDL] = infos.CDL
-	row[CYC_DATE] = "20040424"
-	row[STP_EVENT_DATE] = "20050621"
+	row[CYC_DATE] = cycleDate.Format(dateFormatString)
+	row[STP_EVENT_DATE] = eventDate.Format(dateFormatString)
 	row[STP_TYPE_DESCR] = eventType
 	row[STP_ORI_CNTY_NAME] = county
 	row[CNT_ORDER] = countOrder
@@ -239,7 +275,7 @@ func randomDate(startDate time.Time, endDate time.Time) string {
 
 	randomDateInSeconds := rand.Int63n(delta) + min
 	randomDate := time.Unix(randomDateInSeconds, 0)
-	return randomDate.Format("20060102")
+	return randomDate.Format(dateFormatString)
 }
 
 func randomLetter() string {
@@ -265,71 +301,97 @@ type PersonalInfos struct {
 	CDL       string
 }
 
+type CaseInfos struct {
+	cycleNumber  int
+	date         time.Time
+	isConviction bool
+	isProp64     bool
+}
+
+const dateFormatString = "20060102"
+
 var prop64Offenses = []string{
 	"11357 HS-POSSESSION OF MARIJUANA",
-	"11358 HS-CULTIVATION OF MARIJUANA",
+	"11357(A) HS-POSSESS CONCENTRATED CANNABIS",
+	"11357(C) HS-POSS MARIJUANA OVER 1 OZ/28.5 GRAM",
+	"11357A HS-POSSESSION OF MARIJUANA",
+	"11357B2 HS-POSSESSION OF MARIJUANA",
+	"11358 HS-PLANT/CULTIVATE/ETC MARIJUANA/HASH",
+	"11358(C) HS-CULTIVATE MARIJUANA 6+ PLANTS",
 	"11359 HS-MARIJUANA POSSESS FOR SALE",
+	"11359(A) HS-POSSESS MARIJUANA/HASH FOR SALE",
+	"11359(B) HS-POSSESS MARIJUANA FOR SALE",
+	"11359(C) HS-MARIJUANA POSSESS FOR SALE",
+	"11359B HS-MARIJUANA POSSESS FOR SALE",
 	"11360 HS-SELL/TRANSPORT/ETC MARIJUANA/HASH",
+	"11360 HS-SELL/TRANSPORT/ETC MARIJUANA/HASH",
+	"11360 HS-SELL/TRANSPORT/ETC MARIJUANA/HASH",
+	"11360(A) HS-GIVE/ETC MARIJ OVER 1 OZ/28.5 GRM",
+	"11360(B) SELL/FURNISH/ETC MARIJUANA/HASH",
+	"11360A HS-SELL/FURNISH/ETC MARIJUANA/HASH",
+	"11360A2 HS-SELL/FURNISH/ETC MARIJUANA/HASH",
 }
 
 var otherOffenses = []string{
-	"11350(a) HS-POSSESS NARC CONTROL SUBSTANCE",
+	"11350(A) HS-POSSESS NARC CONTROL SUBSTANCE",
 	"11351.5 HS-POSS/PURCHASE COCAINE BASE F/SALE",
-	"11352(a) HS-TRANSPORT/SELL NARC/CNTL SUB",
+	"11352(A) HS-TRANSPORT/SELL NARC/CNTL SUB",
 	"3056 PC-VIOLATION OF PAROLE:FELONY",
 	"11364 HS-POSSESS CONTROL SUBSTANCE PARAPHERNA",
 	"459 PC-BURGLARY",
-	"166(a)(4) PC-CONTEMPT:DISOBEY COURT ORDER/ETC",
-	"496(a) PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
-	"14601.1(a) VC-DRIVE WHILE LIC SUSPEND/ETC",
-	"11377(a) HS-POSSESS CONTROLLED SUBSTANCE",
-	"245(a)(1) PC-FORCE/ADW NOT FIREARM:GBI LIKELY",
-	"182(a)(1) PC-CONSPIRACY:COMMIT CRIME",
+	"166(A)(4) PC-CONTEMPT:DISOBEY COURT ORDER/ETC",
+	"496(A) PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
+	"14601.1(A) VC-DRIVE WHILE LIC SUSPEND/ETC",
+	"11377(A) HS-POSSESS CONTROLLED SUBSTANCE",
+	"245(A)(1) PC-FORCE/ADW NOT FIREARM:GBI LIKELY",
+	"182(A)(1) PC-CONSPIRACY:COMMIT CRIME",
 	"11352 HS-TRANSPORT/SELL NARCOTIC/CNTL SUB",
-	"1203.2(a) PC-PROBATION VIOL:REARREST/REVOKE",
-	"148.9(a) PC-FALSE ID TO SPECIFIC PEACE OFICERS",
-	"11360(a) HS-GIVE/ETC MARIJ OVER 1 OZ/28.5 GRM",
+	"1203.2(A) PC-PROBATION VIOL:REARREST/REVOKE",
+	"148.9(A) PC-FALSE ID TO SPECIFIC PEACE OFICERS",
+	"11360(A) HS-GIVE/ETC MARIJ OVER 1 OZ/28.5 GRM",
 	"148 PC-OBSTRUCTS/RESISTS PUBLIC OFFICER",
 	"182 PC-CRIMINAL CONSPIRACY",
-	"148(a)(1) PC-OBSTRUCT/ETC PUBLIC OFFICER/ETC",
+	"148(A)(1) PC-OBSTRUCT/ETC PUBLIC OFFICER/ETC",
 	"242 PC-BATTERY",
 	"459 PC-BURGLARY:SECOND DEGREE",
 	"11351 HS-POSS/PURCHASE FOR SALE NARC/CNTL SUB",
-	"148(a) PC-OBSTRUCTS/RESISTS PUBLIC OFFICER/ETC",
+	"148(A) PC-OBSTRUCTS/RESISTS PUBLIC OFFICER/ETC",
 	"853.7 PC-FAIL TO APPEAR AFTER WRITTEN PROMISE",
 	"11378 HS-POSSESS CONTROL SUBSTANCE FOR SALE",
 	"11350 HS-POSSESS NARCOTIC CONTROL SUBSTANCE",
 	"466 PC-POSSESS/ETC BURGLARY TOOLS",
-	"10851(a) VC-TAKE VEH W/O OWN CONSENT/VEH THEFT",
-	"23152(a) VC-DUI ALCOHOL/DRUGS",
+	"10851(A) VC-TAKE VEH W/O OWN CONSENT/VEH THEFT",
+	"23152(A) VC-DUI ALCOHOL/DRUGS",
 	"666 PC-PETTY THEFT W/PR JAIL:SPEC OFFENSES",
 	"422 PC-THREATEN CRIME WITH INTENT TO TERRORIZE",
-	"12500(a) VC-DRIVE W/O LICENSE",
-	"40508(a) VC-FAIL TO APPEAR:WRITTEN PROMISE",
+	"12500(A) VC-DRIVE W/O LICENSE",
+	"40508(A) VC-FAIL TO APPEAR:WRITTEN PROMISE",
 	"273.5 PC-INFLICT CORPORAL INJ ON SPOUSE/COHAB",
 	"211 PC-ROBBERY",
-	"647(f) PC-DISORDERLY CONDUCT:INTOX DRUG/ALCOH",
-	"11550(a) HS-USE/UNDER INFL CONTRLD SUBSTANCE",
-	"273.5(a) PC-INFLICT CORPORAL INJ SPOUSE/COHAB",
+	"647(F) PC-DISORDERLY CONDUCT:INTOX DRUG/ALCOH",
+	"11550(A) HS-USE/UNDER INFL CONTRLD SUBSTANCE",
+	"273.5(A) PC-INFLICT CORPORAL INJ SPOUSE/COHAB",
 	"1203.2 PC-PROBATION VIOL:REARREST/REVOKE",
 	"488 PC-PETTY THEFT",
 	"11550 HS-USE/UNDER INFLUENCE CONTROL SUBST",
 	"148.9 PC-FALSE IDENTIFICATION TO PEACE OFFICER",
-	"23152(b) VC-DUI ALCOHOL/0.08 PERCENT",
-	"243(e)(1) PC-BAT:SPOUSE/EX SP/DATE/ETC",
-	"212.5(c) PC-ROBBERY:SECOND DEGREE",
+	"23152(B) VC-DUI ALCOHOL/0.08 PERCENT",
+	"243(E)(1) PC-BAT:SPOUSE/EX SP/DATE/ETC",
+	"212.5(C) PC-ROBBERY:SECOND DEGREE",
 	"32 PC-ACCESSORY",
 	"10851 VC-TAKE VEH W/O OWN CONSENT/VEH THEFT",
-	"11377(a) HS-POSSESS CNTL SUBSTANCE",
+	"11377(A) HS-POSSESS CNTL SUBSTANCE",
 	"4140 BP-POSSESS HYPODERMIC NEEDLE/SYRINGE",
-	"647(b) PC-DISORDERLY CONDUCT:PROSTITUTION",
-	"243(b) PC-BATTERY PEACE OFCR/EMERG PERSNL/ETC",
-	"484(a)/490.5 PC-THEFT/PETTY THEFT MERCHANDISE",
+	"647(B) PC-DISORDERLY CONDUCT:PROSTITUTION",
+	"243(B) PC-BATTERY PEACE OFCR/EMERG PERSNL/ETC",
+	"484(A)/490.5 PC-THEFT/PETTY THEFT MERCHANDISE",
 	"496.1 PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
 	"25620 BP-POSS OPEN CONTAINER OF ALCOHOL:PUBLIC",
-	"602(l) PC-TRESPASS:OCCUPY PROPERTY W/O CONSENT",
+	"602(L) PC-TRESPASS:OCCUPY PROPERTY W/O CONSENT",
 	"4149 BP-POSSESS HYPODERMIC NEEDLE/SYRINGE",
 	"496 PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
+	"288(A) PC-LEWD OR LASCIV ACTS", // 290 registerable offense
+	"187 PC-MURDER:SECOND DEGREE", // Superstrike
 }
 
 var firstNames = []string{
