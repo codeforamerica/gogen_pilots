@@ -1,13 +1,12 @@
 version: 2
 jobs:
-  build:
+  test-and-build:
     docker:
       - image: circleci/golang:1.12
 
     working_directory: /go/src/gogen
     steps:
       - checkout
-
 
       - run:
           name: install dependencies
@@ -17,24 +16,65 @@ jobs:
 
       - run:
           name: Run unit tests
-          environment:
-
           command: |
             ginkgo -r
 
-  deploy:
-    command: echo "Deployed"
+      - run:
+          name: Build mac executable
+          command: |
+            GOOS="darwin" GOARCH="amd64" go build
 
+
+      - run:
+          name: Build windows executable
+          command: |
+            GOOS="windows" GOARCH="amd64" go build
+
+      - run:
+          name: Build test data generator
+          command: |
+            cd generate_test_data && GOOS="darwin" GOARCH="amd64" go build
+
+      - run:
+          name: Copy build artifacts to subdirectory
+          command: |
+            mkdir artifacts && cp gogen gogen.exe generate_test_data/generate_test_data ./artifacts
+
+      - run:
+          name: Build CircleCI env executable
+          command: |
+            go build && cp gogen ./artifacts/gogen_ci
+
+      - persist_to_workspace:
+          root: './artifacts'
+          paths:
+            - gogen
+            - gogen_ci
+            - gogen.exe
+            - generate_test_data
+
+  deploy:
+    docker:
+      - image: cibuilds/github:0.10
+
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+
+      - run: |
+          VERSION=$(./artifacts/gogen_ci --version)
+          rm ./artifacts/gogen_ci
+          ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 workflows:
   version: 2
   build-workflow:
     jobs:
-      - build
+      - test-and-build
       - hold:
           type: approval
           requires:
-            -build
+            - test-and-build
       - deploy:
           requires:
-            -hold
+            - hold
