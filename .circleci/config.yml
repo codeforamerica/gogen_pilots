@@ -44,10 +44,10 @@ jobs:
     docker:
       - image: cibuilds/github:0.10
 
-  - attach_workspace:
-      at: ./artifacts
-
     steps:
+      - attach_workspace:
+          at: ./artifacts
+
       - run: |
           if [[ `cat ./artifacts/echo-output` == "Hello, world!" ]]; then
             echo "It worked!";
