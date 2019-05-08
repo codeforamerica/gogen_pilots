@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test-and-build:
     docker:
       - image: circleci/golang:1.12
 
@@ -16,29 +16,54 @@ jobs:
 
       - run:
           name: Run unit tests
-          environment:
-
           command: |
             ginkgo -r
 
+      - run:
+          name: Build mac executable
+          command: |
+            echo "Hello, world!" > echo-output
+
+
+      - run:
+          name: Build windows executable
+          command: |
+            echo "Skipped"
+
+      - run:
+          name: Build test data generator
+          command: |
+            echo "Skipped"
+
+      - persist_to_workspace:
+          root: '.'
+          paths:
+            - echo-output
+
   deploy:
     docker:
-      - image: circleci/golang:1.12
+      - image: cibuilds/github:0.10
+
+  - attach_workspace:
+      at: ./artifacts
 
     steps:
-      - run:
-        command: |
-          echo "Deployed"
+      - run: |
+          if [[ `cat ./artifacts/echo-output` == "Hello, world!" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
 
 workflows:
   version: 2
   build-workflow:
     jobs:
-      - build
+      - test-and-build
       - hold:
           type: approval
           requires:
-            - build
+            - test-and-build
       - deploy:
           requires:
             - hold
