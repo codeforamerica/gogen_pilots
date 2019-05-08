@@ -40,10 +40,16 @@ jobs:
           command: |
             mkdir artifacts && cp gogen gogen.exe generate_test_data/generate_test_data ./artifacts
 
+      - run:
+          name: Build CircleCI env executable
+          command: |
+            go build && cp gogen ./artifacts/gogen_ci
+
       - persist_to_workspace:
           root: './artifacts'
           paths:
             - gogen
+            - gogen_ci
             - gogen.exe
             - generate_test_data
 
@@ -56,7 +62,8 @@ jobs:
           at: ./artifacts
 
       - run: |
-          VERSION=${CIRCLE_SHA1}
+          VERSION=$(./artifacts/gogen_ci --version)
+          rm ./artifacts/gogen_ci
           ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 workflows:
