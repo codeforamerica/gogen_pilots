@@ -33,10 +33,15 @@ jobs:
       - run:
           name: Build test data generator
           command: |
-            cd generate_test_data && GOOS="darwin" GOARCH="amd64" go build && cp generate_test_data ../
+            cd generate_test_data && GOOS="darwin" GOARCH="amd64" go build
+
+      - run:
+          name: Copy build artifacts to subdirectory
+          command: |
+            mkdir artifacts && cp gogen gogen.exe generate_test_data/generate_test_data ./artifacts
 
       - persist_to_workspace:
-          root: '.'
+          root: './artifacts'
           paths:
             - gogen
             - gogen.exe
