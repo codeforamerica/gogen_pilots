@@ -3,7 +3,7 @@ package processor
 import (
 	"encoding/csv"
 	"fmt"
-	"gogen/data"
+	"gogen/internal/data"
 	"os"
 	"time"
 )

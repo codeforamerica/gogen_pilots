@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gogen/data"
-	"gogen/processor"
+	"gogen/internal/data"
+	"gogen/internal/processor"
 	"path/filepath"
 	"time"
 

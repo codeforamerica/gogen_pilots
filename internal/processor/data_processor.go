@@ -2,7 +2,7 @@ package processor
 
 import (
 	"fmt"
-	"gogen/data"
+	"gogen/internal/data"
 	"regexp"
 )
 
