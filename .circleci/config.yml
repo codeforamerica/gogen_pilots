@@ -8,7 +8,6 @@ jobs:
     steps:
       - checkout
 
-
       - run:
           name: install dependencies
           command: |
@@ -23,7 +22,8 @@ jobs:
             ginkgo -r
 
   deploy:
-    command: echo "Deployed"
+    command: |
+      echo "Deployed"
 
 
 workflows:
