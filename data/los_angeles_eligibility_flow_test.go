@@ -23,5 +23,12 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		It("returns empty string if there is no match", func() {
 			Expect(flow.MatchedCodeSection("12345(c) HS")).To(Equal(""))
 		})
+
+		It("recognizes attempted code sections for Prop 64", func() {
+			Expect(flow.MatchedCodeSection("664.11357(c) HS")).To(Equal("11357"))
+			Expect(flow.MatchedCodeSection("66411357(c) HS")).To(Equal("11357"))
+			Expect(flow.MatchedCodeSection("664-11357(c) HS")).To(Equal("11357"))
+			Expect(flow.MatchedCodeSection("664/11357(c) HS")).To(Equal("11357"))
+		})
 	})
 })

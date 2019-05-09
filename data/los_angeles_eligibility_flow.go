@@ -47,9 +47,14 @@ func (ef losAngelesEligibilityFlow) NotEligible(info *EligibilityInfo, reason st
 	info.EligibilityReason = reason
 }
 
+func (ef losAngelesEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason string) {
+	info.EligibilityDetermination = "Maybe Eligible - Flag for Review"
+	info.EligibilityReason = reason
+}
+
 func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow) {
 	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
-		ef.ConvictionIsNotFelony(info, row)
+		ef.ConvictionIs11357(info, row)
 	} else {
 		ef.NotEligible(info, "Occurred after 11/09/2016")
 	}
@@ -92,5 +97,17 @@ func (ef losAngelesEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 		ef.EligibleDismissal(info, "Sentence Completed")
 	} else {
 		ef.EligibleReduction(info, "Sentence not Completed")
+	}
+}
+
+func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow) {
+	if ef.MatchedCodeSection(row.CodeSection) == "11357" {
+		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
+			ef.EligibleDismissal(info,"11357(a) or 11357(b)")
+		} else {
+			ef.MaybeEligible(info, "Other 11357")
+		}
+	} else {
+		ef.ConvictionIsNotFelony(info, row)
 	}
 }
