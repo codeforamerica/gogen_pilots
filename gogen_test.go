@@ -336,17 +336,18 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 8 11358 convictions in this county"))
 		Expect(sessionString).To(ContainSubstring("Found 4 11359 convictions in this county"))
 
-		Expect(sessionString).To(ContainSubstring("Found 7 convictions that are eligible for dismissal"))
+		Expect(sessionString).To(ContainSubstring("Found 6 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 1 11357 convictions that are eligible for dismissal"))
-		Expect(sessionString).To(ContainSubstring("Found 4 11358 convictions that are eligible for dismissal"))
+		Expect(sessionString).To(ContainSubstring("Found 3 11358 convictions that are eligible for dismissal"))
 		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are eligible for dismissal"))
 
-		Expect(sessionString).To(ContainSubstring("Found 5 convictions that are eligible for reduction"))
-		Expect(sessionString).To(ContainSubstring("Found 3 11358 convictions that are eligible for reduction"))
-		Expect(sessionString).To(ContainSubstring("Found 2 11359 convictions that are eligible for reduction"))
+		Expect(sessionString).To(ContainSubstring("Found 3 convictions that are eligible for reduction"))
+		Expect(sessionString).To(ContainSubstring("Found 2 11358 convictions that are eligible for reduction"))
+		Expect(sessionString).To(ContainSubstring("Found 1 11359 convictions that are eligible for reduction"))
 
-		Expect(sessionString).To(ContainSubstring("Found 1 convictions that are not eligible"))
-		Expect(sessionString).To(ContainSubstring("Found 1 11358 convictions that are not eligible"))
+		Expect(sessionString).To(ContainSubstring("Found 4 convictions that are not eligible"))
+		Expect(sessionString).To(ContainSubstring("Found 3 11358 convictions that are not eligible"))
+		Expect(sessionString).To(ContainSubstring("Found 1 11359 convictions that are not eligible"))
 
 		Expect(sessionString).To(ContainSubstring("Found 2 convictions that are flagged for review"))
 		Expect(sessionString).To(ContainSubstring("Found 2 11357 convictions that are flagged for review"))
@@ -354,11 +355,12 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Misdemeanor or Infraction"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: 11357(a) or 11357(b)"))
 		Expect(sessionString).To(ContainSubstring("Found 2 convictions in this county with eligibility reason: Other 11357"))
-		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county with eligibility reason: No convictions in past 10 years"))
-		Expect(sessionString).To(ContainSubstring("Found 4 convictions in this county with eligibility reason: Has convictions in past 10 years"))
+		Expect(sessionString).To(ContainSubstring("Found 3 convictions in this county with eligibility reason: No convictions in past 10 years"))
+		Expect(sessionString).To(ContainSubstring("Found 2 convictions in this county with eligibility reason: Has convictions in past 10 years"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Sentence not Completed"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Sentence Completed"))
 		Expect(sessionString).To(ContainSubstring("Found 1 convictions in this county with eligibility reason: Occurred after 11/09/2016"))
+		Expect(sessionString).To(ContainSubstring("Found 3 convictions in this county with eligibility reason: PC 667(e)(2)(c)(iv)"))
 
 		Expect(sessionString).To(ContainSubstring("----------- Prop64 Related Convictions In This County --------------------"))
 

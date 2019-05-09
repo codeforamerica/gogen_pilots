@@ -108,6 +108,14 @@ func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row
 			ef.MaybeEligible(info, "Other 11357")
 		}
 	} else {
+		ef.HasSuperstrikes(info, row)
+	}
+}
+
+func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *DOJRow) {
+	if info.hasSuperstrikes() {
+		ef.NotEligible(info, "PC 667(e)(2)(c)(iv)")
+	} else {
 		ef.ConvictionIsNotFelony(info, row)
 	}
 }

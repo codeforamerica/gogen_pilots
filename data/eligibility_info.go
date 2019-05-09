@@ -81,3 +81,7 @@ func (info *EligibilityInfo) yearsSinceEvent(date time.Time) float64 {
 	years := hours / (24 * 365.25)
 	return years
 }
+
+func (info *EligibilityInfo) hasSuperstrikes() bool {
+	return info.Superstrikes != "-"
+}
