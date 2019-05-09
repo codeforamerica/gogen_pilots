@@ -2,7 +2,8 @@ package processor_test
 
 import (
 	"encoding/csv"
-	//"fmt"
+	"strconv"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
@@ -57,15 +58,7 @@ var _ = Describe("DataProcessor", func() {
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			for i, row := range outputDOJCSV {
-				//fmt.Printf("output file %#v", outputDOJCSV)
-				//for j, item := range row {
-				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
-				//}
-				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
-			}
-
-			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
 		})
 	})
 
@@ -105,15 +98,7 @@ var _ = Describe("DataProcessor", func() {
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			for i, row := range outputDOJCSV {
-				//fmt.Printf("output file %#v", outputDOJCSV)
-				//for j, item := range row {
-				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
-				//}
-				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
-			}
-
-			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
 		})
 	})
 
@@ -157,15 +142,7 @@ var _ = Describe("DataProcessor", func() {
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			for i, row := range outputDOJCSV {
-				//fmt.Printf("output file %#v", outputDOJCSV)
-				//for j, item := range row {
-				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
-				//}
-				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
-			}
-
-			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
 		})
 	})
 
@@ -205,15 +182,7 @@ var _ = Describe("DataProcessor", func() {
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			for i, row := range outputDOJCSV {
-				//fmt.Printf("output file %#v", outputDOJCSV)
-				//for j, item := range row {
-				//	Expect(item).To(Equal(expectedDOJResultsCSV[i][j]))
-				//}
-				Expect(row).To(Equal(expectedDOJResultsCSV[i]))
-			}
-
-			//Expect(outputDOJCSV).To(Equal(expectedDOJResultsCSV))
+			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
 		})
 	})
 
@@ -263,3 +232,12 @@ var _ = Describe("DataProcessor", func() {
 	})
 
 })
+
+func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
+	for i, row := range actualCSV {
+		for j, item := range row {
+			Expect(item).To(Equal(expectedCSV[i][j]), "failed on row "+strconv.Itoa(i+1))
+		}
+	}
+	Expect(actualCSV).To(Equal(expectedCSV))
+}
