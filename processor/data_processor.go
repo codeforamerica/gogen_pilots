@@ -243,31 +243,6 @@ func (d *DataProcessor) incrementConvictionAndClearanceStats(
 	}
 }
 
-func condenseRow(row []string) []string {
-	var condensedRow []string
-	condensedRow = append(condensedRow, row[11])
-	condensedRow = append(condensedRow, row[12])
-	condensedRow = append(condensedRow, row[13])
-	condensedRow = append(condensedRow, row[14])
-	condensedRow = append(condensedRow, row[22])
-	condensedRow = append(condensedRow, row[37])
-	condensedRow = append(condensedRow, row[40])
-	condensedRow = append(condensedRow, row[46])
-	condensedRow = append(condensedRow, row[48])
-	condensedRow = append(condensedRow, row[51])
-	condensedRow = append(condensedRow, row[52])
-	condensedRow = append(condensedRow, row[54])
-	condensedRow = append(condensedRow, row[80])
-	condensedRow = append(condensedRow, row[82])
-	condensedRow = append(condensedRow, row[86])
-	condensedRow = append(condensedRow, row[87])
-	condensedRow = append(condensedRow, row[88])
-	condensedRow = append(condensedRow, row[90])
-	condensedRow = append(condensedRow, row[93])
-	condensedRow = append(condensedRow, row[94])
-	return condensedRow
-}
-
 func (d *DataProcessor) Process(county string) {
 	fmt.Printf("Processing Histories\n")
 	for _, history := range d.dojInformation.Histories {
@@ -297,8 +272,7 @@ func (d *DataProcessor) Process(county string) {
 
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])
-		var condensedRow = condenseRow(row)
-		d.outputCondensedDOJWriter.WriteEntryWithEligibilityInfo(condensedRow, d.dojInformation.Eligibilities[i])
+		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])
 	}
 
 	d.outputDOJWriter.Flush()
@@ -390,4 +364,3 @@ func sumValues(mapOfInts map[string]int) int {
 	}
 	return total
 }
-

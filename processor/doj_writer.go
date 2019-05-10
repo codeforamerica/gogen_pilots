@@ -35,10 +35,10 @@ var DojFullHeaders = []string{
 	"REQ_CDL",
 	"REQ_SSN",
 	"PII_SEG_SEP",
-	"CII_NUMBER", //11
-	"PRI_NAME",   //12
-	"GENDER",     //13
-	"PRI_DOB",    //14
+	"CII_NUMBER",
+	"PRI_NAME",
+	"GENDER",
+	"PRI_DOB",
 	"PRI_SSN",
 	"PRI_CDL",
 	"PRI_IDN",
@@ -46,7 +46,7 @@ var DojFullHeaders = []string{
 	"FBI_NUMBER",
 	"PDR_SEG_SEP",
 	"RACE_CODE",
-	"RACE_DESCR", //22
+	"RACE_DESCR",
 	"EYE_COLOR_CODE",
 	"EYE_COLOR_DESCR",
 	"HAIR_COLOR_CODE",
@@ -61,24 +61,24 @@ var DojFullHeaders = []string{
 	"CITIZENSHIP_LIST",
 	"CYC_SEG_SEP",
 	"CYC_ORDER",
-	"CYC_DATE", //37
+	"CYC_DATE",
 	"STP_SEG_SEP",
 	"STP_ORDER",
-	"STP_EVENT_DATE", //40
+	"STP_EVENT_DATE",
 	"STP_TYPE_CODE",
 	"STP_TYPE_DESCR",
 	"STP_ORI_TYPE",
 	"STP_ORI_TYPE_DESCR",
 	"STP_ORI_CODE",
-	"STP_ORI_DESCR", //46
+	"STP_ORI_DESCR",
 	"STP_ORI_CNTY_CODE",
-	"STP_ORI_CNTY_NAME", //48
+	"STP_ORI_CNTY_NAME",
 	"CNT_SEG_SEP",
 	"CNT_ORDER",
-	"DISP_DATE", //51
-	"OFN",       //52
+	"DISP_DATE",
+	"OFN",
 	"OFFENSE_CODE",
-	"OFFENSE_DESCR", //54
+	"OFFENSE_DESCR",
 	"OFFENSE_TOC",
 	"OFFENSE_QUAL_LST",
 	"DISP_OFFENSE_CODE",
@@ -104,21 +104,21 @@ var DojFullHeaders = []string{
 	"FE_NUM_WARRANT",
 	"DISP_ORDER",
 	"DISP_CODE",
-	"DISP_DESCR", //80
+	"DISP_DESCR",
 	"CONV_STAT_CODE",
-	"CONV_STAT_DESCR", //82
+	"CONV_STAT_DESCR",
 	"SENT_SEG_SEP",
 	"SENT_ORDER",
 	"SENT_LOC_CODE",
-	"SENT_LOC_DESCR", //86
-	"SENT_LENGTH",    //87
-	"SENT_TIME_CODE", //88
+	"SENT_LOC_DESCR",
+	"SENT_LENGTH",
+	"SENT_TIME_CODE",
 	"SENT_TIME_DESCR",
-	"CYC_AGE", //90
+	"CYC_AGE",
 	"CII_TYPE",
 	"CII_TYPE_ALPHA",
-	"COMMENT_TEXT", //93
-	"END_OF_REC",   //94
+	"COMMENT_TEXT",
+	"END_OF_REC",
 }
 var dojCondensedHeaders = []string{
 	"CII_NUMBER",
@@ -145,6 +145,7 @@ var dojCondensedHeaders = []string{
 
 type DOJWriter interface {
 	WriteEntryWithEligibilityInfo([]string, *data.EligibilityInfo)
+	WriteCondensedEntryWithEligibilityInfo([]string, *data.EligibilityInfo)
 	Write([]string)
 	Flush()
 }
@@ -204,7 +205,40 @@ func (cw csvWriter) WriteEntryWithEligibilityInfo(entry []string, info *data.Eli
 		eligibilityCols = make([]string, len(eligiblityHeaders))
 	}
 
-	_ = cw.outputFileWriter.Write(append(entry, eligibilityCols...))
+	cw.Write(append(entry, eligibilityCols...))
+}
+
+func (cw csvWriter) WriteCondensedEntryWithEligibilityInfo(entry []string, info *data.EligibilityInfo) {
+	var condensedRow []string
+
+	includedColumns := []int{
+		data.CII_NUMBER,
+		data.PRI_NAME,
+		data.GENDER,
+		data.PRI_DOB,
+		data.RACE_DESCR,
+		data.CYC_DATE,
+		data.STP_EVENT_DATE,
+		data.STP_ORI_DESCR,
+		data.STP_ORI_CNTY_NAME,
+		data.DISP_DATE,
+		data.OFN,
+		data.OFFENSE_DESCR,
+		data.DISP_DESCR,
+		data.CONV_STAT_DESCR,
+		data.SENT_LOC_DESCR,
+		data.SENT_LENGTH,
+		data.SENT_TIME_CODE,
+		data.CYC_AGE,
+		data.COMMENT_TEXT,
+		data.END_OF_REC,
+	}
+
+	for _, col := range includedColumns {
+		condensedRow = append(condensedRow, entry[col])
+	}
+
+	cw.WriteEntryWithEligibilityInfo(condensedRow, info)
 }
 
 func writeDate(val time.Time) string {
@@ -216,7 +250,7 @@ func (cw csvWriter) Flush() {
 }
 
 func (cw csvWriter) Write(line []string) {
-	cw.outputFileWriter.Write(line)
+	_ = cw.outputFileWriter.Write(line)
 }
 
 func writeFloat(val float64) string {
