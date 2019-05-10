@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gogen/data"
 	"regexp"
+	"sort"
 )
 
 type DataProcessor struct {
@@ -323,9 +324,7 @@ func (d *DataProcessor) Process(county string) {
 
 	fmt.Println()
 	fmt.Println("----------- Eligibility Reasons --------------------")
-	for key, val := range d.clearanceByCodeSection.numberEligibilityByReason {
-		fmt.Printf("Found %d convictions in this county with eligibility reason: %s\n", val, key)
-	}
+	printConvictionsCountByReason(d.clearanceByCodeSection.numberEligibilityByReason)
 	fmt.Println()
 	fmt.Printf("----------- Prop64 Related Convictions In This County --------------------")
 	printSummaryByCodeSection("in this county", d.relatedConvictionsByCodeSection.countyConvictionsByCodeSection)
@@ -356,11 +355,32 @@ func (d *DataProcessor) Process(county string) {
 
 }
 
+func printConvictionsCountByReason(numberEligibilityByReason map[string]int) {
+	reasons := getSortedKeys(numberEligibilityByReason)
+
+	for _, reason := range reasons {
+		fmt.Printf("Found %d convictions in this county with eligibility reason: %s\n", numberEligibilityByReason[reason], reason)
+	}
+}
+
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {
 	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
-	for codeSection, number := range resultsByCodeSection {
-		fmt.Printf("Found %d %s convictions %s\n", number, codeSection, description)
+	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
+
+	codeSections := getSortedKeys(resultsByCodeSection)
+
+	for _, codeSection := range codeSections {
+		fmt.Printf("Found %d %s convictions %s\n", resultsByCodeSection[codeSection], codeSection, description)
 	}
+}
+
+func getSortedKeys(mapWithStringKeys map[string]int) []string {
+	keys := make([]string, 0, len(mapWithStringKeys))
+	for key := range mapWithStringKeys {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func sumValues(mapOfInts map[string]int) int {
@@ -370,3 +390,4 @@ func sumValues(mapOfInts map[string]int) int {
 	}
 	return total
 }
+
