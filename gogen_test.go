@@ -393,7 +393,6 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("3 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
-
 	It("can handle a csv with extra comma at the end of headers", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")

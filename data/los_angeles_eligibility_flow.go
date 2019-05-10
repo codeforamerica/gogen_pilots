@@ -103,7 +103,7 @@ func (ef losAngelesEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow) {
 	if ef.MatchedCodeSection(row.CodeSection) == "11357" {
 		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
-			ef.EligibleDismissal(info,"11357(a) or 11357(b)")
+			ef.EligibleDismissal(info, "11357(a) or 11357(b)")
 		} else {
 			ef.MaybeEligible(info, "Other 11357")
 		}

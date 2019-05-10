@@ -65,23 +65,23 @@ func generateHistory() [][]string {
 	caseInfos := make(map[int]CaseInfos)
 
 	for i := 0; i < numberOfProp64Convictions; i++ {
-		caseInfos[counter] = CaseInfos{isProp64:true, isConviction:true}
+		caseInfos[counter] = CaseInfos{isProp64: true, isConviction: true}
 		counter++
 	}
 
 	for i := 0; i < numberOfOtherConvictions; i++ {
-		caseInfos[counter] = CaseInfos{isProp64:false, isConviction:true}
+		caseInfos[counter] = CaseInfos{isProp64: false, isConviction: true}
 		counter++
 	}
 
 	for i := 0; i < numberOfNonConvictions; i++ {
-		caseInfos[counter] = CaseInfos{isProp64:false, isConviction:false}
+		caseInfos[counter] = CaseInfos{isProp64: false, isConviction: false}
 		counter++
 	}
 
 	counter = 0
 	for _, info := range caseInfos {
-		info.cycleNumber = counter+101
+		info.cycleNumber = counter + 101
 		info.date = dates[counter]
 		rows = append(rows, generateCase(personalInfos, info)...)
 		counter++
@@ -94,7 +94,7 @@ func generateDates(n int) []time.Time {
 	randomNumbers := make([]float64, n)
 	dates := make([]time.Time, n)
 
-	for i := 0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		randomNumbers[i] = rand.Float64()
 	}
 
@@ -102,7 +102,7 @@ func generateDates(n int) []time.Time {
 
 	currentUnixTime := float64(time.Now().Unix())
 
-	for i := 0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		dates[i] = time.Unix(int64(randomNumbers[i]*currentUnixTime), 0)
 	}
 
@@ -391,7 +391,7 @@ var otherOffenses = []string{
 	"4149 BP-POSSESS HYPODERMIC NEEDLE/SYRINGE",
 	"496 PC-RECEIVE/ETC KNOWN STOLEN PROPERTY",
 	"288(A) PC-LEWD OR LASCIV ACTS", // 290 registerable offense
-	"187 PC-MURDER:SECOND DEGREE", // Superstrike
+	"187 PC-MURDER:SECOND DEGREE",   // Superstrike
 }
 
 var firstNames = []string{

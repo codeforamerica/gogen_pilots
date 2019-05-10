@@ -13,14 +13,14 @@ import (
 
 const VERSION = "0.0.1"
 
-var defaultOpts struct {}
+var defaultOpts struct{}
 
 var opts struct {
 	OutputFolder string `long:"outputs" description:"The folder in which to place result files"`
 	DOJFile      string `long:"input-doj" description:"The file containing criminal histories from CA DOJ"`
 	Delimiter    string `long:"delimiter" short:"d" default:"," hidden:"true"`
 	County       string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
-	Version      bool `long:"version" short:"v" description:"Print the version"`
+	Version      bool   `long:"version" short:"v" description:"Print the version"`
 }
 
 func main() {
