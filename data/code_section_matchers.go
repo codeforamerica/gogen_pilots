@@ -2,7 +2,7 @@ package data
 
 import "regexp"
 
-func isSuperstrike(codeSection string) bool {
+func IsSuperstrike(codeSection string) bool {
 	for _, pattern := range superstrikesPatterns {
 		if pattern == codeSection {
 			return true
@@ -11,7 +11,7 @@ func isSuperstrike(codeSection string) bool {
 	return false
 }
 
-func isPC290(codeSection string) bool {
+func IsPC290(codeSection string) bool {
 	for _, pattern := range pc290Patterns {
 		if pattern.MatchString(codeSection) {
 			return true

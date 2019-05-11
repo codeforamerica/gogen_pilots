@@ -84,7 +84,7 @@ func (history *DOJHistory) MostRecentConvictionDate() time.Time {
 func (history *DOJHistory) SuperstrikeCodeSections() []string {
 	var result []string
 	for _, row := range history.Convictions {
-		if isSuperstrike(row.CodeSection) {
+		if IsSuperstrike(row.CodeSection) {
 			result = append(result, row.CodeSection)
 		}
 	}
@@ -95,7 +95,7 @@ func (history *DOJHistory) PC290CodeSections() []string {
 	var result []string
 
 	for _, row := range history.Convictions {
-		if isPC290(row.CodeSection) {
+		if IsPC290(row.CodeSection) {
 			result = append(result, row.CodeSection)
 		}
 	}
