@@ -339,7 +339,6 @@ func printConvictionsCountByReason(numberEligibilityByReason map[string]int) {
 
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {
 	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
-	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
 
 	codeSections := getSortedKeys(resultsByCodeSection)
 
