@@ -330,20 +330,20 @@ func (d *DataProcessor) Process(county string) {
 }
 
 func printConvictionsCountByReason(numberEligibilityByReason map[string]int) {
-	reasons := getSortedKeys(numberEligibilityByReason)
-
-	for _, reason := range reasons {
-		fmt.Printf("Found %d convictions in this county with eligibility reason: %s\n", numberEligibilityByReason[reason], reason)
-	}
+	printMap("Found %d convictions in this county with eligibility reason: %s\n", numberEligibilityByReason)
 }
 
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {
 	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
+	formatString := fmt.Sprintf("Found %%d %%s convictions %s\n", description)
+	printMap(formatString, resultsByCodeSection)
+}
 
-	codeSections := getSortedKeys(resultsByCodeSection)
+func printMap(formatString string, values map[string]int) {
+	keys := getSortedKeys(values)
 
-	for _, codeSection := range codeSections {
-		fmt.Printf("Found %d %s convictions %s\n", resultsByCodeSection[codeSection], codeSection, description)
+	for _, key := range keys {
+		fmt.Printf(formatString, values[key], key)
 	}
 }
 
