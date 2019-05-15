@@ -1,10 +1,13 @@
 package data
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 func IsSuperstrike(codeSection string) bool {
 	for _, pattern := range superstrikesPatterns {
-		if pattern == codeSection {
+		if pattern.MatchString(codeSection) {
 			return true
 		}
 	}
@@ -20,44 +23,58 @@ func IsPC290(codeSection string) bool {
 	return false
 }
 
-var superstrikesPatterns = []string{
-	"187 PC",
-	"191.5 PC",
-	"187-664 PC",
-	"191.5-664 PC",
-	"209 PC",
-	"220 PC",
-	"245(D)(3) PC",
-	"261(A)(2) PC",
-	"261(A)(6) PC",
-	"262(A)(2) PC",
-	"262(A)(4) PC",
-	"264.1 PC",
-	"269 PC",
-	"286(C)(1) PC",
-	"286(C)(2)(A) PC",
-	"286(C)(2)(B) PC",
-	"286(C)(2)(C) PC",
-	"286(C)(3) PC",
-	"286(D)(1) PC",
-	"286(D)(2) PC",
-	"286(D)(3) PC",
-	"288(A) PC",
-	"288(B)(1) PC",
-	"288(B)(2) PC",
-	"288A(C)(1) PC",
-	"288A(C)(2)(A) PC",
-	"288A(C)(2)(B) PC",
-	"288A(C)(2)(C) PC",
-	"288A(D) PC",
-	"288.5(A) PC",
-	"289(A)(1)(A) PC",
-	"289(A)(1)(B) PC",
-	"289(A)(1)(C) PC",
-	"289(A)(2)(C) PC",
-	"289(J) PC",
-	"653F PC",
-	"11418(A)(1) PC",
+var gangEnhancement = `186\.22\(B\)\(4\)`
+var superstrikesWithGangEnhancement = []string{
+	`136\.1`,
+	`215`,
+	`213\(A\)\(1\)\(A\)`,
+	`246`,
+	`519`,
+	`12022\.55`,
+}
+
+var enhanceableOffenses = `((` + strings.Join(superstrikesWithGangEnhancement, `)|(`) + `))`
+var superstrikesPatterns = []*regexp.Regexp{
+	regexp.MustCompile(`37 PC`),
+	regexp.MustCompile(`128 PC`),
+	regexp.MustCompile(enhanceableOffenses + `.*` + gangEnhancement + ` PC`),
+	regexp.MustCompile(gangEnhancement + `.*` + enhanceableOffenses + ` PC`),
+	regexp.MustCompile(`187 PC`),
+	regexp.MustCompile(`188 PC`),
+	regexp.MustCompile(`189(\.[15])? PC`),
+	regexp.MustCompile(`190(\.\d{1,2})?(\(.*\))? PC`),
+	regexp.MustCompile(`191(\.5)? PC`),
+	regexp.MustCompile(`205 PC`),
+	regexp.MustCompile(`207 PC`),
+	regexp.MustCompile(`209(\.5)? PC`),
+	regexp.MustCompile(`217\.1 PC`),
+	regexp.MustCompile(`218 PC`),
+	regexp.MustCompile(`219 PC`),
+	regexp.MustCompile(`220 PC`),
+	regexp.MustCompile(`245\(D\)\(3\) PC`),
+	regexp.MustCompile(`261(\(.*\))? PC`),
+	regexp.MustCompile(`262(\(.*\))? PC`),
+	regexp.MustCompile(`264\.1 PC`),
+	regexp.MustCompile(`269 PC`),
+	regexp.MustCompile(`273AB(\(.*\))? PC`),
+	regexp.MustCompile(`286((\(C\)\([123]\)(\([ABC]\))?)|(\(D\)\([123]\)))? PC`),
+	regexp.MustCompile(`287 PC`),
+	regexp.MustCompile(`288((\(A\))|(\(B\)\([12]\)))? PC`),
+	regexp.MustCompile(`288A((\(D\))|(\(C\)\(1\))|(\(C\)\(2\)\([ABC]\)))? PC`),
+	regexp.MustCompile(`288\.5(\(A\))? PC`),
+	regexp.MustCompile(`289((\(J\))|(\(A\)\(1\)\([ABC]\))|(\(A\)\(2\)\(C\)))? PC`),
+	regexp.MustCompile(`451\.5 PC`),
+	regexp.MustCompile(`653F PC`),
+	regexp.MustCompile(`667\.(61|7|71) PC`),
+	regexp.MustCompile(`4500 PC`),
+	regexp.MustCompile(`11418((\(A\)\(1\))|(\(B\)\([12]\))) PC`),
+	regexp.MustCompile(`12308 PC`),
+	regexp.MustCompile(`12310 PC`),
+	regexp.MustCompile(`18745 PC`),
+	regexp.MustCompile(`18755 PC`),
+	regexp.MustCompile(`1672\(A\) MV`),
+	//regexp.MustCompile(`187-664 PC`),
+	//regexp.MustCompile(`191.5-664 PC`),
 }
 
 var pc290Patterns = []*regexp.Regexp{
