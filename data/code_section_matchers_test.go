@@ -110,6 +110,19 @@ var _ = Describe("IsSuperstrike", func() {
 		}
 	})
 
+	It("returns true if the code section is a superstrike with a -664 attempted", func() {
+		attemptedSuperstrikeCodeSection := "187-664 PC"
+
+		Expect(data.IsSuperstrike(attemptedSuperstrikeCodeSection)).To(BeTrue(), "Failed on example ")
+	})
+
+	It("returns true if the code section is a superstrike with a -182 conspiracy", func() {
+		attemptedSuperstrikeCodeSection := "182 + 190.2(A)(4) PC"
+
+		Expect(data.IsSuperstrike(attemptedSuperstrikeCodeSection)).To(BeTrue(), "Failed on example ")
+	})
+
+
 	It("returns false is the code section is not a superstrike", func() {
 		nonSuperstrikes := []string{
 			"186.22(B)(3)+136.1 PC",
@@ -144,6 +157,7 @@ var _ = Describe("IsSuperstrike", func() {
 			"667.6 PC",
 			"667.72 PC",
 			"667 PC",
+			"667/664 PC",
 			"4500(A) PC",
 			"11418(A)(2) PC",
 			"18745(A) PC",
@@ -220,6 +234,105 @@ var _ = Describe("IsPC290", func() {
 
 		for _, nonPC290 := range nonPC290s {
 			Expect(data.IsPC290(nonPC290)).To(BeFalse(), "Failed on example "+nonPC290)
+		}
+	})
+})
+
+
+var _ = Describe("StripFlags", func() {
+	It("strips the trailing 182 and punctuation and replaces it with a space", func() {
+		validConspiredSuperstrikes := []string{
+			"187-182 PC",
+			"187 182 PC",
+			"189/182 PC",
+			"189.1+182 PC",
+			"190.25(B) + 182 PC",
+			"191 / 182 PC",
+			"191.5 - 182 PC",
+			"37/182 PC",
+			"37 182 PC",
+		}
+		StrippedSuperstrikes := []string{
+			"187 PC",
+			"187 PC",
+			"189 PC",
+			"189.1 PC",
+			"190.25(B) PC",
+			"191 PC",
+			"191.5 PC",
+			"37 PC",
+			"37 PC",
+		}
+
+		for i, validConspiredSuperstrike := range validConspiredSuperstrikes {
+			Expect(data.StripFlags(validConspiredSuperstrike, `182`)).To(Equal(StrippedSuperstrikes[i]), "Failed on example "+validConspiredSuperstrike)
+		}
+	})
+
+	It("strips the prepended 182 and punctuation and replaces it with a space", func() {
+		validConspiredSuperstrikes := []string{
+			"182-189.5 PC",
+			"182/190 PC",
+			"182+190.03 PC",
+			"182 + 190.2(A)(4) PC",
+		}
+		StrippedSuperstrikes := []string{
+			" 189.5 PC",
+			" 190 PC",
+			" 190.03 PC",
+			" 190.2(A)(4) PC",
+		}
+
+		for i, validConspiredSuperstrike := range validConspiredSuperstrikes {
+			Expect(data.StripFlags(validConspiredSuperstrike, `182`)).To(Equal(StrippedSuperstrikes[i]), "Failed on example "+validConspiredSuperstrike)
+		}
+	})
+
+	It("strips the trailing 664 and punctuation and replaces it with a space", func() {
+		validAttemptedSuperstrikes := []string{
+			"187-664 PC",
+			"189/664 PC",
+			"189.1+664 PC",
+			"189.1 664 PC",
+			"190.25(B) + 664 PC",
+			"191 / 664 PC",
+			"191.5 - 664 PC",
+			"37/664 PC",
+			"37 664 PC",
+		}
+		StrippedSuperstrikes := []string{
+			"187 PC",
+			"189 PC",
+			"189.1 PC",
+			"189.1 PC",
+			"190.25(B) PC",
+			"191 PC",
+			"191.5 PC",
+			"37 PC",
+			"37 PC",
+		}
+
+		for i, validAttemptedSuperstrike := range validAttemptedSuperstrikes {
+			Expect(data.StripFlags(validAttemptedSuperstrike, `664`)).To(Equal(StrippedSuperstrikes[i]), "Failed on example "+validAttemptedSuperstrike)
+		}
+	})
+
+	It("strips the prepended 664 and punctuation and replaces it with a space", func() {
+		validAttemptedSuperstrikes := []string{
+			"664-189.5 PC",
+			"664/190 PC",
+			"664+190.03 PC",
+			"664 + 190.2(A)(4) PC",
+		}
+		StrippedSuperstrikes := []string{
+			" 189.5 PC",
+			" 190 PC",
+			" 190.03 PC",
+			" 190.2(A)(4) PC",
+		}
+
+		for i, validAttemptedSuperstrike := range validAttemptedSuperstrikes {
+			Expect(data.StripFlags(validAttemptedSuperstrike, `664`)).To(Equal(StrippedSuperstrikes[i]), "Failed on example "+validAttemptedSuperstrike)
 		}
 	})
 })
