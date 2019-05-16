@@ -77,8 +77,6 @@ var _ = Describe("IsSuperstrike", func() {
 			"18745 PC",
 			"18755 PC",
 			"1672(A) MV",
-			//"187-664 PC",
-			//"191.5-664 PC",
 		}
 
 		for _, validSuperstrike := range validSuperstrikes {
@@ -121,7 +119,6 @@ var _ = Describe("IsSuperstrike", func() {
 
 		Expect(data.IsSuperstrike(attemptedSuperstrikeCodeSection)).To(BeTrue(), "Failed on example ")
 	})
-
 
 	It("returns false is the code section is not a superstrike", func() {
 		nonSuperstrikes := []string{
@@ -173,36 +170,51 @@ var _ = Describe("IsSuperstrike", func() {
 var _ = Describe("IsPC290", func() {
 	It("returns true if the code section falls under PC 290", func() {
 		validPC290s := []string{
-			"266 PC",
-			"266C PC",
-			"267 PC",
-			"285 PC",
-			"288 PC",
-			"290 PC",
-			"261 PC",
-			"269 PC",
-			"314 PC",
-			"290(A) PC",
-			"290.1 PC",
-			"261B PC",
-			"269 PC",
-			"269.8 PC",
-			"314(A)(2)(C)(1) PC",
 			"236.1(B) PC",
-			"236.1(C) PC",
-			"236.1(C)(A) PC",
 			"236.1(B)(C) PC",
 			"236.1(B)(1) PC",
+			"236.1(C) PC",
+			"236.1(C)(A) PC",
 			"243.4(A) PC",
-			"264.11 PC",
-			"311.1(2) PC",
-			"647.6B PC",
 			"243.4(A)(C) PC",
-			"266J(A) PC",
-			"266J.11 PC",
-			"647A(2) PC",
-			"647AB PC",
-			"647A.2 PC",
+			"261 PC",
+			"261B PC",
+			"262(A) PC",
+			"262(A)(1) PC",
+			"264.1 PC",
+			"266 PC",
+			"266C PC",
+			"266H(B) PC",
+			"267 PC",
+			"269 PC",
+			"269.8 PC",
+			"272 PC",
+			"285 PC",
+			"286 PC",
+			"287 PC",
+			"288 PC",
+			"288A PC",
+			"288.2 PC",
+			"288.3 PC",
+			"288.4 PC",
+			"288.5 PC",
+			"288.7 PC",
+			"289 PC",
+			"311.1 PC",
+			"311.2(B) PC",
+			"311.2(C) PC",
+			"311.2(D) PC",
+			"311.3 PC",
+			"311.4 PC",
+			"311.10 PC",
+			"311.11 PC",
+			"314(1) PC",
+			"314(2) PC",
+			"451.5 PC",
+			"647.6B PC",
+			"647A PC",
+			"653F(B) PC",
+			"653F(C) PC",
 		}
 
 		for _, validPC290 := range validPC290s {
@@ -212,24 +224,30 @@ var _ = Describe("IsPC290", func() {
 
 	It("returns false is the code section does not fall under PC 290", func() {
 		nonPC290s := []string{
-			"266.5 PC",
-			"266(C) PC",
-			"267A PC",
-			"2677 PC",
-			"2699 PC",
-			"262 PC",
-			"291 PC",
 			"236.1(A) PC",
 			"236.1B PC",
 			"236.2(B) PC",
 			"236.1(D)(B) PC",
 			"243 PC",
+			"262 PC",
+			"264.11 PC",
+			"266.5 PC",
+			"266(C) PC",
+			"266J(A) PC",
+			"266J.11 PC",
+			"266(J) PC",
+			"267A PC",
+			"2677 PC",
+			"2699 PC",
+			"288.6",
+			"291 PC",
+			"243 PC",
 			"2434 PC",
 			"24 PC",
 			"647(A) PC",
-			"266(J) PC",
 			"647.1(A) PC",
 			"6477A PC",
+			"653F PC",
 		}
 
 		for _, nonPC290 := range nonPC290s {
@@ -237,7 +255,6 @@ var _ = Describe("IsPC290", func() {
 		}
 	})
 })
-
 
 var _ = Describe("StripFlags", func() {
 	It("strips the trailing 182 and punctuation and replaces it with a space", func() {
