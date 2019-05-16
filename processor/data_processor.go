@@ -11,6 +11,7 @@ type DataProcessor struct {
 	dojInformation                      *data.DOJInformation
 	outputDOJWriter                     DOJWriter
 	outputCondensedDOJWriter            DOJWriter
+	outputProp64ConvictionsDOJWriter    DOJWriter
 	prop64Matcher                       *regexp.Regexp
 	stats                               dataProcessorStats
 	totalClearanceResults               totalClearanceResults
@@ -81,32 +82,34 @@ func NewDataProcessor(
 	dojInformation *data.DOJInformation,
 	outputDOJWriter DOJWriter,
 	outputCondensedDOJWriter DOJWriter,
+	outputProp64ConvictionsDOJWriter DOJWriter,
 ) DataProcessor {
 	return DataProcessor{
-		dojInformation:           dojInformation,
-		outputDOJWriter:          outputDOJWriter,
-		outputCondensedDOJWriter: outputCondensedDOJWriter,
-		totalClearanceResults:    totalClearanceResults{},
-		clearanceByCodeSection: clearanceByCodeSection{
+		dojInformation:           				dojInformation,
+		outputDOJWriter:          				outputDOJWriter,
+		outputCondensedDOJWriter: 				outputCondensedDOJWriter,
+		outputProp64ConvictionsDOJWriter: 		outputProp64ConvictionsDOJWriter,
+		totalClearanceResults:    				totalClearanceResults{},
+		clearanceByCodeSection: 				clearanceByCodeSection{
 			numberEligibilityByReason:                     make(map[string]int),
 			numberDismissedByCodeSection:                  make(map[string]int),
 			numberReducedByCodeSection:                    make(map[string]int),
 			numberIneligibleByCodeSection:                 make(map[string]int),
 			numberMaybeEligibleFlagForReviewByCodeSection: make(map[string]int),
 		},
-		relatedChargeClearanceByCodeSection: clearanceByCodeSection{
+		relatedChargeClearanceByCodeSection: 	clearanceByCodeSection{
 			numberEligibilityByReason:                     make(map[string]int),
 			numberDismissedByCodeSection:                  make(map[string]int),
 			numberReducedByCodeSection:                    make(map[string]int),
 			numberIneligibleByCodeSection:                 make(map[string]int),
 			numberMaybeEligibleFlagForReviewByCodeSection: make(map[string]int),
 		},
-		totalExistingConvictions: totalExistingConvictions{},
-		convictionsByCodeSection: convictionsByCodeSection{
+		totalExistingConvictions: 				totalExistingConvictions{},
+		convictionsByCodeSection: 				convictionsByCodeSection{
 			totalConvictionsByCodeSection:  make(map[string]int),
 			countyConvictionsByCodeSection: make(map[string]int),
 		},
-		relatedConvictionsByCodeSection: convictionsByCodeSection{
+		relatedConvictionsByCodeSection: 		convictionsByCodeSection{
 			totalConvictionsByCodeSection:  make(map[string]int),
 			countyConvictionsByCodeSection: make(map[string]int),
 		},
@@ -273,10 +276,14 @@ func (d *DataProcessor) Process(county string) {
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])
 		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])
+		if d.dojInformation.Eligibilities[i] != nil {
+			d.outputProp64ConvictionsDOJWriter.WriteEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])
+		}
 	}
 
 	d.outputDOJWriter.Flush()
 	d.outputCondensedDOJWriter.Flush()
+	d.outputProp64ConvictionsDOJWriter.Flush()
 
 	fmt.Println()
 	fmt.Println("----------- Overall summary of DOJ file --------------------")
