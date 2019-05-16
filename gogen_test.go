@@ -436,4 +436,41 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 28 Total convictions in DOJ file"))
 		Expect(sessionString).To(ContainSubstring("Found 25 convictions in this county"))
 	})
+
+	It("can accept a compute-at option for determining eligibility", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles.csv"))
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		countyFlag := fmt.Sprintf("--county=%s", "LOS ANGELES")
+		computeAtFlag := fmt.Sprintf("--compute-at=%s", "2020-07-01")
+		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit())
+		Expect(session.Err).ToNot(gbytes.Say("required"))
+
+		Eventually(session).Should(gbytes.Say("Found 7 convictions that are eligible for dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 4 11358 convictions that are eligible for dismissal"))
+
+		Eventually(session).Should(gbytes.Say("Found 2 convictions that are eligible for reduction"))
+		Eventually(session).Should(gbytes.Say("Found 1 11358 convictions that are eligible for reduction"))
+
+		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
+		Eventually(session).Should(gbytes.Say("Found 2 convictions in this county with eligibility reason: Sentence Completed"))
+
+		Eventually(session).Should(gbytes.Say("----------- If ELIGIBLE Prop 64 convictions are dismissed or reduced --------------------"))
+		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record in the last 7 years"))
+	})
 })

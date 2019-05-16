@@ -21,6 +21,7 @@ var opts struct {
 	Delimiter    string `long:"delimiter" short:"d" default:"," hidden:"true"`
 	County       string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	Version      bool   `long:"version" short:"v" description:"Print the version"`
+	ComputeAt    string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 }
 
 func main() {
@@ -42,7 +43,18 @@ func main() {
 		panic("Missing required field! Run gogen --help for more info.")
 	}
 
-	dojInformation, _ := NewDOJInformation(opts.DOJFile, time.Now(), opts.County)
+	computeAtDate := time.Now()
+
+	if opts.ComputeAt != "" {
+		computeAtOption, err := time.Parse("2006-01-02", opts.ComputeAt)
+		if err != nil {
+			panic("Invalid --compute-at date. Must be a valid date of the format YYYY-MM-DD.")
+		} else {
+			computeAtDate = computeAtOption
+		}
+	}
+
+	dojInformation, _ := NewDOJInformation(opts.DOJFile, computeAtDate, opts.County)
 
 	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
 	condensedDojWriter := NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
