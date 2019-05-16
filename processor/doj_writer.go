@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var eligiblityHeaders = []string{
+var EligiblityHeaders = []string{
 	"Case Number",
 	"# of convictions on record",
 	"Superstrike Code Section(s)",
@@ -120,7 +120,7 @@ var DojFullHeaders = []string{
 	"COMMENT_TEXT",
 	"END_OF_REC",
 }
-var dojCondensedHeaders = []string{
+var DojCondensedHeaders = []string{
 	"CII_NUMBER",
 	"PRI_NAME",
 	"GENDER",
@@ -174,12 +174,12 @@ func NewWriter(outputFilePath string, headers []string) DOJWriter {
 }
 
 func NewDOJWriter(outputFilePath string) DOJWriter {
-	headers := append(DojFullHeaders, eligiblityHeaders...)
+	headers := append(DojFullHeaders, EligiblityHeaders...)
 	return NewWriter(outputFilePath, headers)
 }
 
 func NewCondensedDOJWriter(outputFilePath string) DOJWriter {
-	headers := append(dojCondensedHeaders, eligiblityHeaders...)
+	headers := append(DojCondensedHeaders, EligiblityHeaders...)
 	return NewWriter(outputFilePath, headers)
 }
 
@@ -202,7 +202,7 @@ func (cw csvWriter) WriteEntryWithEligibilityInfo(entry []string, info *data.Eli
 			info.EligibilityReason,
 		}
 	} else {
-		eligibilityCols = make([]string, len(eligiblityHeaders))
+		eligibilityCols = make([]string, len(EligiblityHeaders))
 	}
 
 	cw.Write(append(entry, eligibilityCols...))
