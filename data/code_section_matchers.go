@@ -6,11 +6,8 @@ import (
 )
 
 func IsSuperstrike(codeSection string) bool {
-	stripped664CodeSection := StripFlags(codeSection, `664`)
-	stripped182CodeSection := StripFlags(codeSection, `182`)
 	for _, pattern := range superstrikesPatterns {
-		if pattern.MatchString(stripped664CodeSection) ||
-			pattern.MatchString(stripped182CodeSection) {
+		if pattern.MatchString(codeSection) {
 			return true
 		}
 	}
@@ -24,14 +21,6 @@ func IsPC290(codeSection string) bool {
 		}
 	}
 	return false
-}
-
-func StripFlags(codeSection string, flag string) string {
-	strayPunctuation := `\s?[-/+]?\s?`
-	mathingRegex := regexp.MustCompile(strayPunctuation + flag + strayPunctuation)
-	s := mathingRegex.ReplaceAllString(codeSection, ` `)
-	return s
-
 }
 
 var gangEnhancement = `186\.22\(B\)\(4\)`
