@@ -14,6 +14,10 @@ func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return ef.prop64Matcher.Match([]byte(codeSection))
 }
 
+func (ef sacramentoEligibilityFlow) IsRelatedCharge(codeSection string) bool {
+	return false
+}
+
 func (ef sacramentoEligibilityFlow) MatchedCodeSection(codeSection string) string {
 	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
 	if len(matches) > 0 {
@@ -33,17 +37,17 @@ func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, 
 }
 
 func (ef sacramentoEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
+	info.EligibilityDetermination["county"] = "Eligible for Dismissal"
 	info.EligibilityReason = reason
 }
 
 func (ef sacramentoEligibilityFlow) EligibleReduction(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Reduction"
+	info.EligibilityDetermination["county"] = "Eligible for Reduction"
 	info.EligibilityReason = reason
 }
 
 func (ef sacramentoEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Not eligible"
+	info.EligibilityDetermination["county"] = "Not eligible"
 	info.EligibilityReason = reason
 }
 

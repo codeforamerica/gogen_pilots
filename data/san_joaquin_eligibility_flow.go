@@ -33,33 +33,33 @@ func (ef sanJoaquinEligibilityFlow) MatchedRelatedCodeSection(codeSection string
 	return ""
 }
 
-func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
+func (ef sanJoaquinEligibilityFlow) IsRelatedCharge(codeSection string) bool {
 	return ef.relatedChargeMatcher.Match([]byte(codeSection))
 }
 
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
-	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
+	if ef.IsProp64Charge(row.CodeSection) || ef.IsRelatedCharge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)
 	}
 }
 
 func (ef sanJoaquinEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
+	info.EligibilityDetermination["county"] = "Eligible for Dismissal"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) EligibleReduction(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Reduction"
+	info.EligibilityDetermination["county"] = "Eligible for Reduction"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Maybe Eligible - Flag for Review"
+	info.EligibilityDetermination["county"] = "Maybe Eligible - Flag for Review"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
 func (ef sanJoaquinEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Not eligible"
+	info.EligibilityDetermination["county"] = "Not eligible"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
 
@@ -72,7 +72,7 @@ func (ef sanJoaquinEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 }
 
 func (ef sanJoaquinEligibilityFlow) convictionIsRelatedCharge(info *EligibilityInfo, row *DOJRow) {
-	if ef.isRelatedCharge(row.CodeSection) {
+	if ef.IsRelatedCharge(row.CodeSection) {
 		ef.hasProp64ChargeInCycle(info, row)
 	} else {
 		ef.ConvictionIsNotFelony(info, row)

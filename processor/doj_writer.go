@@ -198,7 +198,7 @@ func (cw csvWriter) WriteEntryWithEligibilityInfo(entry []string, info *data.Eli
 			writeFloat(info.YearsSinceMostRecentConviction),
 			writeInt(info.NumberOfProp64Convictions),
 			info.Deceased,
-			info.EligibilityDetermination,
+			info.EligibilityDetermination["county"],
 			info.EligibilityReason,
 		}
 	} else {

@@ -7,11 +7,16 @@ import (
 )
 
 type losAngelesEligibilityFlow struct {
-	prop64Matcher *regexp.Regexp
+	prop64Matcher        *regexp.Regexp
+	relatedChargeMatcher *regexp.Regexp
 }
 
 func (ef losAngelesEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return ef.prop64Matcher.Match([]byte(codeSection))
+}
+
+func (ef losAngelesEligibilityFlow) IsRelatedCharge(codeSection string) bool {
+	return ef.relatedChargeMatcher.Match([]byte(codeSection))
 }
 
 func (ef losAngelesEligibilityFlow) MatchedCodeSection(codeSection string) string {
@@ -33,22 +38,22 @@ func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, 
 }
 
 func (ef losAngelesEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
+	info.EligibilityDetermination["county"] = "Eligible for Dismissal"
 	info.EligibilityReason = reason
 }
 
 func (ef losAngelesEligibilityFlow) EligibleReduction(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Reduction"
+	info.EligibilityDetermination["county"] = "Eligible for Reduction"
 	info.EligibilityReason = reason
 }
 
 func (ef losAngelesEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Not eligible"
+	info.EligibilityDetermination["county"] = "Not eligible"
 	info.EligibilityReason = reason
 }
 
 func (ef losAngelesEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Maybe Eligible - Flag for Review"
+	info.EligibilityDetermination["county"] = "Maybe Eligible - Flag for Review"
 	info.EligibilityReason = reason
 }
 

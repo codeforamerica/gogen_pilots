@@ -20,7 +20,7 @@ var _ = Describe("gogen", func() {
 		err       error
 	)
 
-	It("runs and has output for Sacramento", func() {
+	FIt("runs and has output for Sacramento", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())

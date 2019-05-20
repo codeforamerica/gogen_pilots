@@ -28,7 +28,9 @@ func (i *DOJInformation) generateHistories(county string) {
 		startTime := time.Now()
 		dojRow := NewDOJRow(row, index)
 		if i.Histories[dojRow.SubjectID] == nil {
-			i.Histories[dojRow.SubjectID] = new(DOJHistory)
+			i.Histories[dojRow.SubjectID] = &DOJHistory{
+				infos: make(map[int]*EligibilityInfo),
+			}
 		}
 		i.Histories[dojRow.SubjectID].PushRow(dojRow, county)
 		currentRowIndex++

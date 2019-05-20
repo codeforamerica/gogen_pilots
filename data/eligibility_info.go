@@ -15,15 +15,44 @@ type EligibilityInfo struct {
 	Superstrikes                   string
 	PC290CodeSections              string
 	PC290Registration              string
-	EligibilityDetermination       string
+	EligibilityDetermination       map[string]string
 	EligibilityReason              string
 	CaseNumber                     string
 	Deceased                       string
 }
 
+type genericAllDismissedElegibility struct {
+	county string
+}
+
+func (g genericAllDismissedElegibility) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
+	if EligibilityFlows[g.county].IsProp64Charge(row.CodeSection) {
+		g.EligibleDismissal(info)
+	}
+}
+
+func (g genericAllDismissedElegibility) EligibleDismissal(info *EligibilityInfo) {
+	info.EligibilityDetermination["allDismissed"] = "Eligible for Dismissal"
+}
+
+type genericAllDismissedWithRelatedElegibility struct {
+	county string
+}
+
+func (g genericAllDismissedWithRelatedElegibility) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
+	if EligibilityFlows[g.county].IsProp64Charge(row.CodeSection) || EligibilityFlows[g.county].IsRelatedCharge(row.CodeSection) {
+		g.EligibleDismissal(info)
+	}
+}
+
+func (g genericAllDismissedWithRelatedElegibility) EligibleDismissal(info *EligibilityInfo) {
+	info.EligibilityDetermination["allDismissedRelated"] = "Eligible for Dismissal"
+}
+
 func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Time, county string) *EligibilityInfo {
 	info := new(EligibilityInfo)
 	info.comparisonTime = comparisonTime
+	info.EligibilityDetermination = make(map[string]string)
 
 	if (row.DispositionDate == time.Time{}) {
 		info.YearsSinceThisConviction = -1.0
@@ -68,6 +97,8 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	info.CaseNumber = strings.Join(history.CaseNumbers[row.CountOrder[0:6]], "; ")
 
 	EligibilityFlows[county].BeginEligibilityFlow(info, row)
+	genericAllDismissedElegibility{county: county}.BeginEligibilityFlow(info, row)
+	genericAllDismissedWithRelatedElegibility{county: county}.BeginEligibilityFlow(info, row)
 
 	if info.EligibilityReason != "" {
 		return info
