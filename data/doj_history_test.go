@@ -113,4 +113,21 @@ var _ = Describe("DOJHistory", func() {
 			Expect(history.PC290CodeSections()).To(ConsistOf("286(D)(1) PC", "266J PC"))
 		})
 	})
+
+	FDescribe("NumPriorConvictionsForCodeSection", func() {
+		BeforeEach(func() {
+			conviction6 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "11358 PC", Convicted: true, CycleDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "102001003300", DispositionDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+			conviction7 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "11358.1(a) PC", Convicted: true, CycleDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "103001004300", DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
+
+			history.PushRow(conviction6, "SACRAMENTO")
+			history.PushRow(conviction7, "SACRAMENTO")
+		})
+
+		It("returns the number of convictions that start with the given code section that occurred before the given date", func() {
+			Expect(history.NumPriorConvictionsForCodeSection("11358", time.Date(2018, time.May, 4, 0, 0, 0, 0, time.UTC))).To(Equal(2))
+			Expect(history.NumPriorConvictionsForCodeSection("11358", time.Date(2017, time.February, 4, 0, 0, 0, 0, time.UTC))).To(Equal(1))
+			Expect(history.NumPriorConvictionsForCodeSection("11358", time.Date(2010, time.February, 4, 0, 0, 0, 0, time.UTC))).To(Equal(0))
+			Expect(history.NumPriorConvictionsForCodeSection("98765", time.Date(2050, time.February, 4, 0, 0, 0, 0, time.UTC))).To(Equal(0))
+		})
+	})
 })

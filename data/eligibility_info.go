@@ -6,19 +6,20 @@ import (
 )
 
 type EligibilityInfo struct {
-	NumberOfConvictionsOnRecord    int
-	DateOfConviction               time.Time
-	YearsSinceThisConviction       float64
-	YearsSinceMostRecentConviction float64
-	NumberOfProp64Convictions      int
-	comparisonTime                 time.Time
-	Superstrikes                   string
-	PC290CodeSections              string
-	PC290Registration              string
-	EligibilityDetermination       string
-	EligibilityReason              string
-	CaseNumber                     string
-	Deceased                       string
+	NumberOfConvictionsOnRecord              int
+	TwoPriorConvictionsForCurrentCodeSection bool
+	DateOfConviction                         time.Time
+	YearsSinceThisConviction                 float64
+	YearsSinceMostRecentConviction           float64
+	NumberOfProp64Convictions                int
+	comparisonTime                           time.Time
+	Superstrikes                             string
+	PC290CodeSections                        string
+	PC290Registration                        string
+	EligibilityDetermination                 string
+	EligibilityReason                        string
+	CaseNumber                               string
+	Deceased                                 string
 }
 
 func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Time, county string) *EligibilityInfo {
@@ -64,6 +65,7 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 
 	info.NumberOfConvictionsOnRecord = len(history.Convictions)
 	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions(county)
+	info.TwoPriorConvictionsForCurrentCodeSection = hasTwoPriorsForCodeSection(row, history)
 	info.DateOfConviction = row.DispositionDate
 	info.CaseNumber = strings.Join(history.CaseNumbers[row.CountOrder[0:6]], "; ")
 
@@ -84,4 +86,19 @@ func (info *EligibilityInfo) yearsSinceEvent(date time.Time) float64 {
 
 func (info *EligibilityInfo) hasSuperstrikes() bool {
 	return info.Superstrikes != "-"
+}
+
+func hasTwoPriorsForCodeSection(row *DOJRow, history *DOJHistory) bool {
+	if strings.HasPrefix(row.CodeSection, "11358") &&
+		history.NumPriorConvictionsForCodeSection("11358", row.DispositionDate) >= 2 {
+		return true
+	} else if strings.HasPrefix(row.CodeSection, "11359") &&
+		history.NumPriorConvictionsForCodeSection("11359", row.DispositionDate) >= 2 {
+		return true
+	} else if strings.HasPrefix(row.CodeSection, "11360") &&
+		history.NumPriorConvictionsForCodeSection("11360", row.DispositionDate) >= 2 {
+		return true
+	} else {
+		return false
+	}
 }

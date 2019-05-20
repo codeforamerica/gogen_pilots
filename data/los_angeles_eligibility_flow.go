@@ -60,9 +60,9 @@ func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 	}
 }
 
-func (ef losAngelesEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo, row *DOJRow) {
-	if !row.Felony {
-		ef.EligibleDismissal(info, "Misdemeanor or Infraction")
+func (ef losAngelesEligibilityFlow) HasTwoPriorConvictions(info *EligibilityInfo, row *DOJRow) {
+	if info.TwoPriorConvictionsForCurrentCodeSection{
+		ef.NotEligible(info, "Two prior convictions")
 	} else {
 		ef.Is11357b(info, row)
 	}
@@ -116,6 +116,6 @@ func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *
 	if info.hasSuperstrikes() {
 		ef.NotEligible(info, "PC 667(e)(2)(c)(iv)")
 	} else {
-		ef.ConvictionIsNotFelony(info, row)
+		ef.HasTwoPriorConvictions(info, row)
 	}
 }

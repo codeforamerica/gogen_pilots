@@ -311,7 +311,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("4 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
-	It("runs and has output for Los Angeles", func() {
+	FIt("runs and has output for Los Angeles", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
@@ -350,10 +350,10 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 8 11358 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 4 11359 convictions in this county"))
 
-		Eventually(session).Should(gbytes.Say("Found 6 convictions that are eligible for dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 5 convictions that are eligible for dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 1 11357 convictions that are eligible for dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 3 11358 convictions that are eligible for dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are eligible for dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 1 11359 convictions that are eligible for dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Found 3 convictions that are eligible for reduction"))
 		Eventually(session).Should(gbytes.Say("Found 2 11358 convictions that are eligible for reduction"))
@@ -362,24 +362,24 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 2 convictions that are flagged for review"))
 		Eventually(session).Should(gbytes.Say("Found 2 11357 convictions that are flagged for review"))
 
-		Eventually(session).Should(gbytes.Say("Found 4 convictions that are not eligible"))
+		Eventually(session).Should(gbytes.Say("Found 5 convictions that are not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 3 11358 convictions that are not eligible"))
-		Eventually(session).Should(gbytes.Say("Found 1 11359 convictions that are not eligible"))
+		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are not eligible"))
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: 11357\\(a\\) or 11357\\(b\\)"))
 		Eventually(session).Should(gbytes.Say("Found 2 convictions in this county with eligibility reason: Has convictions in past 10 years"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Misdemeanor or Infraction"))
 		Eventually(session).Should(gbytes.Say("Found 3 convictions in this county with eligibility reason: No convictions in past 10 years"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Occurred after 11/09/2016"))
 		Eventually(session).Should(gbytes.Say("Found 2 convictions in this county with eligibility reason: Other 11357"))
 		Eventually(session).Should(gbytes.Say("Found 3 convictions in this county with eligibility reason: PC 667\\(e\\)\\(2\\)\\(c\\)\\(iv\\)"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Sentence Completed"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Sentence not Completed"))
+		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Two prior convictions"))
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Related Convictions In This County --------------------"))
 
-		Eventually(session).Should(gbytes.Say("Found 0 convictions in this county")) //Los Angeles did not include related charges
+		Eventually(session).Should(gbytes.Say("Found 0 convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("Found 0 convictions that are eligible for dismissal"))
 
@@ -395,7 +395,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("----------- If ELIGIBLE Prop 64 convictions are dismissed or reduced --------------------"))
 		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
 		Eventually(session).Should(gbytes.Say("1 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("1 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("0 individuals will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
 		Eventually(session).Should(gbytes.Say("3 individuals will no longer have a felony on their record")) // VM - this changed from 2 to 3

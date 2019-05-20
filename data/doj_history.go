@@ -112,6 +112,16 @@ func (history *DOJHistory) NumberOfProp64Convictions(county string) int {
 	return result
 }
 
+func (history *DOJHistory) NumPriorConvictionsForCodeSection(codeSection string, date time.Time) int {
+	result := 0
+	for _, row := range history.Convictions {
+		if strings.HasPrefix(row.CodeSection, codeSection) && row.DispositionDate.Before(date) {
+			result++
+		}
+	}
+	return result
+}
+
 func (history *DOJHistory) NumberOfConvictionsInCounty(county string) int {
 	result := 0
 	for _, row := range history.Convictions {
