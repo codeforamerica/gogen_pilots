@@ -6,119 +6,104 @@ import (
 	"github.com/tealeg/xlsx"
 	. "gogen/processor"
 	"io/ioutil"
+	"os"
 	path "path/filepath"
 	"strconv"
 )
 
-func ExtractCSVFixtures(inputPathString string) (string, string, error) {
+func ExtractFullCSVFixtures(inputPathString string) (string, string, error) {
 	xlsxPath, err := path.Abs(path.Join(inputPathString))
 
-	inputCSV := extractInputCSV(xlsxPath)
-	expectedResultsCSV := extractFullResultsCSV(xlsxPath)
+	inputCSV := writeInputCSV(xlsxPath)
+	expectedResultsCSV := writeFullResultsCSV(xlsxPath)
 
 	return inputCSV, expectedResultsCSV, err
-}
-
-func extractInputCSV(xlsxPath string) string {
-	tmpCSVfile, err := ioutil.TempFile("", "cadoj_file.csv")
-	xlFile, err := xlsx.OpenFile(xlsxPath)
-	if err != nil {
-		fmt.Println(err)
-	}
-	w := csv.NewWriter(tmpCSVfile)
-	for _, sheet := range xlFile.Sheets {
-		for rowIndex, row := range sheet.Rows {
-			var rowSlice []string
-			for j, cell := range row.Cells {
-				if j >= (len(DojFullHeaders) + 1) {
-					break
-				}
-					if cell == sheet.Rows[rowIndex].Cells[0] {
-						continue
-					} else {
-						text, err := cell.FormattedValue()
-						if err != nil {
-							rowSlice = append(rowSlice, err.Error())
-						}
-						rowSlice = append(rowSlice, text)
-					}
-			}
-			if rowIndex == 0 {
-				continue
-			} else {
-				w.Write(rowSlice)
-			}
-		}
-	}
-	w.Flush()
-	return tmpCSVfile.Name()
-}
-
-func extractFullResultsCSV(xlsxPath string) string {
-	tmpCSVfile, err := ioutil.TempFile("", "cadoj_file.csv")
-	xlFile, err := xlsx.OpenFile(xlsxPath)
-	if err != nil {
-		fmt.Println(err)
-	}
-	w := csv.NewWriter(tmpCSVfile)
-	for _, sheet := range xlFile.Sheets {
-		for rowIndex, row := range sheet.Rows {
-			var rowSlice []string
-			for _, cell := range row.Cells {
-				if cell == sheet.Rows[rowIndex].Cells[0] {
-					continue
-				} else {
-					text, err := cell.FormattedValue()
-					//fmt.Printf("text: %s\n\n", text)
-					if err != nil {
-						rowSlice = append(rowSlice, err.Error())
-					}
-					rowSlice = append(rowSlice, text)
-				}
-			}
-			if rowIndex == 0 {
-				continue
-			} else {
-				w.Write(rowSlice)
-			}
-		}
-	}
-	w.Flush()
-	return tmpCSVfile.Name()
 }
 
 func ExtractCondensedCSVFixture(inputPathString string) (string, error) {
 	xlsxPath, err := path.Abs(path.Join(inputPathString))
 
-	expectedCondensedResultsCSV := extractCondensedColumnsCSV(xlsxPath)
+	expectedCondensedResultsCSV := writeCondensedColumnsCSV(xlsxPath)
 
 	return expectedCondensedResultsCSV, err
 }
 
-func extractCondensedColumnsCSV(xlsxPath string) string {
-	tmpCSVfile, err := ioutil.TempFile("", "cadoj_condensed_file.csv")
-	xlFile, err := xlsx.OpenFile(xlsxPath)
-	if err != nil {
-		fmt.Println(err)
-	}
-	condensedCSV := csv.NewWriter(tmpCSVfile)
-	for _, sheet := range xlFile.Sheets {
+func ExtractProp64ConvictionsCSVFixture(inputPathString string) (string, error) {
+	xlsxPath, err := path.Abs(path.Join(inputPathString))
+
+	expectedCondensedResultsCSV := writeProp64RowsCSV(xlsxPath)
+
+	return expectedCondensedResultsCSV, err
+}
+
+func writeInputCSV(xlsxPath string) string {
+	tmpCSVfile, excelFile := createTempFile(xlsxPath)
+	inputCSV := csv.NewWriter(tmpCSVfile)
+	for _, sheet := range excelFile.Sheets {
 		for rowIndex, row := range sheet.Rows {
 			var rowSlice []string
 			for cellIndex, cell := range row.Cells {
-				if cellIndex >= (len(DojFullHeaders) + len(EligiblityHeaders) + 1) {
+				lengthOfInputFile := len(DojFullHeaders) + 1
+				if cellIndex >= lengthOfInputFile {
 					break
 				}
-				inCondensedOutput, _ := strconv.ParseBool(sheet.Rows[0].Cells[cellIndex].String())
-				if inCondensedOutput == true {
-					if cell == sheet.Rows[rowIndex].Cells[0] {
+				firstCell := sheet.Rows[rowIndex].Cells[0]
+				if cell == firstCell {
+					continue
+				} else {
+					rowSlice = createRowSlice(cell, rowSlice)
+				}
+			}
+			if rowIndex == 0 {
+				continue
+			} else {
+				inputCSV.Write(rowSlice)
+			}
+		}
+	}
+	inputCSV.Flush()
+	return tmpCSVfile.Name()
+}
+
+func writeFullResultsCSV(xlsxPath string) string {
+	tmpCSVfile, excelFile := createTempFile(xlsxPath)
+	fullResultsCSV := csv.NewWriter(tmpCSVfile)
+	for _, sheet := range excelFile.Sheets {
+		for rowIndex, row := range sheet.Rows {
+			var rowSlice []string
+			for _, cell := range row.Cells {
+				firstCell := sheet.Rows[rowIndex].Cells[0]
+				if cell == firstCell {
+					continue
+				} else {
+					rowSlice = createRowSlice(cell, rowSlice)
+				}
+			}
+			if rowIndex == 0 {
+				continue
+			} else {
+				fullResultsCSV.Write(rowSlice)
+			}
+		}
+	}
+	fullResultsCSV.Flush()
+	return tmpCSVfile.Name()
+}
+
+func writeCondensedColumnsCSV(xlsxPath string) string {
+	tmpCSVfile, excelFile := createTempFile(xlsxPath)
+	condensedCSV := csv.NewWriter(tmpCSVfile)
+	for _, sheet := range excelFile.Sheets {
+		for rowIndex, row := range sheet.Rows {
+			var rowSlice []string
+			for cellIndex, cell := range row.Cells {
+				addToOutput, _ := strconv.ParseBool(sheet.Rows[0].Cells[cellIndex].String())
+				firstCell := sheet.Rows[rowIndex].Cells[0]
+				if addToOutput == true {
+					if cell == firstCell {
 						continue
 					} else {
-						text, err := cell.FormattedValue()
-						if err != nil {
-							rowSlice = append(rowSlice, err.Error())
-						}
-						rowSlice = append(rowSlice, text)
+						rowSlice = createRowSlice(cell, rowSlice)
 					}
 				}
 			}
@@ -133,39 +118,20 @@ func extractCondensedColumnsCSV(xlsxPath string) string {
 	return tmpCSVfile.Name()
 }
 
-func ExtractProp64ConvictionsCSVFixture(inputPathString string) (string, error) {
-	xlsxPath, err := path.Abs(path.Join(inputPathString))
-
-	expectedCondensedResultsCSV := extractProp64RowsCSV(xlsxPath)
-
-	return expectedCondensedResultsCSV, err
-}
-
-func extractProp64RowsCSV(xlsxPath string) string {
-	tmpCSVfile, err := ioutil.TempFile("", "cadoj_condensed_file.csv")
-	xlFile, err := xlsx.OpenFile(xlsxPath)
-	if err != nil {
-		fmt.Println(err)
-	}
+func writeProp64RowsCSV(xlsxPath string) string {
+	tmpCSVfile, excelFile := createTempFile(xlsxPath)
 	condensedCSV := csv.NewWriter(tmpCSVfile)
-	for _, sheet := range xlFile.Sheets {
+	for _, sheet := range excelFile.Sheets {
 		for rowIndex, row := range sheet.Rows {
 			addToOutput := false
 			var rowSlice []string
 			for cellIndex, cell := range row.Cells {
-				if cellIndex >= (len(DojFullHeaders) + len(EligiblityHeaders) + 1) {
-					break
-				}
 				addToOutput, _ = strconv.ParseBool(sheet.Rows[rowIndex].Cells[0].String())
 				if addToOutput == true {
 					if cellIndex == 0 {
 						continue
 					} else {
-						text, err := cell.FormattedValue()
-						if err != nil {
-							rowSlice = append(rowSlice, err.Error())
-						}
-						rowSlice = append(rowSlice, text)
+						rowSlice = createRowSlice(cell, rowSlice)
 					}
 				}
 			}
@@ -176,4 +142,22 @@ func extractProp64RowsCSV(xlsxPath string) string {
 	}
 	condensedCSV.Flush()
 	return tmpCSVfile.Name()
+}
+
+func createRowSlice(cell *xlsx.Cell, rowSlice []string) []string {
+	text, err := cell.FormattedValue()
+	if err != nil {
+		rowSlice = append(rowSlice, err.Error())
+	}
+	rowSlice = append(rowSlice, text)
+	return rowSlice
+}
+
+func createTempFile(xlsxPath string) (*os.File, *xlsx.File) {
+	tmpCSVfile, err := ioutil.TempFile("", "temp_file.csv")
+	excelFile, err := xlsx.OpenFile(xlsxPath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return tmpCSVfile, excelFile
 }

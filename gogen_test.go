@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
+	. "gogen/test_fixtures"
 )
 
 var _ = Describe("gogen", func() {
@@ -25,14 +26,14 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "sacramento", "cadoj_sacramento.csv"))
-		Expect(err).ToNot(HaveOccurred())
+		pathToInputExcel := path.Join("test_fixtures", "sacramento", "cadoj_sacramento_source.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
 		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
@@ -118,14 +119,14 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "san_joaquin", "cadoj_san_joaquin.csv"))
-		Expect(err).ToNot(HaveOccurred())
+		pathToInputExcel := path.Join("test_fixtures", "san_joaquin", "cadoj_san_joaquin_source.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
 		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
@@ -217,14 +218,14 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "contra_costa", "cadoj_contra_costa.csv"))
-		Expect(err).ToNot(HaveOccurred())
+		pathToInputExcel := path.Join("test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "CONTRA COSTA")
 		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
@@ -316,14 +317,14 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles.csv"))
-		Expect(err).ToNot(HaveOccurred())
+		pathToInputExcel := path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "LOS ANGELES")
 		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
@@ -413,7 +414,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "san_joaquin", "cadoj_san_joaquin_extra_comma.csv"))
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma", "cadoj_extra_comma.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToGogen, err := gexec.Build("gogen")
@@ -442,14 +443,14 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles.csv"))
-		Expect(err).ToNot(HaveOccurred())
+		pathToInputExcel := path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "LOS ANGELES")
 		computeAtFlag := fmt.Sprintf("--compute-at=%s", "2020-07-01")
 		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)

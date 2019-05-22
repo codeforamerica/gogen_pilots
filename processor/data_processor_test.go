@@ -30,7 +30,7 @@ var _ = Describe("DataProcessor", func() {
 
 			var pathToDOJ string
 			inputPath := path.Join("..", "test_fixtures", "sacramento", "cadoj_sacramento_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractCSVFixtures(inputPath)
+			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
@@ -71,7 +71,7 @@ var _ = Describe("DataProcessor", func() {
 
 			var pathToDOJ string
 			inputPath := path.Join("..", "test_fixtures", "san_joaquin", "cadoj_san_joaquin_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractCSVFixtures(inputPath)
+			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
@@ -112,7 +112,7 @@ var _ = Describe("DataProcessor", func() {
 
 			var pathToDOJ string
 			inputPath := path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractCSVFixtures(inputPath)
+			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
@@ -153,7 +153,7 @@ var _ = Describe("DataProcessor", func() {
 
 			var pathToDOJ string
 			inputPath := path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractCSVFixtures(inputPath)
+			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
@@ -194,7 +194,7 @@ var _ = Describe("DataProcessor", func() {
 
 			var pathToDOJ string
 			inputPath := path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractCSVFixtures(inputPath)
+			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
@@ -238,7 +238,9 @@ var _ = Describe("DataProcessor", func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")
 			Expect(err).ToNot(HaveOccurred())
 
-			pathToDOJ, err := path.Abs(path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles.csv"))
+			var pathToDOJ string
+			inputPath := path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
