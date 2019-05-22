@@ -252,7 +252,7 @@ var _ = Describe("DataProcessor", func() {
 			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
-		It("runs and has output that only includes Prop 64 convictions", func() {
+		It("runs and has condensed output", func() {
 			dataProcessor.Process("LOS ANGELES")
 			format.TruncatedDiff = false
 
@@ -263,9 +263,9 @@ var _ = Describe("DataProcessor", func() {
 			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			pathToExpectedDOJResults, err := path.Abs(path.Join("..", "test_fixtures", "los_angeles", "doj_los_angeles_results_convictions.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
+			condensedInputPath := path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+			expectedProp64CSVResult, err := ExtractProp64ConvictionsCSVFixture(condensedInputPath)
+			ExpectedDOJResultsFile, err := os.Open(expectedProp64CSVResult)
 			Expect(err).ToNot(HaveOccurred())
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
@@ -273,7 +273,6 @@ var _ = Describe("DataProcessor", func() {
 			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
 		})
 	})
-
 })
 
 func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
