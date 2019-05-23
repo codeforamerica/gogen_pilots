@@ -1,6 +1,7 @@
 package data
 
 import (
+	"gogen/matchers"
 	"regexp"
 	"strings"
 	"time"
@@ -11,8 +12,25 @@ type sanJoaquinEligibilityFlow struct {
 	relatedChargeMatcher *regexp.Regexp
 }
 
+func (ef sanJoaquinEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+	infos := make(map[int]*EligibilityInfo)
+	for _, conviction := range history.Convictions {
+		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
+			info := NewEligibilityInfo(conviction, history, comparisonTime, "SAN JOAQUIN")
+			ef.BeginEligibilityFlow(info, conviction)
+			infos[conviction.Index] = info
+		}
+	}
+	return infos
+}
+
+func (ef sanJoaquinEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
+	return county == "SAN JOAQUIN" && (ef.IsProp64Charge(codeSection) || ef.isRelatedCharge(codeSection))
+}
+
 func (ef sanJoaquinEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return ef.prop64Matcher.Match([]byte(codeSection))
+	ok, _ := matchers.Prop64Matcher(codeSection)
+	return ok
 }
 
 func (ef sanJoaquinEligibilityFlow) MatchedCodeSection(codeSection string) string {
@@ -34,7 +52,8 @@ func (ef sanJoaquinEligibilityFlow) MatchedRelatedCodeSection(codeSection string
 }
 
 func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
-	return ef.relatedChargeMatcher.Match([]byte(codeSection))
+	ok, _ := matchers.RelatedChargeMatcher(codeSection)
+	return ok
 }
 
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {

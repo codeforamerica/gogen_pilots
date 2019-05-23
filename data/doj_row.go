@@ -1,7 +1,6 @@
 package data
 
 import (
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -23,8 +22,6 @@ type DOJRow struct {
 	PC290Registration      bool
 	County                 string
 	Felony                 bool
-	NumCrtCase             string
-	CycleDate              time.Time
 	RawRow                 []string
 	CourtNoParts           []string
 	CountOrder             string
@@ -58,8 +55,6 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 		CodeSection:          findCodeSection(rawRow),
 		DispositionDate:      parseDate(dateFormat, rawRow[STP_EVENT_DATE]),
 		OFN:                  rawRow[OFN],
-		NumCrtCase:           rawRow[FE_NUM_CRT_CASE],
-		CycleDate:            parseDate(dateFormat, rawRow[CYC_DATE]),
 		Type:                 rawRow[STP_TYPE_DESCR],
 		PC290Registration:    rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
 		County:               rawRow[STP_ORI_CNTY_NAME],
@@ -103,22 +98,6 @@ func findCodeSection(rawRow []string) string {
 	}
 }
 
-func (row *DOJRow) MatchingCourtNumber(courtNumber string) bool {
-	if courtNumber == row.OFN || courtNumber == row.NumCrtCase {
-		return true
-	}
-
-	if row.CourtNoParts == nil {
-		row.CourtNoParts = regexp.MustCompile("[ ,-]").Split(row.OFN, -1)
-	}
-
-	for _, part := range row.CourtNoParts {
-		if part == courtNumber {
-			return true
-		}
-	}
-	return false
-}
 
 func (row *DOJRow) OccurredInLast7Years() bool {
 	sevenYearsAgo := time.Now().AddDate(-7, 0, 0)

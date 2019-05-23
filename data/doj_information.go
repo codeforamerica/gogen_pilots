@@ -4,16 +4,19 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	. "gogen/matchers"
 	"gogen/utilities"
 	"os"
 	"time"
 )
 
 type DOJInformation struct {
-	Rows           [][]string
-	Histories      map[string]*DOJHistory
-	Eligibilities  map[int]*EligibilityInfo
-	comparisonTime time.Time
+	Rows                     [][]string
+	Histories                map[string]*DOJHistory
+	Eligibilities            map[int]*EligibilityInfo
+	comparisonTime           time.Time
+	TotalConvictions         int
+	TotalConvictionsInCounty int
 }
 
 func (i *DOJInformation) generateHistories(county string) {
@@ -40,10 +43,227 @@ func (i *DOJInformation) generateHistories(county string) {
 	fmt.Println("\nComplete...")
 }
 
+func (i *DOJInformation) TotalIndividuals() int {
+	return len(i.Histories)
+}
+
+func (i *DOJInformation) TotalRows() int {
+	return len(i.Rows)
+}
+
+func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int {
+	allProp64Convictions := make(map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			ok, codeSection := Prop64Matcher(conviction.CodeSection)
+			if ok {
+				allProp64Convictions[codeSection]++
+			}
+		}
+	}
+	return allProp64Convictions
+}
+
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county string) map[string]int {
+	prop64ConvictionsInCounty := make(map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.County == county {
+				ok, codeSection := Prop64Matcher(conviction.CodeSection)
+				if ok {
+					prop64ConvictionsInCounty[codeSection]++
+				}
+			}
+		}
+	}
+	return prop64ConvictionsInCounty
+}
+
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]map[string]int {
+	prop64ConvictionsInCountyByCodeSectionByEligibility := make(map[string]map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.County == county {
+				ok, codeSection := Prop64Matcher(conviction.CodeSection)
+				if ok {
+					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+					if prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
+						prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
+					}
+					prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination][codeSection]++
+				}
+
+			}
+		}
+	}
+	return prop64ConvictionsInCountyByCodeSectionByEligibility
+}
+func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]map[string]int {
+	relatedConvictionsInThisCountyByCodeSectionByEligibility := make(map[string]map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.County == county {
+				ok, codeSection := RelatedChargeMatcher(conviction.CodeSection)
+				if ok {
+					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+					if relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
+						relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
+					}
+					relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination][codeSection]++
+				}
+
+			}
+		}
+	}
+	return relatedConvictionsInThisCountyByCodeSectionByEligibility
+}
+
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string) map[string]map[string]int {
+	prop64ConvictionsInCountyByEligibilityByReason := make(map[string]map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.County == county {
+				ok, _ := Prop64Matcher(conviction.CodeSection)
+				if ok {
+					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+					eligibilityReason := i.Eligibilities[conviction.Index].EligibilityReason
+					if prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] == nil {
+						prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] = make(map[string]int)
+					}
+					prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination][eligibilityReason]++
+				}
+
+			}
+		}
+	}
+	return prop64ConvictionsInCountyByEligibilityByReason
+}
+
+func (i *DOJInformation) CountIndividualsWithFelony() int {
+	countIndividuals := 0
+OuterLoop:
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.Felony {
+				countIndividuals++
+				continue OuterLoop
+			}
+		}
+	}
+	return countIndividuals
+
+}
+
+func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
+	countIndividuals := 0
+	for _, history := range i.Histories {
+		countFelonies := 0
+		countFeloniesReducedOrDismissed := 0
+		for _, conviction := range history.Convictions {
+			if conviction.Felony {
+				countFelonies++
+				if i.Eligibilities[conviction.Index] != nil {
+					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
+						determination == "Eligible for Dismissal" {
+						countFeloniesReducedOrDismissed++
+					}
+				}
+			}
+		}
+		if countFelonies != 0 && (countFelonies == countFeloniesReducedOrDismissed) {
+			countIndividuals++
+		}
+	}
+	return countIndividuals
+}
+
+func (i *DOJInformation) CountIndividualsNoLongerHaveConviction() int {
+	countIndividuals := 0
+	for _, history := range i.Histories {
+		countConvictionsDismissed := 0
+		for _, conviction := range history.Convictions {
+			if i.Eligibilities[conviction.Index] != nil {
+				if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
+					determination == "Eligible for Dismissal" {
+					countConvictionsDismissed++
+				}
+			}
+		}
+		if len(history.Convictions) != 0 &&
+			(len(history.Convictions) == countConvictionsDismissed) {
+			countIndividuals++
+		}
+	}
+	return countIndividuals
+}
+
+func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() int {
+	countIndividuals := 0
+	for _, history := range i.Histories {
+		convictionsInLast7Years := 0
+		countConvictionsDismissedInLast7years := 0
+		for _, conviction := range history.Convictions {
+			if conviction.OccurredInLast7Years() {
+				convictionsInLast7Years++
+				if i.Eligibilities[conviction.Index] != nil {
+					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
+						determination == "Eligible for Dismissal" {
+						countConvictionsDismissedInLast7years++
+					}
+				}
+			}
+		}
+		if convictionsInLast7Years != 0 &&
+			(convictionsInLast7Years == countConvictionsDismissedInLast7years) {
+			countIndividuals++
+		}
+	}
+	return countIndividuals
+}
+
 func (i *DOJInformation) determineEligibility(county string) {
 	for _, history := range i.Histories {
-		history.computeEligibilities(i.Eligibilities, i.comparisonTime, county)
+		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
+
+		i.TotalConvictions += len(history.Convictions)
+		for _, conviction := range history.Convictions {
+
+			if conviction.County == county {
+				i.TotalConvictionsInCounty++
+			}
+		}
+
+		for index, info := range infos {
+			i.Eligibilities[index] = info
+		}
 	}
+}
+
+func (i *DOJInformation) CountIndividualsWithConviction() int {
+	countIndividuals := 0
+
+	for _, history := range i.Histories {
+		if len(history.Convictions) > 0 {
+			countIndividuals++
+		}
+	}
+	return countIndividuals
+
+}
+
+func (i *DOJInformation) CountIndividualsWithConvictionInLast7Years() int {
+	countIndividuals := 0
+
+OuterLoop:
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.OccurredInLast7Years() {
+				countIndividuals++
+				continue OuterLoop
+			}
+		}
+	}
+	return countIndividuals
 }
 
 func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) (*DOJInformation, error) {
@@ -69,5 +289,6 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 
 	info.generateHistories(county)
 	info.determineEligibility(county)
+
 	return &info, nil
 }

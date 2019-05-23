@@ -1,6 +1,7 @@
 package data
 
 import (
+	"gogen/matchers"
 	"regexp"
 	"strings"
 	"time"
@@ -10,8 +11,25 @@ type sacramentoEligibilityFlow struct {
 	prop64Matcher *regexp.Regexp
 }
 
+func (ef sacramentoEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+	infos := make(map[int]*EligibilityInfo)
+	for _, conviction := range history.Convictions {
+		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
+			info := NewEligibilityInfo(conviction, history, comparisonTime, "SACRAMENTO")
+			ef.BeginEligibilityFlow(info, conviction)
+			infos[conviction.Index] = info
+		}
+	}
+	return infos
+}
+
+func (ef sacramentoEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
+	return county == "SACRAMENTO" && ef.IsProp64Charge(codeSection)
+}
+
 func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return ef.prop64Matcher.Match([]byte(codeSection))
+	ok, _ := matchers.Prop64Matcher(codeSection)
+	return ok
 }
 
 func (ef sacramentoEligibilityFlow) MatchedCodeSection(codeSection string) string {

@@ -1,8 +1,12 @@
 package data
 
-import "regexp"
+import (
+	"regexp"
+	"time"
+)
 
 type EligibilityFlow interface {
+	ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo
 	BeginEligibilityFlow(info *EligibilityInfo, conviction *DOJRow)
 	IsProp64Charge(codeSection string) (result bool)
 	MatchedCodeSection(codeSection string) (matchedCodeSection string)

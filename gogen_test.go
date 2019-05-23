@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
-
 	path "path/filepath"
 
 	. "github.com/onsi/ginkgo"
@@ -214,7 +213,6 @@ var _ = Describe("gogen", func() {
 	})
 
 	It("runs and has output for Contra Costa", func() {
-
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
@@ -227,7 +225,9 @@ var _ = Describe("gogen", func() {
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "CONTRA COSTA")
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
+		computeAtFlag := "--compute-at=2019-11-11"
+
+		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -252,25 +252,25 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 8 11358 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 4 11359 convictions in this county"))
 
-		Eventually(session).Should(gbytes.Say("Found 9 convictions that are eligible for dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 10 convictions that are eligible for dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions that are eligible for dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 4 11358 convictions that are eligible for dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are eligible for dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 3 11359 convictions that are eligible for dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Found 0 convictions that are eligible for reduction"))
 
-		Eventually(session).Should(gbytes.Say("Found 5 convictions that are flagged for review"))
+		Eventually(session).Should(gbytes.Say("Found 4 convictions that are flagged for review"))
 		Eventually(session).Should(gbytes.Say("Found 3 11358 convictions that are flagged for review"))
-		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are flagged for review"))
+		Eventually(session).Should(gbytes.Say("Found 1 11359 convictions that are flagged for review"))
 
 		Eventually(session).Should(gbytes.Say("Found 1 convictions that are not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 1 11358 convictions that are not eligible"))
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 		Eventually(session).Should(gbytes.Say("Found 2 convictions in this county with eligibility reason: 11357 HS"))
-		Eventually(session).Should(gbytes.Say("Found 4 convictions in this county with eligibility reason: Has convictions in past 5 years"))
+		Eventually(session).Should(gbytes.Say("Found 3 convictions in this county with eligibility reason: Has convictions in past 5 years"))
 		Eventually(session).Should(gbytes.Say("Found 2 convictions in this county with eligibility reason: Misdemeanor or Infraction"))
-		Eventually(session).Should(gbytes.Say("Found 4 convictions in this county with eligibility reason: No convictions in past 5 years"))
+		Eventually(session).Should(gbytes.Say("Found 5 convictions in this county with eligibility reason: No convictions in past 5 years"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Occurred after 11/09/2016"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Sentence Completed"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions in this county with eligibility reason: Sentence not Completed"))
