@@ -20,6 +20,7 @@ type DOJHistory struct {
 	CyclesWithProp64Charges map[string]bool
 	CaseNumbers             map[string][]string
 	IsDeceased              bool
+	EligibilityInfos        map[int]*EligibilityInfo
 }
 
 func (history *DOJHistory) PushRow(row DOJRow, county string) {

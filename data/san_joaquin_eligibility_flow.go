@@ -37,6 +37,10 @@ func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
 	return ef.relatedChargeMatcher.Match([]byte(codeSection))
 }
 
+func (ef sanJoaquinEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+	return nil
+}
+
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
 	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)

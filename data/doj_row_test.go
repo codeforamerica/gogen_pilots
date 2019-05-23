@@ -44,14 +44,6 @@ var _ = Describe("DojRow", func() {
 		})
 	})
 
-	Describe("MatchingCourtNumber", func() {
-		It("Matches after splitting by nonalphanum chars", func() {
-			row := NewDOJRow(rawRow, 1)
-
-			Expect(row.MatchingCourtNumber("140189")).To(BeTrue())
-		})
-	})
-
 	Describe("OccurredInLast7Years", func() {
 		Context("when the disposition date occurred in the last 7 years", func() {
 			BeforeEach(func() {

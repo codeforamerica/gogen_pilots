@@ -26,6 +26,10 @@ func (ef sacramentoEligibilityFlow) MatchedRelatedCodeSection(codeSection string
 	return ""
 }
 
+func (ef sacramentoEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+	return nil
+}
+
 func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
 	if ef.IsProp64Charge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)

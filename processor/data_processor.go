@@ -45,7 +45,6 @@ type clearanceByCodeSection struct {
 }
 
 type totalExistingConvictions struct {
-	totalConvictions             int
 	totalCountyConvictions       int
 	totalHasFelony               int
 	totalHasConvictionLast7Years int
@@ -188,9 +187,7 @@ func (d *DataProcessor) incrementConvictionAndClearanceStats(
 	clearanceStats *totalClearanceResults,
 ) {
 
-	convictionStats.totalConvictions += len(history.Convictions)
 	convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
-
 	if history.NumberOfFelonies() > 0 {
 		convictionStats.totalHasFelony++
 
@@ -289,7 +286,7 @@ func (d *DataProcessor) Process(county string) {
 	fmt.Println("----------- Overall summary of DOJ file --------------------")
 	fmt.Printf("Found %d Total rows in DOJ file\n", len(d.dojInformation.Rows))
 	fmt.Printf("Found %d Total individuals in DOJ file\n", len(d.dojInformation.Histories))
-	fmt.Printf("Found %d Total convictions in DOJ file\n", d.totalExistingConvictions.totalConvictions)
+	fmt.Printf("Found %d Total convictions in DOJ file\n", d.dojInformation.TotalConvictions)
 	fmt.Printf("Found %d convictions in this county\n", d.totalExistingConvictions.totalCountyConvictions)
 
 	fmt.Println()

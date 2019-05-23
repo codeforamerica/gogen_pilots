@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -9,6 +10,22 @@ import (
 type contraCostaEligibilityFlow struct {
 	prop64Matcher        *regexp.Regexp
 	relatedChargeMatcher *regexp.Regexp
+}
+
+func (ef contraCostaEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+	infos := make(map[int]*EligibilityInfo)
+	for _, conviction := range history.Convictions {
+		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
+			info := NewEligibilityInfo(conviction, history, comparisonTime, "CONTRA COSTA")
+			ef.BeginEligibilityFlow(info, conviction)
+			infos[conviction.Index] = info
+		}
+	}
+	return infos
+}
+
+func (ef contraCostaEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
+	return county == "CONTRA COSTA" && (ef.IsProp64Charge(codeSection) || ef.isRelatedCharge(codeSection))
 }
 
 func (ef contraCostaEligibilityFlow) IsProp64Charge(codeSection string) bool {

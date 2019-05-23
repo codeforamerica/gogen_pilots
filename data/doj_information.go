@@ -10,10 +10,12 @@ import (
 )
 
 type DOJInformation struct {
-	Rows           [][]string
-	Histories      map[string]*DOJHistory
-	Eligibilities  map[int]*EligibilityInfo
-	comparisonTime time.Time
+	Rows             [][]string
+	Histories        map[string]*DOJHistory
+	Eligibilities    map[int]*EligibilityInfo
+	comparisonTime   time.Time
+	TotalConvictions int
+	TotalConvictionsInCounty int
 }
 
 func (i *DOJInformation) generateHistories(county string) {
@@ -42,7 +44,15 @@ func (i *DOJInformation) generateHistories(county string) {
 
 func (i *DOJInformation) determineEligibility(county string) {
 	for _, history := range i.Histories {
-		history.computeEligibilities(i.Eligibilities, i.comparisonTime, county)
+		//history.computeEligibilities(i.Eligibilities, i.comparisonTime, county)
+		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
+
+		i.TotalConvictions += len(history.Convictions)
+		i.TotalConvictionsInCounty += len(history.EligibilityInfos)
+
+		for index, info := range infos {
+			i.Eligibilities[index] = info
+		}
 	}
 }
 
@@ -69,5 +79,6 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 
 	info.generateHistories(county)
 	info.determineEligibility(county)
+
 	return &info, nil
 }
