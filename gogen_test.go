@@ -26,7 +26,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToInputExcel := path.Join("test_fixtures", "sacramento", "cadoj_sacramento_source.xlsx")
+		pathToInputExcel := path.Join("test_fixtures", "sacramento.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
@@ -119,7 +119,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToInputExcel := path.Join("test_fixtures", "san_joaquin", "cadoj_san_joaquin_source.xlsx")
+		pathToInputExcel := path.Join("test_fixtures", "san_joaquin.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
@@ -218,7 +218,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToInputExcel := path.Join("test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
+		pathToInputExcel := path.Join("test_fixtures", "contra_costa.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
@@ -317,7 +317,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToInputExcel := path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+		pathToInputExcel := path.Join("test_fixtures", "los_angeles.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
@@ -414,7 +414,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma", "cadoj_extra_comma.csv"))
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToGogen, err := gexec.Build("gogen")
@@ -443,7 +443,7 @@ var _ = Describe("gogen", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToInputExcel := path.Join("test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+		pathToInputExcel := path.Join("test_fixtures", "los_angeles.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
 		pathToGogen, err := gexec.Build("gogen")
