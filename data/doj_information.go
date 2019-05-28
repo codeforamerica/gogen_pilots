@@ -44,11 +44,14 @@ func (i *DOJInformation) generateHistories(county string) {
 
 func (i *DOJInformation) determineEligibility(county string) {
 	for _, history := range i.Histories {
-		//history.computeEligibilities(i.Eligibilities, i.comparisonTime, county)
 		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
 
 		i.TotalConvictions += len(history.Convictions)
-		i.TotalConvictionsInCounty += len(history.EligibilityInfos)
+		for _, conviction := range history.Convictions {
+			if conviction.County == county{
+				i.TotalConvictionsInCounty ++
+			}
+		}
 
 		for index, info := range infos {
 			i.Eligibilities[index] = info

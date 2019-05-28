@@ -187,7 +187,7 @@ var _ = Describe("contraCostaEligibilityFlow", func() {
 			Expect(ok).To(Equal(true))
 		})
 
-		FIt("returns the correct eligibility determination for each conviction", func() {
+		It("returns the correct eligibility determination for each conviction", func() {
 			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
 			Expect(len(infos)).To(Equal(4))
 			Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))

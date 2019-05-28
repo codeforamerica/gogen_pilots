@@ -43,6 +43,5 @@ var _ = Describe("DojInformation", func() {
 		It("Counts total convictions in this county", func(){
 			Expect(dojInformation.TotalConvictionsInCounty).To(Equal(26))
 		})
-
 	})
 })
