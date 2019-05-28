@@ -22,7 +22,7 @@ var _ = Describe("DojInformation", func() {
 		_, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		inputPath := path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
+		inputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
 		pathToDOJ, _, err = ExtractFullCSVFixtures(inputPath)
 		Expect(err).ToNot(HaveOccurred())
 
