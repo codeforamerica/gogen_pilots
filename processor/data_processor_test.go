@@ -12,6 +12,7 @@ import (
 	"os"
 	path "path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -19,181 +20,60 @@ var _ = Describe("DataProcessor", func() {
 	var (
 		outputDir                string
 		dataProcessor            DataProcessor
+		pathToDOJ 				 string
 		pathToExpectedDOJResults string
 		err                      error
 	)
 
-	Describe("Sacramento", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
+	counties := [...]string{"Contra Costa", "Los Angeles", "Sacramento", "San Joaquin"}
+	for _, county := range counties {
+		Describe(county, func() {
+			BeforeEach(func() {
+				outputDir, err = ioutil.TempDir("/tmp", "gogen")
+				Expect(err).ToNot(HaveOccurred())
 
-			var pathToDOJ string
-			inputPath := path.Join("..", "test_fixtures", "sacramento", "cadoj_sacramento_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
+				inputPath := path.Join("..", "test_fixtures", strings.ReplaceAll(strings.ToLower(county), " ", "_") + ".xlsx")
+				pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
+				Expect(err).ToNot(HaveOccurred())
 
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+				comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "SACRAMENTO")
+				dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, strings.ToUpper(county))
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_sacramento_results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "doj_sacramento_results_condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "doj_sacramento_results_convictions.csv"))
+				dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
+				dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+				dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+				dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			})
+
+			It("runs and has output", func() {
+				dataProcessor.Process("SACRAMENTO")
+				format.TruncatedDiff = false
+
+				pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
+				Expect(err).ToNot(HaveOccurred())
+				OutputDOJFile, err := os.Open(pathToDOJOutput)
+				Expect(err).ToNot(HaveOccurred())
+				outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
+				Expect(err).ToNot(HaveOccurred())
+
+				ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
+				Expect(err).ToNot(HaveOccurred())
+				expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
+				Expect(err).ToNot(HaveOccurred())
+
+				expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
+			})
 		})
-
-		It("runs and has output", func() {
-			dataProcessor.Process("SACRAMENTO")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_sacramento_results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
-
-	Describe("San Joaquin", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
-
-			var pathToDOJ string
-			inputPath := path.Join("..", "test_fixtures", "san_joaquin", "cadoj_san_joaquin_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "SAN JOAQUIN")
-
-			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_san_joaquin_results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "doj_san_joaquin_results_condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "doj_san_joaquin_results_convictions.csv"))
-
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
-		})
-
-		It("runs and has output", func() {
-			dataProcessor.Process("SAN JOAQUIN")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_san_joaquin_results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
-
-	Describe("Contra Costa", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
-
-			var pathToDOJ string
-			inputPath := path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA")
-
-			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_contra_costa_results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "doj_contra_costa_results_condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "doj_contra_costa_results_convictions.csv"))
-
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
-		})
-
-		It("runs and has output", func() {
-			dataProcessor.Process("CONTRA COSTA")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_contra_costa_results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
-
-	Describe("Los Angeles", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
-
-			var pathToDOJ string
-			inputPath := path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES")
-
-			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_los_angeles_results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "doj_los_angeles_results_condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "doj_los_angeles_results_convictions.csv"))
-
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
-		})
-
-		It("runs and has output", func() {
-			dataProcessor.Process("LOS ANGELES")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_los_angeles_results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
+	}
 
 	Describe("Condensed columns output file", func() {
 		BeforeEach(func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")
 			Expect(err).ToNot(HaveOccurred())
 
-			var pathToDOJ string
-			inputPath := path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
+			inputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
 			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -201,12 +81,12 @@ var _ = Describe("DataProcessor", func() {
 
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA")
 
-			dojResultsPath := path.Join(outputDir, "doj_contra_costa_results.csv")
-			dojCondensedResultsPath := path.Join(outputDir, "doj_contra_costa_results_condensed.csv")
+			dojResultsPath := path.Join(outputDir, "results.csv")
+			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
 
 			dojWriter := NewDOJWriter(dojResultsPath)
 			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "doj_contra_costa_results_convictions.csv"))
+			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
 			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
@@ -215,14 +95,14 @@ var _ = Describe("DataProcessor", func() {
 			dataProcessor.Process("CONTRA COSTA")
 			format.TruncatedDiff = false
 
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_contra_costa_results_condensed.csv"))
+			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "condensed.csv"))
 			Expect(err).ToNot(HaveOccurred())
 			OutputDOJFile, err := os.Open(pathToDOJOutput)
 			Expect(err).ToNot(HaveOccurred())
 			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			condensedInputPath := path.Join("..", "test_fixtures", "contra_costa", "cadoj_contra_costa_source.xlsx")
+			condensedInputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
 			expectedCondensedCSVResult, err := ExtractCondensedCSVFixture(condensedInputPath)
 			ExpectedDOJResultsFile, err := os.Open(expectedCondensedCSVResult)
 			Expect(err).ToNot(HaveOccurred())
@@ -238,8 +118,7 @@ var _ = Describe("DataProcessor", func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")
 			Expect(err).ToNot(HaveOccurred())
 
-			var pathToDOJ string
-			inputPath := path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+			inputPath := path.Join("..", "test_fixtures", "los_angeles.xlsx")
 			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -247,9 +126,9 @@ var _ = Describe("DataProcessor", func() {
 
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES")
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "doj_los_angeles_results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "doj_los_angeles_results_condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "doj_los_angeles_results_convictions.csv"))
+			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
 			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
@@ -258,14 +137,14 @@ var _ = Describe("DataProcessor", func() {
 			dataProcessor.Process("LOS ANGELES")
 			format.TruncatedDiff = false
 
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "doj_los_angeles_results_convictions.csv"))
+			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "convictions.csv"))
 			Expect(err).ToNot(HaveOccurred())
 			OutputDOJFile, err := os.Open(pathToDOJOutput)
 			Expect(err).ToNot(HaveOccurred())
 			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			condensedInputPath := path.Join("..", "test_fixtures", "los_angeles", "cadoj_los_angeles_source.xlsx")
+			condensedInputPath := path.Join("..", "test_fixtures", "los_angeles.xlsx")
 			expectedProp64CSVResult, err := ExtractProp64ConvictionsCSVFixture(condensedInputPath)
 			ExpectedDOJResultsFile, err := os.Open(expectedProp64CSVResult)
 			Expect(err).ToNot(HaveOccurred())
