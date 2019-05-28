@@ -62,14 +62,6 @@ var _ = Describe("contraCostaEligibilityFlow", func() {
 	})
 
 	Describe("Processing a history", func() {
-		/*
-BeforeEach
-	create a history
-	populate with some convictions
-expect
-	return map of infos with index keys
- */
-
 		var (
 			history           DOJHistory
 			conviction1       DOJRow
@@ -95,6 +87,7 @@ expect
 				County:          COUNTY,
 				CountOrder:      "101001001000",
 				Index:           0,
+				Felony:          false,
 			}
 			nonConviction = DOJRow{
 				DOB:             birthDate,
@@ -135,6 +128,7 @@ expect
 				County:          COUNTY,
 				CountOrder:      "104001005000",
 				Index:           4,
+				Felony:          true,
 			}
 			conviction5 = DOJRow{
 				DOB:             birthDate,
@@ -157,6 +151,7 @@ expect
 				CountOrder:           "104001006000",
 				Index:                6,
 				SentencePartDuration: time.Duration(30 * days),
+				Felony:               true,
 			}
 			registration := DOJRow{
 				DOB:               birthDate,
@@ -179,7 +174,7 @@ expect
 			}
 		})
 
-		FIt("returns a map of eligibility infos", func() {
+		It("returns a map of eligibility infos", func() {
 			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
 			Expect(len(infos)).To(Equal(4))
 			_, ok := infos[0]
@@ -192,6 +187,17 @@ expect
 			Expect(ok).To(Equal(true))
 		})
 
-		PContext("returns the correct eligibility determination for each conviction", func() {})
+		FIt("returns the correct eligibility determination for each conviction", func() {
+			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
+			Expect(len(infos)).To(Equal(4))
+			Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+			Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
+			Expect(infos[2].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+			Expect(infos[2].EligibilityReason).To(Equal("No Related Prop64 Charges"))
+			Expect(infos[4].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+			Expect(infos[4].EligibilityReason).To(Equal("No convictions in past 5 years"))
+			Expect(infos[6].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+			Expect(infos[6].EligibilityReason).To(Equal("No convictions in past 5 years"))
+		})
 	})
 })
