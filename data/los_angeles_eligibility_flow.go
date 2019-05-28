@@ -1,6 +1,7 @@
 package data
 
 import (
+	"gogen/matchers"
 	"regexp"
 	"strings"
 	"time"
@@ -27,7 +28,8 @@ func (ef losAngelesEligibilityFlow) checkRelevancy(codeSection string, county st
 }
 
 func (ef losAngelesEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return ef.prop64Matcher.Match([]byte(codeSection))
+	ok, _ := matchers.Prop64Matcher(codeSection)
+	return ok
 }
 
 func (ef losAngelesEligibilityFlow) MatchedCodeSection(codeSection string) string {

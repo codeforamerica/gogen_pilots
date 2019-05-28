@@ -4,17 +4,18 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	. "gogen/matchers"
 	"gogen/utilities"
 	"os"
 	"time"
 )
 
 type DOJInformation struct {
-	Rows             [][]string
-	Histories        map[string]*DOJHistory
-	Eligibilities    map[int]*EligibilityInfo
-	comparisonTime   time.Time
-	TotalConvictions int
+	Rows                     [][]string
+	Histories                map[string]*DOJHistory
+	Eligibilities            map[int]*EligibilityInfo
+	comparisonTime           time.Time
+	TotalConvictions         int
 	TotalConvictionsInCounty int
 }
 
@@ -42,14 +43,65 @@ func (i *DOJInformation) generateHistories(county string) {
 	fmt.Println("\nComplete...")
 }
 
+func (i *DOJInformation) TotalIndividuals() int {
+	return len(i.Histories)
+}
+
+func (i *DOJInformation) TotalRows() int {
+	return len(i.Rows)
+}
+
+func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int {
+	allProp64Convictions := make(map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			ok, codeSection := Prop64Matcher(conviction.CodeSection)
+			if ok {
+				allProp64Convictions[codeSection]++
+			}
+		}
+	}
+	return allProp64Convictions
+}
+
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county string) map[string]int {
+	prop64ConvictionsInCounty := make(map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.County == county {
+				ok, codeSection := Prop64Matcher(conviction.CodeSection)
+				if ok {
+					prop64ConvictionsInCounty[codeSection]++
+				}
+			}
+		}
+	}
+	return prop64ConvictionsInCounty
+}
+
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]int {
+	prop64ConvictionsInCountyByCodeSectionByEligibility := make(map[string]map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.County == county {
+				ok, codeSection := Prop64Matcher(conviction.CodeSection)
+				if ok {
+					prop64ConvictionsInCounty[codeSection]++
+				}
+			}
+		}
+	}
+	return prop64ConvictionsInCountyByCodeSectionByEligibility
+}
+
 func (i *DOJInformation) determineEligibility(county string) {
 	for _, history := range i.Histories {
 		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
 
 		i.TotalConvictions += len(history.Convictions)
 		for _, conviction := range history.Convictions {
-			if conviction.County == county{
-				i.TotalConvictionsInCounty ++
+			if conviction.County == county {
+				i.TotalConvictionsInCounty++
 			}
 		}
 

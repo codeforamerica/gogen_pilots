@@ -1,6 +1,7 @@
 package data
 
 import (
+	"gogen/matchers"
 	"regexp"
 	"strings"
 	"time"
@@ -28,7 +29,8 @@ func (ef contraCostaEligibilityFlow) checkRelevancy(codeSection string, county s
 }
 
 func (ef contraCostaEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return ef.prop64Matcher.Match([]byte(codeSection))
+	ok, _ := matchers.Prop64Matcher(codeSection)
+	return ok
 }
 
 func (ef contraCostaEligibilityFlow) MatchedCodeSection(codeSection string) string {
@@ -50,7 +52,8 @@ func (ef contraCostaEligibilityFlow) MatchedRelatedCodeSection(codeSection strin
 }
 
 func (ef contraCostaEligibilityFlow) isRelatedCharge(codeSection string) bool {
-	return ef.relatedChargeMatcher.Match([]byte(codeSection))
+	ok, _ := matchers.RelatedChargeMatcher(codeSection)
+	return ok
 }
 
 func (ef contraCostaEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
