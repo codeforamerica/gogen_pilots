@@ -18,7 +18,6 @@ var defaultOpts struct{}
 var opts struct {
 	OutputFolder string `long:"outputs" description:"The folder in which to place result files"`
 	DOJFile      string `long:"input-doj" description:"The file containing criminal histories from CA DOJ"`
-	Delimiter    string `long:"delimiter" short:"d" default:"," hidden:"true"`
 	County       string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	Version      bool   `long:"version" short:"v" description:"Print the version"`
 	ComputeAt    string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
