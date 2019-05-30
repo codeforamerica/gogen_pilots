@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	. "gogen/data"
-	. "gogen/processor"
+	"gogen/data"
+	"gogen/processor"
 	"os"
 	"path/filepath"
 	"time"
@@ -53,13 +53,13 @@ func main() {
 		}
 	}
 
-	dojInformation, _ := NewDOJInformation(opts.DOJFile, computeAtDate, opts.County)
+	dojInformation, _ := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County)
 
-	dojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
-	condensedDojWriter := NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
-	prop64ConvictionsDojWriter := NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_convictions.csv"))
+	dojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
+	condensedDojWriter := processor.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
+	prop64ConvictionsDojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_convictions.csv"))
 
-	dataProcessor := NewDataProcessor(dojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dataProcessor := processor.NewDataProcessor(dojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 
 	dataProcessor.Process(opts.County)
 }

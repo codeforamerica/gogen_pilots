@@ -144,7 +144,7 @@ func (i *DOJInformation) CountIndividualsWithFelony() int {
 OuterLoop:
 	for _, history := range i.Histories {
 		for _, conviction := range history.Convictions {
-			if conviction.Felony {
+			if conviction.IsFelony {
 				countIndividuals++
 				continue OuterLoop
 			}
@@ -160,7 +160,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
 		countFelonies := 0
 		countFeloniesReducedOrDismissed := 0
 		for _, conviction := range history.Convictions {
-			if conviction.Felony {
+			if conviction.IsFelony {
 				countFelonies++
 				if i.Eligibilities[conviction.Index] != nil {
 					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
