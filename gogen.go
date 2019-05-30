@@ -53,7 +53,7 @@ func main() {
 		}
 	}
 
-	dojInformation, _ := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County)
+	dojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County)
 
 	dojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
 	condensedDojWriter := processor.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))

@@ -266,7 +266,7 @@ OuterLoop:
 	return countIndividuals
 }
 
-func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) (*DOJInformation, error) {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
 		panic(err)
@@ -280,6 +280,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	if err != nil {
 		panic(err)
 	}
+
 	info := DOJInformation{
 		Rows:           rows,
 		Histories:      make(map[string]*DOJHistory),
@@ -290,5 +291,5 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	info.generateHistories(county)
 	info.determineEligibility(county)
 
-	return &info, nil
+	return &info
 }

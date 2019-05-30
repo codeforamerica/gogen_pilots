@@ -38,7 +38,7 @@ var _ = Describe("DataProcessor", func() {
 
 				comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-				dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, strings.ToUpper(county))
+				dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, strings.ToUpper(county))
 
 				dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 				dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
@@ -79,7 +79,7 @@ var _ = Describe("DataProcessor", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA")
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA")
 
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
@@ -124,7 +124,7 @@ var _ = Describe("DataProcessor", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES")
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES")
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))

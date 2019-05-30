@@ -28,7 +28,7 @@ var _ = Describe("DojInformation", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		comparisonTime = time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-		dojInformation, _ = NewDOJInformation(pathToDOJ, comparisonTime, county)
+		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county)
 	})
 
 	It("Populates Eligibilities based on Index of Conviction", func() {
