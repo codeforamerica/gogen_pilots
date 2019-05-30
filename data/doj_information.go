@@ -20,8 +20,8 @@ type DOJInformation struct {
 }
 
 func (i *DOJInformation) generateHistories(county string) {
-	currentRowIndex := 0.0
-	totalRows := float64(len(i.Rows))
+	currentRowIndex := 0
+	totalRows := len(i.Rows)
 
 	fmt.Println("Reading DOJ Data Into Memory")
 
