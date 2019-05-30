@@ -14,14 +14,14 @@ type DOJRow struct {
 	SSN                    string
 	DOB                    time.Time
 	CDL                    string
-	Convicted              bool
+	WasConvicted           bool
 	CodeSection            string
 	DispositionDate        time.Time
 	OFN                    string
 	Type                   string
-	PC290Registration      bool
+	IsPC290Registration    bool
 	County                 string
-	Felony                 bool
+	IsFelony               bool
 	NumCrtCase             string
 	CycleDate              time.Time
 	CourtNoParts           []string
@@ -36,35 +36,31 @@ const dateFormat = "20060102"
 
 func NewDOJRow(rawRow []string, index int) DOJRow {
 
-	var isFelony bool
-
-	if rawRow[CONV_STAT_DESCR] == "" {
-		isFelony = rawRow[OFFENSE_TOC] == "F"
-	} else {
-		isFelony = rawRow[CONV_STAT_DESCR] == "FELONY"
-	}
-
 	return DOJRow{
-		Name:                 rawRow[PRI_NAME],
-		WeakName:             strings.Split(rawRow[PRI_NAME], " ")[0],
-		SubjectID:            rawRow[SUBJECT_ID],
-		CII:                  rawRow[CII_NUMBER],
+		Name:              rawRow[PRI_NAME],
+		WeakName:          strings.Split(rawRow[PRI_NAME], " ")[0],
+		SubjectID:         rawRow[SUBJECT_ID],
+		CII:               rawRow[CII_NUMBER],
 		SSN:                  rawRow[PRI_SSN],
 		DOB:                  parseDate(dateFormat, rawRow[PRI_DOB]),
 		CDL:                  rawRow[PRI_CDL],
-		Convicted:            strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
+		WasConvicted:         strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
 		CodeSection:          findCodeSection(rawRow),
 		DispositionDate:      parseDate(dateFormat, rawRow[STP_EVENT_DATE]),
 		OFN:                  rawRow[OFN],
 		Type:                 rawRow[STP_TYPE_DESCR],
-		PC290Registration:    rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
+		IsPC290Registration:  rawRow[STP_TYPE_DESCR] == "REGISTRATION" && strings.HasPrefix(rawRow[OFFENSE_DESCR], "290"),
 		County:               rawRow[STP_ORI_CNTY_NAME],
-		Felony:               isFelony,
+		IsFelony:             isFelony(rawRow),
 		CountOrder:           rawRow[CNT_ORDER],
 		Index:                index,
 		SentenceEndDate:      getSentenceEndDate(rawRow),
 		SentencePartDuration: getSentencePartDuration(rawRow),
 	}
+}
+
+func isFelony(rawRow []string) bool {
+	return rawRow[CONV_STAT_DESCR] == "FELONY" || (rawRow[CONV_STAT_DESCR] == "" && rawRow[OFFENSE_TOC] == "F")
 }
 
 func getSentenceEndDate(rawRow []string) time.Time {

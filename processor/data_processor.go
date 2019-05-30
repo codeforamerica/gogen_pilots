@@ -141,7 +141,7 @@ func (d *DataProcessor) incrementEligibilities(
 	switch eligibility.EligibilityDetermination {
 	case "Eligible for Dismissal":
 		clearanceByCodeSection.numberDismissedByCodeSection[matchedCodeSection]++
-		if conviction.Felony {
+		if conviction.IsFelony {
 			historyStats.feloniesDismissed++
 			if conviction.OccurredInLast7Years() {
 				historyStats.feloniesDismissedLast7Years++

@@ -37,7 +37,7 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		history.CyclesWithProp64Charges = make(map[string]bool)
 		history.CaseNumbers = make(map[string][]string)
 	}
-	if row.Convicted && history.seenConvictions[row.CountOrder] {
+	if row.WasConvicted && history.seenConvictions[row.CountOrder] {
 		lastConviction := history.Convictions[len(history.Convictions)-1]
 		newEndDate := lastConviction.SentenceEndDate.Add(row.SentencePartDuration)
 		lastConviction.SentenceEndDate = newEndDate
@@ -50,10 +50,10 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 	if row.Type == "COURT ACTION" && row.OFN != "" {
 		history.CaseNumbers[row.CountOrder[0:6]] = setAppend(history.CaseNumbers[row.CountOrder[0:6]], row.OFN)
 	}
-	if row.PC290Registration {
+	if row.IsPC290Registration {
 		history.PC290Registration = true
 	}
-	if row.Convicted && !history.seenConvictions[row.CountOrder] {
+	if row.WasConvicted && !history.seenConvictions[row.CountOrder] {
 		row.HasProp64ChargeInCycle = history.CyclesWithProp64Charges[row.CountOrder[0:3]]
 		history.Convictions = append(history.Convictions, &row)
 		history.seenConvictions[row.CountOrder] = true
@@ -126,7 +126,7 @@ func (history *DOJHistory) NumberOfConvictionsInCounty(county string) int {
 func (history *DOJHistory) NumberOfFelonies() int {
 	felonies := 0
 	for _, row := range history.Convictions {
-		if row.Felony {
+		if row.IsFelony {
 			felonies++
 		}
 	}

@@ -99,7 +99,7 @@ func (ef sanJoaquinEligibilityFlow) convictionIsRelatedCharge(info *EligibilityI
 }
 
 func (ef sanJoaquinEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo, row *DOJRow) {
-	if !row.Felony {
+	if !row.IsFelony {
 		ef.EligibleDismissal(info, "Misdemeanor or Infraction")
 	} else {
 		ef.Is11357(info, row)

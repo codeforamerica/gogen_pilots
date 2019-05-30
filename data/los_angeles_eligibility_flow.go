@@ -79,7 +79,7 @@ func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 }
 
 func (ef losAngelesEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo, row *DOJRow) {
-	if !row.Felony {
+	if !row.IsFelony {
 		ef.EligibleDismissal(info, "Misdemeanor or Infraction")
 	} else {
 		ef.Is11357b(info, row)
