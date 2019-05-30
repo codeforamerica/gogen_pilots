@@ -20,7 +20,6 @@ type DOJInformation struct {
 }
 
 func (i *DOJInformation) generateHistories(county string) {
-	currentRowIndex := 0
 	totalRows := len(i.Rows)
 
 	fmt.Println("Reading DOJ Data Into Memory")
@@ -34,11 +33,10 @@ func (i *DOJInformation) generateHistories(county string) {
 			i.Histories[dojRow.SubjectID] = new(DOJHistory)
 		}
 		i.Histories[dojRow.SubjectID].PushRow(dojRow, county)
-		currentRowIndex++
 
 		totalTime += time.Since(startTime)
 
-		utilities.PrintProgressBar(currentRowIndex, totalRows, totalTime, "")
+		utilities.PrintProgressBar(index + 1, totalRows, totalTime, "")
 	}
 	fmt.Println("\nComplete...")
 }
