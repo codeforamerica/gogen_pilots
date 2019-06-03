@@ -59,15 +59,20 @@ var _ = Describe("DojInformation", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 3, "11358": 8, "11359": 4}))
 		})
 
-		FIt("Prop64 convictions in this county by code section and eligibility determination", func() {
-			//for _, history := range dojInformation.Histories{
-			//	EligibilityFlows["CONTRA COSTA"].ProcessHistory(history, comparisonTime)
-			//}
+		//It("Prop64 convictions in this county by code section and eligibility determination", func() {
+		//	Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county)).To(Equal(
+		//		map[string]map[string]int{
+		//			"Eligible for Dismissal":           {"11357": 3, "11358": 4, "11359": 3},
+		//			"Maybe Eligible - Flag for Review": {"11358": 3, "11359": 1},
+		//			"Not eligible":                     {"11358": 1}}))
+		//})
+
+		It("Prop64 convictions in this county by eligibility determination and reason", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county)).To(Equal(
 				map[string]map[string]int{
-					"Eligible for Dismissal":              {"11357": 3, "11358": 4, "11359": 2},
-					"Maybe Eligible - flagged for review": {"11358": 3, "11359": 2},
-					"Not Eligible":                        {"11358": 1}}))
+					"Eligible for Dismissal":           {"11357": 3, "11358": 4, "11359": 3},
+					"Maybe Eligible - Flag for Review": {"11358": 3, "11359": 1},
+					"Not eligible":                     {"11358": 1}}))
 		})
 	})
 })

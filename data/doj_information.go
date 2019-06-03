@@ -81,33 +81,44 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county strin
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]map[string]int {
 	prop64ConvictionsInCountyByCodeSectionByEligibility := make(map[string]map[string]int)
-	fmt.Printf("\np64 before loop: %v\n", prop64ConvictionsInCountyByCodeSectionByEligibility)
 	for _, history := range i.Histories {
-		fmt.Println("\nnew history")
-		for convictionIndex, conviction := range history.Convictions {
+		for _, conviction := range history.Convictions {
 			if conviction.County == county {
-				fmt.Println("in county match")
 				ok, codeSection := Prop64Matcher(conviction.CodeSection)
-				if ok && (history.EligibilityInfos[convictionIndex] == nil){
-					fmt.Println("eligibility is nil")
-				}
-				if ok && (history.EligibilityInfos[convictionIndex] != nil){
-					eligibilityDetermination := history.EligibilityInfos[convictionIndex].EligibilityDetermination
-					fmt.Println("in okay")
-					fmt.Printf("eligibility: %v", eligibilityDetermination)
-
-					//if prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
-					//	prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] = map[string]int{codeSection: 1}
-					//} else {
+				if ok {
+					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+					if prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
+						prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
+					}
 					prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination][codeSection]++
-					//}
 				}
+
 			}
 		}
 	}
-	fmt.Printf("map value: %v", prop64ConvictionsInCountyByCodeSectionByEligibility)
 	return prop64ConvictionsInCountyByCodeSectionByEligibility
 }
+
+//func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string) map[string]map[string]int {
+//	prop64ConvictionsInCountyByEligibilityByReason := make(map[string]map[string]int)
+//	for _, history := range i.Histories {
+//		for _, conviction := range history.Convictions {
+//			if conviction.County == county {
+//				ok, _ := Prop64Matcher(conviction.CodeSection)
+//				if ok {
+//					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+//					eligibilityReason := i.Eligibilities[conviction.Index].EligibilityReason
+//					if prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] == nil {
+//						prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] = make(map[string]int)
+//					}
+//					prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination][eligibilityReason]++
+//				}
+//
+//			}
+//		}
+//	}
+//	return prop64ConvictionsInCountyByEligibilityByReason
+//}
 
 func (i *DOJInformation) determineEligibility(county string) {
 	for _, history := range i.Histories {
@@ -115,6 +126,7 @@ func (i *DOJInformation) determineEligibility(county string) {
 
 		i.TotalConvictions += len(history.Convictions)
 		for _, conviction := range history.Convictions {
+
 			if conviction.County == county {
 				i.TotalConvictionsInCounty++
 			}
