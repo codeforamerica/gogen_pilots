@@ -20,8 +20,7 @@ type DOJInformation struct {
 }
 
 func (i *DOJInformation) generateHistories(county string) {
-	currentRowIndex := 0.0
-	totalRows := float64(len(i.Rows))
+	totalRows := len(i.Rows)
 
 	fmt.Println("Reading DOJ Data Into Memory")
 
@@ -34,11 +33,10 @@ func (i *DOJInformation) generateHistories(county string) {
 			i.Histories[dojRow.SubjectID] = new(DOJHistory)
 		}
 		i.Histories[dojRow.SubjectID].PushRow(dojRow, county)
-		currentRowIndex++
 
 		totalTime += time.Since(startTime)
 
-		utilities.PrintProgressBar(currentRowIndex, totalRows, totalTime, "")
+		utilities.PrintProgressBar(index + 1, totalRows, totalTime, "")
 	}
 	fmt.Println("\nComplete...")
 }
@@ -144,7 +142,7 @@ func (i *DOJInformation) CountIndividualsWithFelony() int {
 OuterLoop:
 	for _, history := range i.Histories {
 		for _, conviction := range history.Convictions {
-			if conviction.Felony {
+			if conviction.IsFelony {
 				countIndividuals++
 				continue OuterLoop
 			}
@@ -160,7 +158,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
 		countFelonies := 0
 		countFeloniesReducedOrDismissed := 0
 		for _, conviction := range history.Convictions {
-			if conviction.Felony {
+			if conviction.IsFelony {
 				countFelonies++
 				if i.Eligibilities[conviction.Index] != nil {
 					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
@@ -266,7 +264,7 @@ OuterLoop:
 	return countIndividuals
 }
 
-func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) (*DOJInformation, error) {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
 		panic(err)
@@ -280,6 +278,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	if err != nil {
 		panic(err)
 	}
+
 	info := DOJInformation{
 		Rows:           rows,
 		Histories:      make(map[string]*DOJHistory),
@@ -290,5 +289,5 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	info.generateHistories(county)
 	info.determineEligibility(county)
 
-	return &info, nil
+	return &info
 }

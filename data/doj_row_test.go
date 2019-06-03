@@ -26,8 +26,8 @@ var _ = Describe("DojRow", func() {
 		Expect(row.WeakName).To(Equal("SKYWALKER,LUKE"))
 		Expect(row.SubjectID).To(Equal("18675309"))
 		Expect(row.DOB).To(Equal(expectedDob))
-		Expect(row.PC290Registration).To(BeFalse())
-		Expect(row.Felony).To(BeTrue())
+		Expect(row.IsPC290Registration).To(BeFalse())
+		Expect(row.IsFelony).To(BeTrue())
 	})
 
 	Context("The row is a registration event", func() {
@@ -40,7 +40,7 @@ var _ = Describe("DojRow", func() {
 		It("recognizes the registration", func() {
 			row := NewDOJRow(rawRow, 1)
 
-			Expect(row.PC290Registration).To(BeTrue())
+			Expect(row.IsPC290Registration).To(BeTrue())
 		})
 	})
 
