@@ -60,11 +60,14 @@ var _ = Describe("DojInformation", func() {
 		})
 
 		FIt("Prop64 convictions in this county by code section and eligibility determination", func() {
+			//for _, history := range dojInformation.Histories{
+			//	EligibilityFlows["CONTRA COSTA"].ProcessHistory(history, comparisonTime)
+			//}
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county)).To(Equal(
 				map[string]map[string]int{
-					"Eligible for Dismissal": {"11357": 3, "11358": 4, "11359": 2},
+					"Eligible for Dismissal":              {"11357": 3, "11358": 4, "11359": 2},
 					"Maybe Eligible - flagged for review": {"11358": 3, "11359": 2},
-					"Not Eligible": {"11358": 1}}))
+					"Not Eligible":                        {"11358": 1}}))
 		})
 	})
 })
