@@ -222,7 +222,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
 				countFelonies++
 				if i.Eligibilities[conviction.Index] != nil {
 					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
-						determination == "Eligible for Dismissal" {
+						determination == "Eligible for Dismissal" || determination == "Eligible for Reduction"{
 						countFeloniesReducedOrDismissed++
 					}
 				}
