@@ -15,11 +15,6 @@ type DataProcessor struct {
 	prop64Matcher                       *regexp.Regexp
 	stats                               dataProcessorStats
 	totalClearanceResults               totalClearanceResults
-	clearanceByCodeSection              clearanceByCodeSection
-	relatedChargeClearanceByCodeSection clearanceByCodeSection
-	totalExistingConvictions            totalExistingConvictions
-	convictionsByCodeSection            convictionsByCodeSection
-	relatedConvictionsByCodeSection     convictionsByCodeSection
 }
 
 type totalClearanceResults struct {
@@ -36,38 +31,12 @@ type totalClearanceResults struct {
 	numberNoMoreConvictionsIfAllSealedIncludingRelated        int
 }
 
-type clearanceByCodeSection struct {
-	numberEligibilityByReason                     map[string]int
-	numberDismissedByCodeSection                  map[string]int
-	numberReducedByCodeSection                    map[string]int
-	numberIneligibleByCodeSection                 map[string]int
-	numberMaybeEligibleFlagForReviewByCodeSection map[string]int
-}
-
-type totalExistingConvictions struct {
-	totalCountyConvictions       int
-	totalHasFelony               int
-	totalHasConvictionLast7Years int
-	totalHasConvictions          int
-}
-
-type convictionsByCodeSection struct {
-	totalConvictionsByCodeSection  map[string]int
-	countyConvictionsByCodeSection map[string]int
-	DOJEligibilityByCodeSection    map[string]map[string]int
-}
-
 type historySummaryStats struct {
 	feloniesDismissed               int
 	feloniesReduced                 int
 	maybeEligibleFelonies           int
 	notEligibleFelonies             int
 	misdemeanorsDismissed           int
-	feloniesDismissedLast7Years     int
-	feloniesReducedLast7Years       int
-	maybeEligibleFeloniesLast7Years int
-	notEligibleFeloniesLast7Years   int
-	misdemeanorsDismissedLast7Years int
 }
 
 type dataProcessorStats struct {
@@ -84,191 +53,19 @@ func NewDataProcessor(
 	outputProp64ConvictionsDOJWriter DOJWriter,
 ) DataProcessor {
 	return DataProcessor{
-		dojInformation:           				dojInformation,
-		outputDOJWriter:          				outputDOJWriter,
-		outputCondensedDOJWriter: 				outputCondensedDOJWriter,
-		outputProp64ConvictionsDOJWriter: 		outputProp64ConvictionsDOJWriter,
-		totalClearanceResults:    				totalClearanceResults{},
-		clearanceByCodeSection: 				clearanceByCodeSection{
-			numberEligibilityByReason:                     make(map[string]int),
-			numberDismissedByCodeSection:                  make(map[string]int),
-			numberReducedByCodeSection:                    make(map[string]int),
-			numberIneligibleByCodeSection:                 make(map[string]int),
-			numberMaybeEligibleFlagForReviewByCodeSection: make(map[string]int),
-		},
-		relatedChargeClearanceByCodeSection: 	clearanceByCodeSection{
-			numberEligibilityByReason:                     make(map[string]int),
-			numberDismissedByCodeSection:                  make(map[string]int),
-			numberReducedByCodeSection:                    make(map[string]int),
-			numberIneligibleByCodeSection:                 make(map[string]int),
-			numberMaybeEligibleFlagForReviewByCodeSection: make(map[string]int),
-		},
-		totalExistingConvictions: 				totalExistingConvictions{},
-		convictionsByCodeSection: 				convictionsByCodeSection{
-			totalConvictionsByCodeSection:  make(map[string]int),
-			countyConvictionsByCodeSection: make(map[string]int),
-		},
-		relatedConvictionsByCodeSection: 		convictionsByCodeSection{
-			totalConvictionsByCodeSection:  make(map[string]int),
-			countyConvictionsByCodeSection: make(map[string]int),
-		},
+		dojInformation:                   dojInformation,
+		outputDOJWriter:                  outputDOJWriter,
+		outputCondensedDOJWriter:         outputCondensedDOJWriter,
+		outputProp64ConvictionsDOJWriter: outputProp64ConvictionsDOJWriter,
+		totalClearanceResults:            totalClearanceResults{},
+
+
 	}
 }
 
-func (d *DataProcessor) incrementConvictionsByCodeSection(
-	conviction *data.DOJRow,
-	county string,
-	matchedCodeSection string,
-	convictionsByCodeSection *convictionsByCodeSection,
-) {
-	if matchedCodeSection != "" {
-		convictionsByCodeSection.totalConvictionsByCodeSection[matchedCodeSection]++
-		if conviction.County == county {
-			convictionsByCodeSection.countyConvictionsByCodeSection[matchedCodeSection]++
-		}
-	}
-
-}
-
-func (d *DataProcessor) incrementEligibilities(
-	eligibility *data.EligibilityInfo,
-	conviction *data.DOJRow,
-	county string,
-	matchedCodeSection string,
-	historyStats *historySummaryStats,
-	clearanceByCodeSection *clearanceByCodeSection,
-) {
-	switch eligibility.EligibilityDetermination {
-	case "Eligible for Dismissal":
-		clearanceByCodeSection.numberDismissedByCodeSection[matchedCodeSection]++
-		if conviction.IsFelony {
-			historyStats.feloniesDismissed++
-			if conviction.OccurredInLast7Years() {
-				historyStats.feloniesDismissedLast7Years++
-			}
-		} else {
-			historyStats.misdemeanorsDismissed++
-			if conviction.OccurredInLast7Years() {
-				historyStats.misdemeanorsDismissedLast7Years++
-			}
-		}
-
-	case "Eligible for Reduction":
-		clearanceByCodeSection.numberReducedByCodeSection[matchedCodeSection]++
-		historyStats.feloniesReduced++
-		if conviction.OccurredInLast7Years() {
-			historyStats.feloniesReducedLast7Years++
-		}
-
-	case "Not eligible":
-		clearanceByCodeSection.numberIneligibleByCodeSection[matchedCodeSection]++
-		historyStats.notEligibleFelonies++
-		if conviction.OccurredInLast7Years() {
-			historyStats.notEligibleFeloniesLast7Years++
-		}
-
-	case "Maybe Eligible - Flag for Review":
-		clearanceByCodeSection.numberMaybeEligibleFlagForReviewByCodeSection[matchedCodeSection]++
-		historyStats.maybeEligibleFelonies++
-		if conviction.OccurredInLast7Years() {
-			historyStats.maybeEligibleFeloniesLast7Years++
-		}
-	}
-
-	clearanceByCodeSection.numberEligibilityByReason[eligibility.EligibilityReason]++
-}
-
-func (d *DataProcessor) incrementConvictionAndClearanceStats(
-	county string,
-	history *data.DOJHistory,
-	prop64HistoryStats *historySummaryStats,
-	relatedChargeHistoryStats *historySummaryStats,
-	convictionStats *totalExistingConvictions,
-	clearanceStats *totalClearanceResults,
-) {
-
-	convictionStats.totalCountyConvictions += history.NumberOfConvictionsInCounty(county)
-	if history.NumberOfFelonies() > 0 {
-		convictionStats.totalHasFelony++
-
-		if history.NumberOfFelonies() == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced) {
-			clearanceStats.numberNoLongerHaveFelony++
-		}
-
-		if history.NumberOfFelonies() == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced + prop64HistoryStats.maybeEligibleFelonies + prop64HistoryStats.notEligibleFelonies) {
-			clearanceStats.numberNoLongerHaveFelonyIfAllSealed++
-		}
-
-		if history.NumberOfFelonies() == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced +
-			prop64HistoryStats.maybeEligibleFelonies + prop64HistoryStats.notEligibleFelonies +
-			relatedChargeHistoryStats.feloniesDismissed + relatedChargeHistoryStats.notEligibleFelonies) {
-			clearanceStats.numberNoLongerHaveFelonyIfAllSealedIncludingRelated++
-		}
-	}
-
-	if len(history.Convictions) > 0 {
-		convictionStats.totalHasConvictions++
-
-		if len(history.Convictions) == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.misdemeanorsDismissed) {
-			clearanceStats.numberNoMoreConvictions++
-		}
-
-		if len(history.Convictions) == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced + prop64HistoryStats.maybeEligibleFelonies + prop64HistoryStats.notEligibleFelonies + prop64HistoryStats.misdemeanorsDismissed) {
-			clearanceStats.numberNoMoreConvictionsIfAllSealed++
-		}
-
-		if len(history.Convictions) == (prop64HistoryStats.feloniesDismissed + prop64HistoryStats.feloniesReduced +
-			prop64HistoryStats.maybeEligibleFelonies + prop64HistoryStats.notEligibleFelonies + prop64HistoryStats.misdemeanorsDismissed +
-			relatedChargeHistoryStats.feloniesDismissed + relatedChargeHistoryStats.misdemeanorsDismissed) {
-			clearanceStats.numberNoMoreConvictionsIfAllSealedIncludingRelated++
-		}
-	}
-
-	if history.NumberOfConvictionsInLast7Years() > 0 {
-		convictionStats.totalHasConvictionLast7Years++
-
-		if history.NumberOfConvictionsInLast7Years() == (prop64HistoryStats.feloniesDismissedLast7Years + prop64HistoryStats.misdemeanorsDismissedLast7Years) {
-			clearanceStats.numberClearedRecordsLast7Years++
-		}
-
-		if history.NumberOfConvictionsInLast7Years() == (prop64HistoryStats.feloniesDismissedLast7Years + prop64HistoryStats.feloniesReducedLast7Years + prop64HistoryStats.maybeEligibleFeloniesLast7Years + prop64HistoryStats.notEligibleFeloniesLast7Years + prop64HistoryStats.misdemeanorsDismissedLast7Years) {
-			clearanceStats.numberClearedRecordsLast7YearsIfAllSealed++
-		}
-
-		if history.NumberOfConvictionsInLast7Years() == (prop64HistoryStats.feloniesDismissedLast7Years + prop64HistoryStats.feloniesReducedLast7Years +
-			prop64HistoryStats.maybeEligibleFeloniesLast7Years + prop64HistoryStats.notEligibleFeloniesLast7Years + prop64HistoryStats.misdemeanorsDismissedLast7Years +
-			relatedChargeHistoryStats.feloniesDismissedLast7Years + relatedChargeHistoryStats.notEligibleFeloniesLast7Years + relatedChargeHistoryStats.misdemeanorsDismissedLast7Years) {
-			clearanceStats.numberClearedRecordsLast7YearsIfAllSealedIncludingRelated++
-		}
-	}
-}
 
 func (d *DataProcessor) Process(county string) {
 	fmt.Printf("Processing Histories\n")
-	for _, history := range d.dojInformation.Histories {
-
-		historyStats := historySummaryStats{}
-		relatedChargeHistoryStats := historySummaryStats{}
-
-		for _, conviction := range history.Convictions {
-			matchedCodeSection := data.EligibilityFlows[county].MatchedCodeSection(conviction.CodeSection)
-			matchedRelatedCodeSection := data.EligibilityFlows[county].MatchedRelatedCodeSection(conviction.CodeSection)
-
-			d.incrementConvictionsByCodeSection(conviction, county, matchedCodeSection, &d.convictionsByCodeSection)
-			d.incrementConvictionsByCodeSection(conviction, county, matchedRelatedCodeSection, &d.relatedConvictionsByCodeSection)
-
-			eligibility, ok := d.dojInformation.Eligibilities[conviction.Index]
-
-			if ok && matchedCodeSection != "" {
-				d.incrementEligibilities(eligibility, conviction, county, matchedCodeSection, &historyStats, &d.clearanceByCodeSection)
-			}
-			if ok && matchedRelatedCodeSection != "" {
-				d.incrementEligibilities(eligibility, conviction, county, matchedRelatedCodeSection, &relatedChargeHistoryStats, &d.relatedChargeClearanceByCodeSection)
-			}
-		}
-
-		d.incrementConvictionAndClearanceStats(county, history, &historyStats, &relatedChargeHistoryStats, &d.totalExistingConvictions, &d.totalClearanceResults)
-	}
 
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])
@@ -282,44 +79,48 @@ func (d *DataProcessor) Process(county string) {
 	d.outputCondensedDOJWriter.Flush()
 	d.outputProp64ConvictionsDOJWriter.Flush()
 
+	d.PrintAggregateStatistics(county)
+}
+
+func (d *DataProcessor) PrintAggregateStatistics(county string) {
 	fmt.Println()
 	fmt.Println("----------- Overall summary of DOJ file --------------------")
-	fmt.Printf("Found %d Total rows in DOJ file\n", len(d.dojInformation.Rows))
-	fmt.Printf("Found %d Total individuals in DOJ file\n", len(d.dojInformation.Histories))
+	fmt.Printf("Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())
+	fmt.Printf("Found %d Total individuals in DOJ file\n", d.dojInformation.TotalIndividuals())
 	fmt.Printf("Found %d Total convictions in DOJ file\n", d.dojInformation.TotalConvictions)
-	fmt.Printf("Found %d convictions in this county\n", d.totalExistingConvictions.totalCountyConvictions)
+	fmt.Printf("Found %d convictions in this county\n", d.dojInformation.TotalConvictionsInCounty)
 
 	fmt.Println()
 	fmt.Printf("----------- Prop64 Convictions Overall--------------------")
-	printSummaryByCodeSection("total", d.convictionsByCodeSection.totalConvictionsByCodeSection)
+	printSummaryByCodeSection("total", d.dojInformation.OverallProp64ConvictionsByCodeSection())
 	fmt.Println()
+
 	fmt.Printf("----------- Prop64 Convictions In This County --------------------")
-	printSummaryByCodeSection("in this county", d.convictionsByCodeSection.countyConvictionsByCodeSection)
-	printSummaryByCodeSection("that are eligible for dismissal", d.clearanceByCodeSection.numberDismissedByCodeSection)
-	printSummaryByCodeSection("that are eligible for reduction", d.clearanceByCodeSection.numberReducedByCodeSection)
-	printSummaryByCodeSection("that are flagged for review", d.clearanceByCodeSection.numberMaybeEligibleFlagForReviewByCodeSection)
-	printSummaryByCodeSection("that are not eligible", d.clearanceByCodeSection.numberIneligibleByCodeSection)
+	printSummaryByCodeSection("in this county", d.dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county))
+
+	printSummaryByCodeSectionByEligibility(d.dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county))
 
 	fmt.Println()
 	fmt.Println("----------- Eligibility Reasons --------------------")
-	printConvictionsCountByReason(d.clearanceByCodeSection.numberEligibilityByReason)
+	printSummaryByEligibilityByReason(d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county))
+	fmt.Println()
 	fmt.Println()
 	fmt.Printf("----------- Prop64 Related Convictions In This County --------------------")
-	printSummaryByCodeSection("in this county", d.relatedConvictionsByCodeSection.countyConvictionsByCodeSection)
-	printSummaryByCodeSection("that are eligible for dismissal", d.relatedChargeClearanceByCodeSection.numberDismissedByCodeSection)
-	printSummaryByCodeSection("that are flagged for review", d.relatedChargeClearanceByCodeSection.numberMaybeEligibleFlagForReviewByCodeSection)
-	printSummaryByCodeSection("that are not eligible", d.relatedChargeClearanceByCodeSection.numberIneligibleByCodeSection)
+	printSummaryByCodeSection("in this county", d.dojInformation.OverallRelatedConvictionsByCodeSection())
+	fmt.Println()
+	printSummaryByCodeSectionByEligibility(d.dojInformation.RelatedConvictionsInThisCountyByCodeSectionByEligibility(county))
+	fmt.Println()
 
-	fmt.Println()
 	fmt.Println("----------- Impact to individuals --------------------")
-	fmt.Printf("%d individuals currently have a felony on their record\n", d.totalExistingConvictions.totalHasFelony)
-	fmt.Printf("%d individuals currently have convictions on their record\n", d.totalExistingConvictions.totalHasConvictions)
-	fmt.Printf("%d individuals currently have convictions on their record in the last 7 years\n", d.totalExistingConvictions.totalHasConvictionLast7Years)
+	fmt.Printf("%d individuals currently have a felony on their record\n", d.dojInformation.CountIndividualsWithFelony())
+	fmt.Printf("%d individuals currently have convictions on their record\n", d.dojInformation.CountIndividualsWithConviction())
+	fmt.Printf("%d individuals currently have convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsWithConvictionInLast7Years())
 	fmt.Println()
-	fmt.Println("----------- If ELIGIBLE Prop 64 convictions are dismissed or reduced --------------------")
-	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelony)
-	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictions)
-	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7Years)
+
+	fmt.Println("----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------")
+	fmt.Printf("%d individual(s) who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony())
+	fmt.Printf("%d individual(s) who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction())
+	fmt.Printf("%d individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
 	fmt.Println()
 	fmt.Println("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
 	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealed)
@@ -333,14 +134,40 @@ func (d *DataProcessor) Process(county string) {
 
 }
 
-func printConvictionsCountByReason(numberEligibilityByReason map[string]int) {
-	printMap("Found %d convictions in this county with eligibility reason: %s\n", numberEligibilityByReason)
-}
-
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {
 	fmt.Printf("\nFound %d convictions %s\n", sumValues(resultsByCodeSection), description)
 	formatString := fmt.Sprintf("Found %%d %%s convictions %s\n", description)
 	printMap(formatString, resultsByCodeSection)
+}
+
+func printSummaryByCodeSectionByEligibility(resultsByCodeSectionByEligibility map[string]map[string]int) {
+
+	for determination, codeSectionMap := range resultsByCodeSectionByEligibility {
+		fmt.Printf("\n%v", determination)
+
+		total := 0
+		for codeSection, value := range codeSectionMap {
+
+			total += value
+			fmt.Printf("\nFound %v %v convictions that are %v", value, codeSection, determination)
+		}
+		fmt.Printf("\nFound %v convictions total that are %v\n", total, determination)
+	}
+}
+
+func printSummaryByEligibilityByReason(resultsByCodeSectionByEligibility map[string]map[string]int) {
+
+	for determination, eligibilityMap := range resultsByCodeSectionByEligibility {
+		fmt.Printf("\n%v", determination)
+
+		total := 0
+		for eligibilityReason, value := range eligibilityMap {
+
+			total += value
+			fmt.Printf("\nFound %v convictions with eligibility reason %v", value, eligibilityReason)
+		}
+		fmt.Println()
+	}
 }
 
 func printMap(formatString string, values map[string]int) {

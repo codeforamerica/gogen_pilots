@@ -32,7 +32,7 @@ var _ = Describe("DataProcessor", func() {
 				outputDir, err = ioutil.TempDir("/tmp", "gogen")
 				Expect(err).ToNot(HaveOccurred())
 
-				inputPath := path.Join("..", "test_fixtures", strings.ReplaceAll(strings.ToLower(county), " ", "_") + ".xlsx")
+				inputPath := path.Join("..", "test_fixtures", strings.Replace(strings.ToLower(county), " ", "_",1) + ".xlsx")
 				pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 				Expect(err).ToNot(HaveOccurred())
 

@@ -41,6 +41,24 @@ func (i *DOJInformation) generateHistories(county string) {
 	fmt.Println("\nComplete...")
 }
 
+func (i *DOJInformation) determineEligibility(county string) {
+	for _, history := range i.Histories {
+		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
+
+		i.TotalConvictions += len(history.Convictions)
+		for _, conviction := range history.Convictions {
+
+			if conviction.County == county {
+				i.TotalConvictionsInCounty++
+			}
+		}
+
+		for index, info := range infos {
+			i.Eligibilities[index] = info
+		}
+	}
+}
+
 func (i *DOJInformation) TotalIndividuals() int {
 	return len(i.Histories)
 }
@@ -60,6 +78,19 @@ func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int 
 		}
 	}
 	return allProp64Convictions
+}
+
+func (i *DOJInformation) OverallRelatedConvictionsByCodeSection() map[string]int {
+	relatedConvictions := make(map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			ok, codeSection := RelatedChargeMatcher(conviction.CodeSection)
+			if ok {
+				relatedConvictions[codeSection]++
+			}
+		}
+	}
+	return relatedConvictions
 }
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county string) map[string]int {
@@ -137,6 +168,7 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(coun
 	return prop64ConvictionsInCountyByEligibilityByReason
 }
 
+
 func (i *DOJInformation) CountIndividualsWithFelony() int {
 	countIndividuals := 0
 OuterLoop:
@@ -150,6 +182,34 @@ OuterLoop:
 	}
 	return countIndividuals
 
+}
+
+
+func (i *DOJInformation) CountIndividualsWithConviction() int {
+	countIndividuals := 0
+
+	for _, history := range i.Histories {
+		if len(history.Convictions) > 0 {
+			countIndividuals++
+		}
+	}
+	return countIndividuals
+
+}
+
+func (i *DOJInformation) CountIndividualsWithConvictionInLast7Years() int {
+	countIndividuals := 0
+
+OuterLoop:
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			if conviction.OccurredInLast7Years() {
+				countIndividuals++
+				continue OuterLoop
+			}
+		}
+	}
+	return countIndividuals
 }
 
 func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
@@ -219,51 +279,6 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() in
 	return countIndividuals
 }
 
-func (i *DOJInformation) determineEligibility(county string) {
-	for _, history := range i.Histories {
-		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
-
-		i.TotalConvictions += len(history.Convictions)
-		for _, conviction := range history.Convictions {
-
-			if conviction.County == county {
-				i.TotalConvictionsInCounty++
-			}
-		}
-
-		for index, info := range infos {
-			i.Eligibilities[index] = info
-		}
-	}
-}
-
-func (i *DOJInformation) CountIndividualsWithConviction() int {
-	countIndividuals := 0
-
-	for _, history := range i.Histories {
-		if len(history.Convictions) > 0 {
-			countIndividuals++
-		}
-	}
-	return countIndividuals
-
-}
-
-func (i *DOJInformation) CountIndividualsWithConvictionInLast7Years() int {
-	countIndividuals := 0
-
-OuterLoop:
-	for _, history := range i.Histories {
-		for _, conviction := range history.Convictions {
-			if conviction.OccurredInLast7Years() {
-				countIndividuals++
-				continue OuterLoop
-			}
-		}
-	}
-	return countIndividuals
-}
-
 func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
@@ -278,7 +293,6 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	if err != nil {
 		panic(err)
 	}
-
 	info := DOJInformation{
 		Rows:           rows,
 		Histories:      make(map[string]*DOJHistory),
