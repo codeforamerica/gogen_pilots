@@ -4,7 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/tealeg/xlsx"
-	. "gogen/processor"
+	. "gogen/exporter"
 	"io/ioutil"
 	"os"
 	path "path/filepath"

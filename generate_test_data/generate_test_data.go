@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jessevdk/go-flags"
 	. "gogen/data"
-	. "gogen/processor"
+	. "gogen/exporter"
 	"math"
 	"math/rand"
 	"path/filepath"

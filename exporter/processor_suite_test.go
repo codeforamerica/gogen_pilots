@@ -1,4 +1,4 @@
-package processor_test
+package exporter_test
 
 import (
 	"testing"

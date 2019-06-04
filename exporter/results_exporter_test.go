@@ -1,4 +1,4 @@
-package processor_test
+package exporter_test
 
 import (
 	"encoding/csv"
@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 	"gogen/data"
-	. "gogen/processor"
+	. "gogen/exporter"
 	. "gogen/test_fixtures"
 	"io/ioutil"
 	"os"
@@ -16,11 +16,11 @@ import (
 	"time"
 )
 
-var _ = Describe("DataProcessor", func() {
+var _ = Describe("ResultsExporter", func() {
 	var (
 		outputDir                string
-		dataProcessor            DataProcessor
-		pathToDOJ 				 string
+		dataProcessor            Exporter
+		pathToDOJ                string
 		pathToExpectedDOJResults string
 		err                      error
 	)
@@ -44,11 +44,11 @@ var _ = Describe("DataProcessor", func() {
 				dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 				dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-				dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+				dataProcessor = NewExporter(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 			})
 
 			It("runs and has output", func() {
-				dataProcessor.Process("SACRAMENTO")
+				dataProcessor.SummarizeAndExport("SACRAMENTO")
 				format.TruncatedDiff = false
 
 				pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
@@ -88,11 +88,11 @@ var _ = Describe("DataProcessor", func() {
 			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewExporter(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has condensed output", func() {
-			dataProcessor.Process("CONTRA COSTA")
+			dataProcessor.SummarizeAndExport("CONTRA COSTA")
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "condensed.csv"))
@@ -130,11 +130,11 @@ var _ = Describe("DataProcessor", func() {
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewExporter(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has condensed output", func() {
-			dataProcessor.Process("LOS ANGELES")
+			dataProcessor.SummarizeAndExport("LOS ANGELES")
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "convictions.csv"))
