@@ -19,7 +19,7 @@ type DOJInformation struct {
 	TotalConvictionsInCounty int
 }
 
-func (i *DOJInformation) generateHistories(county string) {
+func (i *DOJInformation) generateSubjects(county string) {
 	totalRows := len(i.Rows)
 
 	fmt.Println("Reading DOJ Data Into Memory")
@@ -286,7 +286,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 		comparisonTime: comparisonTime,
 	}
 
-	info.generateHistories(county)
+	info.generateSubjects(county)
 	info.determineEligibility(county)
 
 	return &info
