@@ -16,7 +16,7 @@ func (ef losAngelesEligibilityFlow) ProcessHistory(history *DOJHistory, comparis
 	for _, conviction := range history.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
 			info := NewEligibilityInfo(conviction, history, comparisonTime, "LOS ANGELES")
-			ef.BeginEligibilityFlow(info, conviction)
+			ef.BeginEligibilityFlow(info, conviction, history)
 			infos[conviction.Index] = info
 		}
 	}
@@ -44,9 +44,9 @@ func (ef losAngelesEligibilityFlow) MatchedRelatedCodeSection(codeSection string
 	return ""
 }
 
-func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if ef.IsProp64Charge(row.CodeSection) {
-		ef.ConvictionBeforeNovNine2016(info, row)
+		ef.ConvictionBeforeNovNine2016(info, row, history)
 	}
 }
 
@@ -70,39 +70,39 @@ func (ef losAngelesEligibilityFlow) MaybeEligible(info *EligibilityInfo, reason 
 	info.EligibilityReason = reason
 }
 
-func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
-		ef.ConvictionIs11357(info, row)
+		ef.ConvictionIs11357(info, row, history)
 	} else {
 		ef.NotEligible(info, "Occurred after 11/09/2016")
 	}
 }
 
-func (ef losAngelesEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if !row.IsFelony {
 		ef.EligibleDismissal(info, "Misdemeanor or Infraction")
 	} else {
-		ef.Is11357b(info, row)
+		ef.Is11357b(info, row, history)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) Is11357b(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) Is11357b(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if strings.HasPrefix(row.CodeSection, "11357(b)") {
 		ef.EligibleDismissal(info, "HS 11357(b)")
 	} else {
-		ef.MoreThanOneConviction(info, row)
+		ef.MoreThanOneConviction(info, row, history)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) MoreThanOneConviction(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) MoreThanOneConviction(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if info.NumberOfConvictionsOnRecord > 1 {
-		ef.HasConvictionsInPast10Years(info, row)
+		ef.HasConvictionsInPast10Years(info, row, history)
 	} else {
-		ef.CurrentlyServingSentence(info, row)
+		ef.CurrentlyServingSentence(info, row, history)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) HasConvictionsInPast10Years(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) HasConvictionsInPast10Years(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if info.YearsSinceMostRecentConviction > 10 {
 		ef.EligibleDismissal(info, "No convictions in past 10 years")
 	} else {
@@ -110,7 +110,7 @@ func (ef losAngelesEligibilityFlow) HasConvictionsInPast10Years(info *Eligibilit
 	}
 }
 
-func (ef losAngelesEligibilityFlow) CurrentlyServingSentence(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) CurrentlyServingSentence(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if row.SentenceEndDate.Before(info.comparisonTime) {
 		ef.EligibleDismissal(info, "Sentence Completed")
 	} else {
@@ -118,7 +118,7 @@ func (ef losAngelesEligibilityFlow) CurrentlyServingSentence(info *EligibilityIn
 	}
 }
 
-func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if ef.MatchedCodeSection(row.CodeSection) == "11357" {
 		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
 			ef.EligibleDismissal(info, "11357(a) or 11357(b)")
@@ -126,14 +126,30 @@ func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row
 			ef.MaybeEligible(info, "Other 11357")
 		}
 	} else {
-		ef.HasSuperstrikes(info, row)
+		ef.HasSuperstrikes(info, row, history)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *DOJRow) {
+func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if info.hasSuperstrikes() {
 		ef.NotEligible(info, "PC 667(e)(2)(c)(iv)")
 	} else {
-		ef.ConvictionIsNotFelony(info, row)
+		ef.TwoPriors(info, row, history)
 	}
+}
+
+func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+	if info.hasTwoPriors(row, history) {
+		ef.NotEligible(info, "Two Priors")
+	} else {
+		ef.OlderThanFifty(info, row, history)
+	}
+}
+
+func (ef losAngelesEligibilityFlow) OlderThanFifty(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+	ef.EligibleDismissal(info, "NEXT STEP TO BE IMPLEMENTED")
+}
+
+func (ef losAngelesEligibilityFlow) YoungerThanTwentyOne(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+
 }

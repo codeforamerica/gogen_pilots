@@ -67,13 +67,7 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 	info.DateOfConviction = row.DispositionDate
 	info.CaseNumber = strings.Join(history.CaseNumbers[row.CountOrder[0:6]], "; ")
 
-	EligibilityFlows[county].BeginEligibilityFlow(info, row)
-
-	if info.EligibilityReason != "" {
-		return info
-	} else {
-		return nil
-	}
+	return info
 }
 
 func (info *EligibilityInfo) yearsSinceEvent(date time.Time) float64 {
@@ -84,4 +78,20 @@ func (info *EligibilityInfo) yearsSinceEvent(date time.Time) float64 {
 
 func (info *EligibilityInfo) hasSuperstrikes() bool {
 	return info.Superstrikes != "-"
+}
+
+func (info *EligibilityInfo) hasTwoPriors(row *DOJRow, history *DOJHistory) bool {
+	priorConvictionsOfSameCodeSectionPrefix := 0
+	codeSectionRune := []rune(row.CodeSection)
+	codeSectionPrefix := string(codeSectionRune[0:5])
+	for _, conviction := range history.Convictions {
+//if prop 64 conviction!!!
+		if conviction.DispositionDate.Before(row.DispositionDate)  {
+			if strings.HasPrefix(conviction.CodeSection, codeSectionPrefix) {
+				priorConvictionsOfSameCodeSectionPrefix++
+			}
+		}
+	}
+
+	return priorConvictionsOfSameCodeSectionPrefix >= 2
 }
