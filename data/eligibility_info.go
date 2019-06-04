@@ -21,7 +21,7 @@ type EligibilityInfo struct {
 	Deceased                       string
 }
 
-func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Time, county string) *EligibilityInfo {
+func NewEligibilityInfo(row *DOJRow, subject *Subject, comparisonTime time.Time, county string) *EligibilityInfo {
 	info := new(EligibilityInfo)
 	info.comparisonTime = comparisonTime
 
@@ -31,41 +31,41 @@ func NewEligibilityInfo(row *DOJRow, history *DOJHistory, comparisonTime time.Ti
 		info.YearsSinceThisConviction = info.yearsSinceEvent(row.DispositionDate)
 	}
 
-	if history.IsDeceased {
+	if subject.IsDeceased {
 		info.Deceased = "Deceased"
 	} else {
 		info.Deceased = "-"
 	}
 
-	if history.PC290Registration {
+	if subject.PC290Registration {
 		info.PC290Registration = "Yes"
 	} else {
 		info.PC290Registration = "-"
 	}
 
-	if len(history.PC290CodeSections()) > 0 {
-		info.PC290CodeSections = strings.Join(history.PC290CodeSections(), ";")
+	if len(subject.PC290CodeSections()) > 0 {
+		info.PC290CodeSections = strings.Join(subject.PC290CodeSections(), ";")
 	} else {
 		info.PC290CodeSections = "-"
 	}
 
-	if len(history.SuperstrikeCodeSections()) > 0 {
-		info.Superstrikes = strings.Join(history.SuperstrikeCodeSections(), ";")
+	if len(subject.SuperstrikeCodeSections()) > 0 {
+		info.Superstrikes = strings.Join(subject.SuperstrikeCodeSections(), ";")
 	} else {
 		info.Superstrikes = "-"
 	}
 
-	mostRecentConvictionDate := history.MostRecentConvictionDate()
+	mostRecentConvictionDate := subject.MostRecentConvictionDate()
 	if (mostRecentConvictionDate == time.Time{}) {
 		info.YearsSinceMostRecentConviction = -1.0
 	} else {
 		info.YearsSinceMostRecentConviction = info.yearsSinceEvent(mostRecentConvictionDate)
 	}
 
-	info.NumberOfConvictionsOnRecord = len(history.Convictions)
-	info.NumberOfProp64Convictions = history.NumberOfProp64Convictions(county)
+	info.NumberOfConvictionsOnRecord = len(subject.Convictions)
+	info.NumberOfProp64Convictions = subject.NumberOfProp64Convictions(county)
 	info.DateOfConviction = row.DispositionDate
-	info.CaseNumber = strings.Join(history.CaseNumbers[row.CountOrder[0:6]], "; ")
+	info.CaseNumber = strings.Join(subject.CaseNumbers[row.CountOrder[0:6]], "; ")
 
 	EligibilityFlows[county].BeginEligibilityFlow(info, row)
 

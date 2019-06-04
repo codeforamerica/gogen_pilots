@@ -12,11 +12,11 @@ type sanJoaquinEligibilityFlow struct {
 	relatedChargeMatcher *regexp.Regexp
 }
 
-func (ef sanJoaquinEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+func (ef sanJoaquinEligibilityFlow) ProcessHistory(subject *Subject, comparisonTime time.Time) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
-	for _, conviction := range history.Convictions {
+	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
-			info := NewEligibilityInfo(conviction, history, comparisonTime, "SAN JOAQUIN")
+			info := NewEligibilityInfo(conviction, subject, comparisonTime, "SAN JOAQUIN")
 			ef.BeginEligibilityFlow(info, conviction)
 			infos[conviction.Index] = info
 		}

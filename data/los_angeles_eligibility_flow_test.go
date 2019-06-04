@@ -32,9 +32,9 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		})
 	})
 
-	Describe("Processing a history", func() {
+	Describe("Processing a subject", func() {
 		var (
-			history           DOJHistory
+			subject           Subject
 			conviction1       DOJRow
 			conviction2       DOJRow
 			conviction3       DOJRow
@@ -139,14 +139,14 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			comparisonTime = time.Date(2019, 4, 10, 0, 0, 0, 0, time.UTC)
 
 			rows := []DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5, conviction5Prison}
-			history = DOJHistory{}
+			subject = Subject{}
 			for _, row := range rows {
-				history.PushRow(row, COUNTY)
+				subject.PushRow(row, COUNTY)
 			}
 		})
 
 		It("returns a map of eligibility infos", func() {
-			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
+			infos := EligibilityFlows[COUNTY].ProcessHistory(&subject, comparisonTime)
 			Expect(len(infos)).To(Equal(3))
 			_, ok := infos[0]
 			Expect(ok).To(Equal(true))
@@ -157,7 +157,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		})
 
 		It("returns the correct eligibility determination for each conviction", func() {
-			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
+			infos := EligibilityFlows[COUNTY].ProcessHistory(&subject, comparisonTime)
 			Expect(len(infos)).To(Equal(3))
 			Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
 			Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))

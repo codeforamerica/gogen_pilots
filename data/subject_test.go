@@ -8,9 +8,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DOJHistory", func() {
+var _ = Describe("Subject", func() {
 	var (
-		history           data.DOJHistory
+		subject           data.Subject
 		conviction1       data.DOJRow
 		conviction2       data.DOJRow
 		conviction3       data.DOJRow
@@ -36,21 +36,21 @@ var _ = Describe("DOJHistory", func() {
 		registration := data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A05555555", SSN: "345678125", OFN: "1236 12345678-00", DOB: birthDate, CodeSection: "290 PC", WasConvicted: false, CycleDate: time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC), CountOrder: "105001007000", DispositionDate: time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC), IsPC290Registration: true}
 
 		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5, conviction5Prison}
-		history = data.DOJHistory{}
+		subject = data.Subject{}
 		for _, row := range rows {
-			history.PushRow(row, "SACRAMENTO")
+			subject.PushRow(row, "SACRAMENTO")
 		}
 	})
 
 	Describe("PushRow", func() {
-		It("Sets the correct values on the history", func() {
-			Expect(history.SubjectID).To(Equal("subj_id"))
-			Expect(history.Name).To(Equal("SOUP,ZAK E"))
-			Expect(history.WeakName).To(Equal("SOUP,ZAK"))
-			Expect(history.CII).To(Equal("A012345678"))
-			Expect(history.SSN).To(Equal("345678125"))
-			Expect(history.DOB).To(Equal(birthDate))
-			Expect(history.CDL).To(Equal("testcdl"))
+		It("Sets the correct values on the subject", func() {
+			Expect(subject.ID).To(Equal("subj_id"))
+			Expect(subject.Name).To(Equal("SOUP,ZAK E"))
+			Expect(subject.WeakName).To(Equal("SOUP,ZAK"))
+			Expect(subject.CII).To(Equal("A012345678"))
+			Expect(subject.SSN).To(Equal("345678125"))
+			Expect(subject.DOB).To(Equal(birthDate))
+			Expect(subject.CDL).To(Equal("testcdl"))
 
 			expectedConviction1 := conviction1
 			expectedConviction2 := conviction2
@@ -65,7 +65,7 @@ var _ = Describe("DOJHistory", func() {
 			expectedConviction5.HasProp64ChargeInCycle = true
 			expectedConviction5.SentenceEndDate = time.Date(2012, 04, 03, 0, 0, 0, 0, time.UTC)
 
-			Expect(history.Convictions).To(ConsistOf(
+			Expect(subject.Convictions).To(ConsistOf(
 				&expectedConviction1,
 				&expectedConviction2,
 				&expectedConviction3,
@@ -73,14 +73,14 @@ var _ = Describe("DOJHistory", func() {
 				&expectedConviction5,
 			))
 
-			Expect(history.Convictions).ToNot(ConsistOf(&conviction5Prison))
-			Expect(history.Convictions[4].SentenceEndDate).To(Equal(time.Date(2012, 04, 03, 0, 0, 0, 0, time.UTC)))
+			Expect(subject.Convictions).ToNot(ConsistOf(&conviction5Prison))
+			Expect(subject.Convictions[4].SentenceEndDate).To(Equal(time.Date(2012, 04, 03, 0, 0, 0, 0, time.UTC)))
 		})
 	})
 
 	Describe("MostRecentConvictionDate", func() {
 		It("returns the most recent conviction date", func() {
-			Expect(history.MostRecentConvictionDate()).To(Equal(time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC)))
+			Expect(subject.MostRecentConvictionDate()).To(Equal(time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC)))
 		})
 	})
 
@@ -90,29 +90,29 @@ var _ = Describe("DOJHistory", func() {
 				conviction6 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "187 PC", WasConvicted: true, CycleDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "102001003300", DispositionDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
 				conviction7 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "191.5 PC", WasConvicted: true, CycleDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "103001004300", DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
 
-				history.PushRow(conviction6, "SACRAMENTO")
-				history.PushRow(conviction7, "SACRAMENTO")
+				subject.PushRow(conviction6, "SACRAMENTO")
+				subject.PushRow(conviction7, "SACRAMENTO")
 			})
 
 			It("returns the number of convictions that occurred in the last 7 years", func() {
-				Expect(history.NumberOfConvictionsInLast7Years()).To(Equal(2))
+				Expect(subject.NumberOfConvictionsInLast7Years()).To(Equal(2))
 			})
 		})
 
 		It("returns 0 if no convictions occurred in the last 7 years", func() {
-			Expect(history.NumberOfConvictionsInLast7Years()).To(Equal(0))
+			Expect(subject.NumberOfConvictionsInLast7Years()).To(Equal(0))
 		})
 	})
 
 	Describe("SuperstrikeCodeSections", func() {
-		It("returns a list of superstrikes in the history", func() {
-			Expect(history.SuperstrikeCodeSections()).To(ConsistOf("286(D)(1) PC", "187 PC"))
+		It("returns a list of superstrikes in the subject", func() {
+			Expect(subject.SuperstrikeCodeSections()).To(ConsistOf("286(D)(1) PC", "187 PC"))
 		})
 	})
 
 	Describe("PC290CodeSections", func() {
-		It("returns a list of code sections that fall under PC290 for the history", func() {
-			Expect(history.PC290CodeSections()).To(ConsistOf("286(D)(1) PC", "266J PC"))
+		It("returns a list of code sections that fall under PC290 for the subject", func() {
+			Expect(subject.PC290CodeSections()).To(ConsistOf("286(D)(1) PC", "266J PC"))
 		})
 	})
 })
