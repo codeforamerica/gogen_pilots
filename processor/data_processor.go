@@ -13,37 +13,6 @@ type DataProcessor struct {
 	outputCondensedDOJWriter            DOJWriter
 	outputProp64ConvictionsDOJWriter    DOJWriter
 	prop64Matcher                       *regexp.Regexp
-	stats                               dataProcessorStats
-	totalClearanceResults               totalClearanceResults
-}
-
-type totalClearanceResults struct {
-	numberHistoriesWithFelonies                               int
-	numberHistoriesWithConvictionInLast7Years                 int
-	numberNoLongerHaveFelony                                  int
-	numberNoLongerHaveFelonyIfAllSealed                       int
-	numberNoLongerHaveFelonyIfAllSealedIncludingRelated       int
-	numberClearedRecordsLast7Years                            int
-	numberClearedRecordsLast7YearsIfAllSealed                 int
-	numberClearedRecordsLast7YearsIfAllSealedIncludingRelated int
-	numberNoMoreConvictions                                   int
-	numberNoMoreConvictionsIfAllSealed                        int
-	numberNoMoreConvictionsIfAllSealedIncludingRelated        int
-}
-
-type historySummaryStats struct {
-	feloniesDismissed               int
-	feloniesReduced                 int
-	maybeEligibleFelonies           int
-	notEligibleFelonies             int
-	misdemeanorsDismissed           int
-}
-
-type dataProcessorStats struct {
-	nDOJProp64Convictions int
-	nDOJSubjects          int
-	nDOJFelonies          int
-	nDOJMisdemeanors      int
 }
 
 func NewDataProcessor(
@@ -57,9 +26,6 @@ func NewDataProcessor(
 		outputDOJWriter:                  outputDOJWriter,
 		outputCondensedDOJWriter:         outputCondensedDOJWriter,
 		outputProp64ConvictionsDOJWriter: outputProp64ConvictionsDOJWriter,
-		totalClearanceResults:            totalClearanceResults{},
-
-
 	}
 }
 
@@ -122,15 +88,15 @@ func (d *DataProcessor) PrintAggregateStatistics(county string) {
 	fmt.Printf("%d individual(s) who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction())
 	fmt.Printf("%d individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
 	fmt.Println()
-	fmt.Println("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
-	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealed)
-	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictionsIfAllSealed)
-	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7YearsIfAllSealed)
-	fmt.Println()
-	fmt.Println("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------")
-	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealedIncludingRelated)
-	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictionsIfAllSealedIncludingRelated)
-	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7YearsIfAllSealedIncludingRelated)
+	//fmt.Println("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
+	//fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealed)
+	//fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictionsIfAllSealed)
+	//fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7YearsIfAllSealed)
+	//fmt.Println()
+	//fmt.Println("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------")
+	//fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealedIncludingRelated)
+	//fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictionsIfAllSealedIncludingRelated)
+	//fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7YearsIfAllSealedIncludingRelated)
 
 }
 
