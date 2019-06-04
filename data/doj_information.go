@@ -64,6 +64,19 @@ func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int 
 	return allProp64Convictions
 }
 
+func (i *DOJInformation) OverallRelatedConvictionsByCodeSection() map[string]int {
+	relatedConvictions := make(map[string]int)
+	for _, history := range i.Histories {
+		for _, conviction := range history.Convictions {
+			ok, codeSection := RelatedChargeMatcher(conviction.CodeSection)
+			if ok {
+				relatedConvictions[codeSection]++
+			}
+		}
+	}
+	return relatedConvictions
+}
+
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county string) map[string]int {
 	prop64ConvictionsInCounty := make(map[string]int)
 	for _, history := range i.Histories {
