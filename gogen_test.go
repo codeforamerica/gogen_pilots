@@ -213,7 +213,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("4 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
 
-	FIt("runs and has output for Contra Costa", func() {
+	It("runs and has output for Contra Costa", func() {
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
