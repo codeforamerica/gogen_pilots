@@ -19,13 +19,9 @@ var _ = Describe("DojRow", func() {
 	})
 
 	It("Sets values on initialization", func() {
-		expectedDob := time.Date(1960, time.March, 14, 0, 0, 0, 0, time.UTC)
-
 		row := NewDOJRow(rawRow, 1)
 		Expect(row.Name).To(Equal("SKYWALKER,LUKE S"))
-		Expect(row.WeakName).To(Equal("SKYWALKER,LUKE"))
 		Expect(row.SubjectID).To(Equal("18675309"))
-		Expect(row.DOB).To(Equal(expectedDob))
 		Expect(row.IsPC290Registration).To(BeFalse())
 		Expect(row.IsFelony).To(BeTrue())
 	})

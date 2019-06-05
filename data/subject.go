@@ -1,22 +1,15 @@
 package data
 
 import (
-	"strings"
 	"time"
 )
 
 type Subject struct {
 	ID                      string
 	Name                    string
-	WeakName                string
-	CII                     string
-	DOB                     time.Time
-	SSN                     string
-	CDL                     string
 	Convictions             []*DOJRow
 	seenConvictions         map[string]bool
 	PC290Registration       bool
-	OriginalCII             string
 	CyclesWithProp64Charges map[string]bool
 	CaseNumbers             map[string][]string
 	IsDeceased              bool
@@ -27,12 +20,6 @@ func (subject *Subject) PushRow(row DOJRow, county string) {
 	if subject.ID == "" {
 		subject.ID = row.SubjectID
 		subject.Name = row.Name
-		subject.WeakName = strings.Split(row.Name, " ")[0]
-		subject.CII = row.CII
-		subject.OriginalCII = row.CII
-		subject.DOB = row.DOB
-		subject.SSN = row.SSN
-		subject.CDL = row.CDL
 		subject.seenConvictions = make(map[string]bool)
 		subject.CyclesWithProp64Charges = make(map[string]bool)
 		subject.CaseNumbers = make(map[string][]string)

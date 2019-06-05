@@ -7,13 +7,8 @@ import (
 )
 
 type DOJRow struct {
-	Name                   string
-	WeakName               string
 	SubjectID              string
-	CII                    string
-	SSN                    string
-	DOB                    time.Time
-	CDL                    string
+	Name                   string
 	WasConvicted           bool
 	CodeSection            string
 	DispositionDate        time.Time
@@ -38,12 +33,7 @@ func NewDOJRow(rawRow []string, index int) DOJRow {
 
 	return DOJRow{
 		Name:              rawRow[PRI_NAME],
-		WeakName:          strings.Split(rawRow[PRI_NAME], " ")[0],
 		SubjectID:         rawRow[SUBJECT_ID],
-		CII:               rawRow[CII_NUMBER],
-		SSN:                  rawRow[PRI_SSN],
-		DOB:                  parseDate(dateFormat, rawRow[PRI_DOB]),
-		CDL:                  rawRow[PRI_CDL],
 		WasConvicted:         strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
 		CodeSection:          findCodeSection(rawRow),
 		DispositionDate:      parseDate(dateFormat, rawRow[STP_EVENT_DATE]),

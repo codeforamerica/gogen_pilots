@@ -42,15 +42,12 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			conviction5       DOJRow
 			conviction5Prison DOJRow
 			nonConviction     DOJRow
-			birthDate         time.Time
 			comparisonTime    time.Time
 		)
 
 		BeforeEach(func() {
 			days := time.Duration(24) * (time.Hour)
-			birthDate = time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
 			conviction1 = DOJRow{
-				DOB:             birthDate,
 				WasConvicted:       true,
 				CodeSection:     "11357 HS",
 				DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
@@ -61,7 +58,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				IsFelony:          false,
 			}
 			nonConviction = DOJRow{
-				DOB:             birthDate,
 				WasConvicted:       false,
 				CodeSection:     "11357 HS",
 				DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC),
@@ -71,7 +67,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				Index:           1,
 			}
 			conviction2 = DOJRow{
-				DOB:             birthDate,
 				WasConvicted:       true,
 				CodeSection:     "602 PC",
 				DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
@@ -81,7 +76,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				Index:           2,
 			}
 			conviction3 = DOJRow{
-				DOB:             birthDate,
 				WasConvicted:       true,
 				CodeSection:     "187 PC",
 				DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC),
@@ -91,7 +85,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				Index:           3,
 			}
 			conviction4 = DOJRow{
-				DOB:             birthDate,
 				WasConvicted:       true,
 				CodeSection:     "11360 HS",
 				DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC),
@@ -102,7 +95,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				IsFelony:          true,
 			}
 			conviction5 = DOJRow{
-				DOB:             birthDate,
 				WasConvicted:       true,
 				CodeSection:     "266J PC",
 				DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
@@ -113,7 +105,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
 			}
 			conviction5Prison = DOJRow{
-				DOB:                  birthDate,
 				WasConvicted:            true,
 				CodeSection:          "11360 HS",
 				DispositionDate:      time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
@@ -125,7 +116,6 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				IsFelony:               true,
 			}
 			registration := DOJRow{
-				DOB:               birthDate,
 				WasConvicted:         false,
 				CodeSection:       "290 PC",
 				DispositionDate:   time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC),
