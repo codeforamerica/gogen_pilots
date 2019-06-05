@@ -53,13 +53,22 @@ func main() {
 		}
 	}
 
-	dojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County)
+	countyEligibilityFlow := data.EligibilityFlows[opts.County]
+
+	countyDojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County, countyEligibilityFlow)
+
+	dismissAllProp64EligibilityFlow := data.EligibilityFlows["DISMISS ALL PROP 64"]
+
+	dismissAllProp64DojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County, dismissAllProp64EligibilityFlow)
 
 	dojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
 	condensedDojWriter := processor.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
 	prop64ConvictionsDojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_convictions.csv"))
 
-	dataProcessor := processor.NewDataProcessor(dojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dataProcessor := processor.NewDataProcessor(countyDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+
+	dismissAllProp64DataProcessor := processor.NewDataProcessor(dismissAllProp64DojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dismissAllProp64DataProcessor.Process(opts.County)
 
 	dataProcessor.Process(opts.County)
 }

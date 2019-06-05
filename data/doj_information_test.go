@@ -4,18 +4,67 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "gogen/data"
+	. 	"gogen/matchers"
 	. "gogen/test_fixtures"
+
 	"io/ioutil"
 	"path"
+	"regexp"
 	"time"
 )
 
+type testEligibilityFlow struct {
+	prop64Matcher *regexp.Regexp
+}
+func (ef testEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+	ef.EligibleDismissal(info, "Because")
+}
+
+func (ef testEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
+	info.EligibilityDetermination = "Test is Eligible"
+	info.EligibilityReason = reason
+}
+
+
+func (ef testEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
+	infos := make(map[int]*EligibilityInfo)
+	for _, conviction := range history.Convictions {
+		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
+			info := NewEligibilityInfo(conviction, history, comparisonTime, "SACRAMENTO")
+			ef.BeginEligibilityFlow(info, conviction, history)
+			infos[conviction.Index] = info
+		}
+	}
+	return infos
+}
+
+func (ef testEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
+	return ef.IsProp64Charge(codeSection)
+}
+
+func (ef testEligibilityFlow) IsProp64Charge(codeSection string) bool {
+	ok, _ := Prop64Matcher(codeSection)
+	return ok
+}
+
+func (ef testEligibilityFlow) MatchedCodeSection(codeSection string) string {
+	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
+	if len(matches) > 0 {
+		return matches[1]
+	}
+	return ""
+}
+
+func (ef testEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
+	return ""
+}
 var _ = Describe("DojInformation", func() {
 	county := "CONTRA COSTA"
 	var (
 		pathToDOJ      string
 		comparisonTime time.Time
 		err            error
+		testDojInformation *DOJInformation
 		dojInformation *DOJInformation
 	)
 
@@ -28,7 +77,15 @@ var _ = Describe("DojInformation", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		comparisonTime = time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county)
+		testFlow := testEligibilityFlow{prop64Matcher: regexp.MustCompile(`(11357|11358|11359|11360)`)}
+		contraCostaFlow := EligibilityFlows["CONTRA COSTA"]
+		testDojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county, testFlow)
+		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county, contraCostaFlow)
+	})
+
+	It("Uses the provided eligibility flow", func() {
+		Expect(testDojInformation.Eligibilities[11].EligibilityDetermination).To(Equal("Test is Eligible"))
+		Expect(testDojInformation.Eligibilities[11].CaseNumber).To(Equal("998877; 34345"))
 	})
 
 	It("Populates Eligibilities based on Index of Conviction", func() {

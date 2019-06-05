@@ -97,7 +97,6 @@ func (d *DataProcessor) PrintAggregateStatistics(county string) {
 	//fmt.Printf("%d individuals will no longer have a felony on their record\n", d.totalClearanceResults.numberNoLongerHaveFelonyIfAllSealedIncludingRelated)
 	//fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.totalClearanceResults.numberNoMoreConvictionsIfAllSealedIncludingRelated)
 	//fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.totalClearanceResults.numberClearedRecordsLast7YearsIfAllSealedIncludingRelated)
-
 }
 
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {

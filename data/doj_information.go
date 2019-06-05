@@ -41,9 +41,9 @@ func (i *DOJInformation) generateHistories(county string) {
 	fmt.Println("\nComplete...")
 }
 
-func (i *DOJInformation) determineEligibility(county string) {
+func (i *DOJInformation) determineEligibility(county string, eligibilityFlow EligibilityFlow) {
 	for _, history := range i.Histories {
-		infos := EligibilityFlows[county].ProcessHistory(history, i.comparisonTime)
+		infos := eligibilityFlow.ProcessHistory(history, i.comparisonTime, county)
 
 		i.TotalConvictions += len(history.Convictions)
 		for _, conviction := range history.Convictions {
@@ -279,7 +279,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() in
 	return countIndividuals
 }
 
-func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string) *DOJInformation {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string, eligibilityFlow EligibilityFlow) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
 		panic(err)
@@ -301,7 +301,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	}
 
 	info.generateHistories(county)
-	info.determineEligibility(county)
+	info.determineEligibility(county, eligibilityFlow)
 
 	return &info
 }

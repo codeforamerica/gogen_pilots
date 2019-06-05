@@ -11,7 +11,7 @@ type losAngelesEligibilityFlow struct {
 	prop64Matcher *regexp.Regexp
 }
 
-func (ef losAngelesEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time) map[int]*EligibilityInfo {
+func (ef losAngelesEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range history.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {

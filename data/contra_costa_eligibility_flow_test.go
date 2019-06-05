@@ -175,7 +175,7 @@ var _ = Describe("contraCostaEligibilityFlow", func() {
 		})
 
 		It("returns a map of eligibility infos", func() {
-			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
+			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime, COUNTY)
 			Expect(len(infos)).To(Equal(4))
 			_, ok := infos[0]
 			Expect(ok).To(Equal(true))
@@ -188,7 +188,7 @@ var _ = Describe("contraCostaEligibilityFlow", func() {
 		})
 
 		It("returns the correct eligibility determination for each conviction", func() {
-			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime)
+			infos := EligibilityFlows[COUNTY].ProcessHistory(&history, comparisonTime, COUNTY)
 			Expect(len(infos)).To(Equal(4))
 			Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 			Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))

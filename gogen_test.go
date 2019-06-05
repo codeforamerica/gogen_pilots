@@ -469,15 +469,17 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring( "1 individual(s) who had convictions will no longer have any convictions on their record"))
 		Expect(sessionString).To(ContainSubstring( "0 individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
-		//	Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
-		//	Eventually(session).Should(gbytes.Say("3 individuals will no longer have a felony on their record")) // VM - this changed from 2 to 3
-		//	Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		//	Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
-		//
+			Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
+			Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
+			Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
+			Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+
 		//	Eventually(session).Should(gbytes.Say("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
 		//	Eventually(session).Should(gbytes.Say("3 individuals will no longer have a felony on their record")) // VM - this changed from 2 to 3
 		//	Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
 		//	Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
 	})
+
+
 
 })
