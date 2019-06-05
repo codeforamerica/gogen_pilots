@@ -17,7 +17,7 @@ func (ef sanJoaquinEligibilityFlow) ProcessHistory(history *DOJHistory, comparis
 	for _, conviction := range history.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
 			info := NewEligibilityInfo(conviction, history, comparisonTime, "SAN JOAQUIN")
-			ef.BeginEligibilityFlow(info, conviction)
+			ef.BeginEligibilityFlow(info, conviction, history)
 			infos[conviction.Index] = info
 		}
 	}
@@ -56,7 +56,7 @@ func (ef sanJoaquinEligibilityFlow) isRelatedCharge(codeSection string) bool {
 	return ok
 }
 
-func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow) {
+func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)
 	}

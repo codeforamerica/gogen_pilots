@@ -1,6 +1,7 @@
 package data
 
 import (
+	. "gogen/matchers"
 	"strings"
 	"time"
 )
@@ -85,13 +86,53 @@ func (info *EligibilityInfo) hasTwoPriors(row *DOJRow, history *DOJHistory) bool
 	codeSectionRune := []rune(row.CodeSection)
 	codeSectionPrefix := string(codeSectionRune[0:5])
 	for _, conviction := range history.Convictions {
-//if prop 64 conviction!!!
-		if conviction.DispositionDate.Before(row.DispositionDate)  {
-			if strings.HasPrefix(conviction.CodeSection, codeSectionPrefix) {
-				priorConvictionsOfSameCodeSectionPrefix++
+		prop64Conviction, _ := Prop64Matcher(conviction.CodeSection)
+		if prop64Conviction {
+			if conviction.DispositionDate.Before(row.DispositionDate) {
+				if strings.HasPrefix(conviction.CodeSection, codeSectionPrefix) {
+					priorConvictionsOfSameCodeSectionPrefix++
+				}
 			}
 		}
 	}
 
 	return priorConvictionsOfSameCodeSectionPrefix >= 2
+}
+
+func (info *EligibilityInfo) olderThanFifty(row *DOJRow, history *DOJHistory) bool {
+	age := info.yearsSinceEvent(history.DOB)
+	if age >= 50 {
+		return true
+	}
+	return false
+}
+
+func (info *EligibilityInfo) youngerThanTwentyOne(row *DOJRow, history *DOJHistory) bool {
+	age := info.yearsSinceEvent(history.DOB)
+	if age <= 21 {
+		return true
+	}
+	return false
+}
+
+func (info *EligibilityInfo) onlyProp64Convictions(row *DOJRow, history *DOJHistory) bool {
+	return len(history.Convictions) == info.NumberOfProp64Convictions
+}
+
+func (info *EligibilityInfo) allSentencesCompleted(row *DOJRow, history *DOJHistory) bool {
+	for _, conviction := range history.Convictions {
+		if conviction.SentenceEndDate.After(info.comparisonTime){
+			return false
+		}
+	}
+	return true
+}
+
+func (info *EligibilityInfo) noConvictionsPastTenYears(row *DOJRow, history *DOJHistory) bool {
+	for _, conviction := range history.Convictions {
+		if conviction.DispositionDate.After(info.comparisonTime.AddDate(-10,0,0)) {
+			return false
+		}
+	}
+	return true
 }
