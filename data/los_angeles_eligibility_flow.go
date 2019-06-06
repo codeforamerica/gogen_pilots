@@ -23,6 +23,10 @@ func (ef losAngelesEligibilityFlow) ProcessHistory(history *DOJHistory, comparis
 	return infos
 }
 
+func (ef losAngelesEligibilityFlow) ChecksRelatedCharges() bool {
+	return false
+}
+
 func (ef losAngelesEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
 	return county == "LOS ANGELES" && ef.IsProp64Charge(codeSection)
 }

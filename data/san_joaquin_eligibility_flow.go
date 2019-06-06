@@ -24,6 +24,10 @@ func (ef sanJoaquinEligibilityFlow) ProcessHistory(history *DOJHistory, comparis
 	return infos
 }
 
+func (ef sanJoaquinEligibilityFlow) ChecksRelatedCharges() bool {
+	return true
+}
+
 func (ef sanJoaquinEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
 	return county == "SAN JOAQUIN" && (ef.IsProp64Charge(codeSection) || ef.isRelatedCharge(codeSection))
 }

@@ -23,6 +23,10 @@ func (ef contraCostaEligibilityFlow) ProcessHistory(history *DOJHistory, compari
 	}
 	return infos
 }
+func (ef contraCostaEligibilityFlow) ChecksRelatedCharges() bool {
+	return true
+}
+
 
 func (ef contraCostaEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
 	return county == "CONTRA COSTA" && (ef.IsProp64Charge(codeSection) || ef.isRelatedCharge(codeSection))
