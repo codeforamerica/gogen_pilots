@@ -36,12 +36,13 @@ var _ = Describe("DataProcessor", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "SACRAMENTO", data.EligibilityFlows["SACRAMENTO"])
+			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "SACRAMENTO", data.EligibilityFlows["DISMISS ALL PROP 64"])
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dismissAllProp64DojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has output", func() {
@@ -76,12 +77,13 @@ var _ = Describe("DataProcessor", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "SAN JOAQUIN", data.EligibilityFlows["SAN JOAQUIN"])
+			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "SAN JOAQUIN", data.EligibilityFlows["DISMISS ALL PROP 64"])
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dismissAllProp64DojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has output", func() {
@@ -116,12 +118,13 @@ var _ = Describe("DataProcessor", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
+			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64"])
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dismissAllProp64DojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has output", func() {
@@ -156,12 +159,13 @@ var _ = Describe("DataProcessor", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
+			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dismissAllProp64DojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has output", func() {
@@ -196,6 +200,7 @@ var _ = Describe("DataProcessor", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
+			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64"])
 
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
@@ -204,7 +209,7 @@ var _ = Describe("DataProcessor", func() {
 			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dismissAllProp64DojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has condensed output", func() {
@@ -241,12 +246,13 @@ var _ = Describe("DataProcessor", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			dojInformation:= data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
+			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
-			dataProcessor = NewDataProcessor(dojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+			dataProcessor = NewDataProcessor(dojInformation, dismissAllProp64DojInformation, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
 
 		It("runs and has condensed output", func() {

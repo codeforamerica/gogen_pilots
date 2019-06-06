@@ -65,10 +65,8 @@ func main() {
 	condensedDojWriter := processor.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
 	prop64ConvictionsDojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_convictions.csv"))
 
-	dataProcessor := processor.NewDataProcessor(countyDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dataProcessor := processor.NewDataProcessor(countyDojInformation, dismissAllProp64DojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 
-	dismissAllProp64DataProcessor := processor.NewDataProcessor(dismissAllProp64DojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
-	dismissAllProp64DataProcessor.Process(opts.County)
 
 	dataProcessor.Process(opts.County)
 }
