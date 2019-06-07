@@ -58,6 +58,11 @@ func (ef testEligibilityFlow) MatchedCodeSection(codeSection string) string {
 func (ef testEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
 	return ""
 }
+
+func (ef testEligibilityFlow) ChecksRelatedCharges() bool {
+	return false
+}
+
 var _ = Describe("DojInformation", func() {
 	county := "CONTRA COSTA"
 	var (

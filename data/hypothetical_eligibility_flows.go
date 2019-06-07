@@ -1,7 +1,7 @@
 package data
 
 import (
-	.	"gogen/matchers"
+	. "gogen/matchers"
 	"regexp"
 	"time"
 )
@@ -94,7 +94,7 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) EligibleDismissal(info *Elig
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) checkRelevancy(codeSection string, convictionCounty string, flowCounty string) bool {
-	return convictionCounty == flowCounty && ef.IsProp64Charge(codeSection)
+	return convictionCounty == flowCounty && (ef.IsProp64Charge(codeSection) || ef.IsRelatedCharge(codeSection))
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) IsProp64Charge(codeSection string) bool {
