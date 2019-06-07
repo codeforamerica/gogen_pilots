@@ -139,7 +139,6 @@ func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibilit
 				ok, codeSection := RelatedChargeMatcher(conviction.CodeSection)
 				if ok {
 					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
-					fmt.Printf("\n\n\n\n\n\n\n!!!!!!Determination is: %v\n\n", i.Eligibilities[conviction.Index])
 					if relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
 						relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
 					}
@@ -247,9 +246,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConviction() int {
 	for _, history := range i.Histories {
 		countConvictionsDismissed := 0
 		for _, conviction := range history.Convictions {
-			fmt.Printf("\n\ncode section:%v\n\n", history.Convictions)
 			if i.Eligibilities[conviction.Index] != nil {
-				fmt.Printf("\n\ncode section:%v\n\n", conviction.CodeSection)
 				if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
 					determination == "Eligible for Dismissal" {
 					countConvictionsDismissed++

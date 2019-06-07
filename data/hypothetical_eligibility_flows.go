@@ -1,7 +1,6 @@
 package data
 
 import (
-	"fmt"
 	.	"gogen/matchers"
 	"regexp"
 	"time"
@@ -59,6 +58,9 @@ func (ef dismissAllProp64EligibilityFlow) MatchedRelatedCodeSection(codeSection 
 	return ""
 }
 
+
+
+
 type dismissAllProp64AndRelatedEligibilityFlow struct {
 	prop64Matcher *regexp.Regexp
 	relatedChargeMatcher *regexp.Regexp
@@ -71,7 +73,6 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) ProcessHistory(history *DOJH
 			info := NewEligibilityInfo(conviction, history, comparisonTime, county)
 			ef.BeginEligibilityFlow(info, conviction, history)
 			infos[conviction.Index] = info
-			fmt.Printf("\n\ndetermination for code section %v for is: %v \n\n", conviction.CodeSection, infos[conviction.Index].EligibilityDetermination)
 		}
 	}
 	return infos
