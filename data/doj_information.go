@@ -294,9 +294,12 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	}
 
 	bufferedReader := bufio.NewReader(dojFile)
-	bufferedReader.ReadLine() // read and discard header row
-
 	sourceCSV := csv.NewReader(bufferedReader)
+
+	if includesHeaders(dojFileName) {
+		bufferedReader.ReadLine() // read and discard header row
+	}
+
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
 		panic(err)
@@ -312,4 +315,24 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	info.determineEligibility(county, eligibilityFlow)
 
 	return &info
+}
+
+func isHeaderRow(row []string) bool {
+	return row[0] == "RECORD_ID"
+}
+
+func includesHeaders(fileName string) bool {
+	file, err := os.Open(fileName)
+	if err != nil {
+		panic(err)
+	}
+	bufferedReader := bufio.NewReader(file)
+	sourceCSV := csv.NewReader(bufferedReader)
+
+	firstRow, err := sourceCSV.Read()
+	if err != nil {
+		panic(err)
+	}
+
+	return isHeaderRow(firstRow)
 }

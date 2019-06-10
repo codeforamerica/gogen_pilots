@@ -50,6 +50,37 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("Found 25 convictions in this county"))
 	})
 
+	It("can handle an input file without headers", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "no_headers.csv"))
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
+		computeAtFlag := "--compute-at=2019-11-11"
+
+		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit())
+		Expect(session.Err).ToNot(gbytes.Say("required"))
+
+		sessionString := string(session.Out.Contents())
+
+		Expect(sessionString).To(ContainSubstring("Found 38 Total rows in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 11 Total individuals in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 28 Total convictions in DOJ file"))
+		Expect(sessionString).To(ContainSubstring("Found 25 convictions in this county"))
+	})
+
 	It("can accept a compute-at option for determining eligibility", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
