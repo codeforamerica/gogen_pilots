@@ -7,6 +7,7 @@ import (
 	. "gogen/matchers"
 	"gogen/utilities"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -296,7 +297,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	bufferedReader := bufio.NewReader(dojFile)
 	sourceCSV := csv.NewReader(bufferedReader)
 
-	if includesHeaders(dojFileName) {
+	if includesHeaders(bufferedReader) {
 		bufferedReader.ReadLine() // read and discard header row
 	}
 
@@ -317,22 +318,18 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 	return &info
 }
 
-func isHeaderRow(row []string) bool {
-	return row[0] == "RECORD_ID"
+func isHeaderRow(rowString string) bool {
+	return strings.HasPrefix(rowString, "RECORD_ID")
 }
 
-func includesHeaders(fileName string) bool {
-	file, err := os.Open(fileName)
-	if err != nil {
-		panic(err)
-	}
-	bufferedReader := bufio.NewReader(file)
-	sourceCSV := csv.NewReader(bufferedReader)
+func includesHeaders(reader *bufio.Reader) bool {
+	firstRowBytes, err := reader.Peek(128)
 
-	firstRow, err := sourceCSV.Read()
 	if err != nil {
 		panic(err)
 	}
+
+	firstRow := string(firstRowBytes)
 
 	return isHeaderRow(firstRow)
 }
