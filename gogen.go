@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"gogen/data"
 	"gogen/processor"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -16,11 +18,12 @@ const VERSION = "0.0.2"
 var defaultOpts struct{}
 
 var opts struct {
-	OutputFolder string `long:"outputs" description:"The folder in which to place result files"`
-	DOJFile      string `long:"input-doj" description:"The file containing criminal histories from CA DOJ"`
-	County       string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
-	Version      bool   `long:"version" short:"v" description:"Print the version"`
-	ComputeAt    string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
+	OutputFolder       string `long:"outputs" description:"The folder in which to place result files"`
+	DOJFile            string `long:"input-doj" description:"The file containing criminal histories from CA DOJ"`
+	County             string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
+	Version            bool   `long:"version" short:"v" description:"Print the version"`
+	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
+	EligibilityOptions string `long:"eligibility-options" description:"File containing options for which eligibility logic to apply"`
 }
 
 func main() {
@@ -53,7 +56,29 @@ func main() {
 		}
 	}
 
-	countyEligibilityFlow := data.EligibilityFlows[opts.County]
+	var countyEligibilityFlow data.EligibilityFlow
+
+	if opts.EligibilityOptions != "" {
+		var options data.EligibilityOptions
+		optionsFile, err := os.Open(opts.EligibilityOptions)
+		if err != nil {
+			panic(err)
+		}
+		defer optionsFile.Close()
+
+		optionsBytes, err := ioutil.ReadAll(optionsFile)
+		if err != nil {
+			panic(err)
+		}
+
+		err = json.Unmarshal(optionsBytes, &options)
+		if err != nil {
+			panic(err)
+		}
+		countyEligibilityFlow = data.NewConfigurableEligibilityFlow(options, opts.County)
+	} else {
+		countyEligibilityFlow = data.EligibilityFlows[opts.County]
+	}
 
 	countyDojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County, countyEligibilityFlow)
 

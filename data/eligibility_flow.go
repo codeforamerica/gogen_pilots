@@ -11,16 +11,19 @@ type EligibilityFlow interface {
 }
 
 var EligibilityFlows = map[string]EligibilityFlow{
-	"SACRAMENTO": sacramentoEligibilityFlow{
-	},
-	"SAN JOAQUIN": sanJoaquinEligibilityFlow{
-	},
-	"CONTRA COSTA": contraCostaEligibilityFlow{
-	},
-	"LOS ANGELES": losAngelesEligibilityFlow{
-	},
-	"DISMISS ALL PROP 64": dismissAllProp64EligibilityFlow{
-	},
-	"DISMISS ALL PROP 64 AND RELATED": dismissAllProp64AndRelatedEligibilityFlow{
-	},
+	"SACRAMENTO":                      sacramentoEligibilityFlow{},
+	"SAN JOAQUIN":                     sanJoaquinEligibilityFlow{},
+	"CONTRA COSTA":                    contraCostaEligibilityFlow{},
+	"LOS ANGELES":                     losAngelesEligibilityFlow{},
+	"DISMISS ALL PROP 64":             dismissAllProp64EligibilityFlow{},
+	"DISMISS ALL PROP 64 AND RELATED": dismissAllProp64AndRelatedEligibilityFlow{},
+}
+
+type EligibilityOptions struct {
+	BaselineEligibility BaselineEligibility `json:"baselineEligibility"`
+}
+
+type BaselineEligibility struct {
+	Dismiss []string `json:"dismiss"`
+	Reduce  []string `json:"reduce"`
 }
