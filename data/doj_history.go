@@ -23,7 +23,7 @@ type DOJHistory struct {
 	EligibilityInfos        map[int]*EligibilityInfo
 }
 
-func (history *DOJHistory) PushRow(row DOJRow, county string) {
+func (history *DOJHistory) PushRow(row DOJRow, eligibilityFlow EligibilityFlow) {
 	if history.SubjectID == "" {
 		history.SubjectID = row.SubjectID
 		history.Name = row.Name
@@ -59,7 +59,7 @@ func (history *DOJHistory) PushRow(row DOJRow, county string) {
 		history.seenConvictions[row.CountOrder] = true
 	}
 
-	if EligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+	if eligibilityFlow.IsProp64Charge(row.CodeSection) {
 		history.CyclesWithProp64Charges[row.CountOrder[0:3]] = true
 		for _, conviction := range history.Convictions {
 			if conviction.CountOrder[0:3] == row.CountOrder[0:3] {

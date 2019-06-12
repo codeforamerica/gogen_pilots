@@ -20,7 +20,7 @@ type DOJInformation struct {
 	TotalConvictionsInCounty int
 }
 
-func (i *DOJInformation) generateHistories(county string) {
+func (i *DOJInformation) generateHistories(eligibilityFlow EligibilityFlow) {
 	totalRows := len(i.Rows)
 
 	fmt.Println("Reading DOJ Data Into Memory")
@@ -33,7 +33,7 @@ func (i *DOJInformation) generateHistories(county string) {
 		if i.Histories[dojRow.SubjectID] == nil {
 			i.Histories[dojRow.SubjectID] = new(DOJHistory)
 		}
-		i.Histories[dojRow.SubjectID].PushRow(dojRow, county)
+		i.Histories[dojRow.SubjectID].PushRow(dojRow, eligibilityFlow)
 
 		totalTime += time.Since(startTime)
 
@@ -312,7 +312,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 		comparisonTime: comparisonTime,
 	}
 
-	info.generateHistories(county)
+	info.generateHistories(eligibilityFlow)
 	info.determineEligibility(county, eligibilityFlow)
 
 	return &info

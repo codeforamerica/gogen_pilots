@@ -24,6 +24,8 @@ var _ = Describe("DOJHistory", func() {
 	)
 
 	days := time.Duration(24) * (time.Hour)
+	sacramentoEligibilityFlow := data.EligibilityFlows["SACRAMENTO"]
+
 	BeforeEach(func() {
 		birthDate = time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
 		conviction1 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1234", DOB: birthDate, CodeSection: "11357 HS", WasConvicted: true, CycleDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "101001001000", DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC), County: "SAN FRANCISCO", NumCrtCase: "777CRTCASE"}
@@ -38,7 +40,7 @@ var _ = Describe("DOJHistory", func() {
 		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5, conviction5Prison}
 		history = data.DOJHistory{}
 		for _, row := range rows {
-			history.PushRow(row, "SACRAMENTO")
+			history.PushRow(row, sacramentoEligibilityFlow)
 		}
 	})
 
@@ -90,8 +92,8 @@ var _ = Describe("DOJHistory", func() {
 				conviction6 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1119999", DOB: birthDate, CodeSection: "187 PC", WasConvicted: true, CycleDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "102001003300", DispositionDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
 				conviction7 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", CDL: "testcdl", CII: "A012345678", SSN: "345678125", OFN: "1118888", DOB: birthDate, CodeSection: "191.5 PC", WasConvicted: true, CycleDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), CountOrder: "103001004300", DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
 
-				history.PushRow(conviction6, "SACRAMENTO")
-				history.PushRow(conviction7, "SACRAMENTO")
+				history.PushRow(conviction6, sacramentoEligibilityFlow)
+				history.PushRow(conviction7, sacramentoEligibilityFlow)
 			})
 
 			It("returns the number of convictions that occurred in the last 7 years", func() {

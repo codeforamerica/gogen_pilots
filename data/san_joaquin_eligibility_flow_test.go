@@ -169,7 +169,7 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			rows := []DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5, conviction5Prison}
 			history = DOJHistory{}
 			for _, row := range rows {
-				history.PushRow(row, COUNTY)
+				history.PushRow(row, flow)
 			}
 		})
 
