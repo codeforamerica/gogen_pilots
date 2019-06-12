@@ -220,8 +220,9 @@ var _ = Describe("gogen", func() {
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
+		computeAtDate := "--compute-at=2019-05-01"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag)
+		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtDate)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
