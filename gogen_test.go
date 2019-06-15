@@ -483,7 +483,6 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 4 convictions total that are Not eligible"))
 
-
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason 11357(a) or 11357(b)")))

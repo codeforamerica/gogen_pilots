@@ -58,11 +58,8 @@ func (ef dismissAllProp64EligibilityFlow) MatchedRelatedCodeSection(codeSection 
 	return ""
 }
 
-
-
-
 type dismissAllProp64AndRelatedEligibilityFlow struct {
-	prop64Matcher *regexp.Regexp
+	prop64Matcher        *regexp.Regexp
 	relatedChargeMatcher *regexp.Regexp
 }
 
@@ -83,7 +80,7 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) ChecksRelatedCharges() bool 
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
-	if ef.IsProp64Charge(row.CodeSection) || ef.IsRelatedCharge(row.CodeSection){
+	if ef.IsProp64Charge(row.CodeSection) || ef.IsRelatedCharge(row.CodeSection) {
 		ef.EligibleDismissal(info, "Dismiss all Prop 64 and related charges")
 	}
 }
@@ -123,4 +120,3 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) IsRelatedCharge(codeSection 
 	ok, _ := RelatedChargeMatcher(codeSection)
 	return ok
 }
-

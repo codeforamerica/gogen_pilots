@@ -33,8 +33,8 @@ const dateFormat = "20060102"
 func NewDOJRow(rawRow []string, index int) DOJRow {
 
 	return DOJRow{
-		Name:              rawRow[PRI_NAME],
-		SubjectID:         rawRow[SUBJECT_ID],
+		Name:                 rawRow[PRI_NAME],
+		SubjectID:            rawRow[SUBJECT_ID],
 		DOB:                  parseDate(dateFormat, rawRow[PRI_DOB]),
 		WasConvicted:         strings.HasPrefix(rawRow[DISP_DESCR], "CONVICTED"),
 		CodeSection:          findCodeSection(rawRow),
@@ -86,7 +86,6 @@ func findCodeSection(rawRow []string) string {
 		return strings.Split(rawRow[OFFENSE_DESCR], "-")[0]
 	}
 }
-
 
 func (row *DOJRow) OccurredInLast7Years() bool {
 	sevenYearsAgo := time.Now().AddDate(-7, 0, 0)
