@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "gogen/data"
-	. 	"gogen/matchers"
+	. "gogen/matchers"
 	. "gogen/test_fixtures"
 
 	"io/ioutil"
@@ -16,6 +16,7 @@ import (
 type testEligibilityFlow struct {
 	prop64Matcher *regexp.Regexp
 }
+
 func (ef testEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
 	ef.EligibleDismissal(info, "Because")
 }
@@ -24,7 +25,6 @@ func (ef testEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason st
 	info.EligibilityDetermination = "Test is Eligible"
 	info.EligibilityReason = reason
 }
-
 
 func (ef testEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
@@ -66,11 +66,11 @@ func (ef testEligibilityFlow) ChecksRelatedCharges() bool {
 var _ = Describe("DojInformation", func() {
 	county := "CONTRA COSTA"
 	var (
-		pathToDOJ      string
-		comparisonTime time.Time
-		err            error
+		pathToDOJ          string
+		comparisonTime     time.Time
+		err                error
 		testDojInformation *DOJInformation
-		dojInformation *DOJInformation
+		dojInformation     *DOJInformation
 	)
 
 	BeforeEach(func() {
@@ -130,15 +130,15 @@ var _ = Describe("DojInformation", func() {
 		It("Prop64 convictions in this county by eligibility determination and reason", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county)).To(Equal(
 				map[string]map[string]int{
-					"Eligible for Dismissal":           {
+					"Eligible for Dismissal": {
 						"No convictions in past 5 years": 5,
-						"11357 HS": 2,
-						"Misdemeanor or Infraction": 2,
-						"Sentence Completed": 1,
+						"11357 HS":                       2,
+						"Misdemeanor or Infraction":      2,
+						"Sentence Completed":             1,
 					},
 					"Maybe Eligible - Flag for Review": {
 						"Has convictions in past 5 years": 3,
-						"Sentence not Completed": 1},
+						"Sentence not Completed":          1},
 					"Not eligible": {"Occurred after 11/09/2016": 1}}))
 		})
 

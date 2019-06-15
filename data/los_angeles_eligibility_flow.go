@@ -156,10 +156,9 @@ func (ef losAngelesEligibilityFlow) ServingSentence(info *EligibilityInfo, row *
 }
 
 func (ef losAngelesEligibilityFlow) IsDeceased(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
-	if history.IsDeceased  {
+	if history.IsDeceased {
 		ef.EligibleDismissal(info, "Deceased")
 	} else {
 		ef.HandReview(info, "????")
 	}
 }
-

@@ -121,7 +121,7 @@ func (info *EligibilityInfo) onlyProp64Convictions(row *DOJRow, history *DOJHist
 
 func (info *EligibilityInfo) allSentencesCompleted(row *DOJRow, history *DOJHistory) bool {
 	for _, conviction := range history.Convictions {
-		if conviction.SentenceEndDate.After(info.comparisonTime){
+		if conviction.SentenceEndDate.After(info.comparisonTime) {
 			return false
 		}
 	}
@@ -130,7 +130,7 @@ func (info *EligibilityInfo) allSentencesCompleted(row *DOJRow, history *DOJHist
 
 func (info *EligibilityInfo) noConvictionsPastTenYears(row *DOJRow, history *DOJHistory) bool {
 	for _, conviction := range history.Convictions {
-		if conviction.DispositionDate.After(info.comparisonTime.AddDate(-10,0,0)) {
+		if conviction.DispositionDate.After(info.comparisonTime.AddDate(-10, 0, 0)) {
 			return false
 		}
 	}

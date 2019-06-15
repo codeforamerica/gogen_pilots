@@ -37,7 +37,7 @@ func (i *DOJInformation) generateHistories(eligibilityFlow EligibilityFlow) {
 
 		totalTime += time.Since(startTime)
 
-		utilities.PrintProgressBar(index + 1, totalRows, totalTime, "")
+		utilities.PrintProgressBar(index+1, totalRows, totalTime, "")
 	}
 	fmt.Println("\nComplete...")
 }
@@ -144,7 +144,6 @@ func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibilit
 						relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
 					}
 
-
 					relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination][codeSection]++
 				}
 
@@ -175,7 +174,6 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(coun
 	return prop64ConvictionsInCountyByEligibilityByReason
 }
 
-
 func (i *DOJInformation) CountIndividualsWithFelony() int {
 	countIndividuals := 0
 OuterLoop:
@@ -190,7 +188,6 @@ OuterLoop:
 	return countIndividuals
 
 }
-
 
 func (i *DOJInformation) CountIndividualsWithConviction() int {
 	countIndividuals := 0
@@ -228,8 +225,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
 			if conviction.IsFelony {
 				countFelonies++
 				if i.Eligibilities[conviction.Index] != nil {
-					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
-						determination == "Eligible for Dismissal" || determination == "Eligible for Reduction"{
+					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" || determination == "Eligible for Reduction" {
 						countFeloniesReducedOrDismissed++
 					}
 				}
@@ -248,8 +244,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConviction() int {
 		countConvictionsDismissed := 0
 		for _, conviction := range history.Convictions {
 			if i.Eligibilities[conviction.Index] != nil {
-				if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
-					determination == "Eligible for Dismissal" {
+				if determination := i.Eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" {
 					countConvictionsDismissed++
 				}
 			}
@@ -271,8 +266,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() in
 			if conviction.OccurredInLast7Years() {
 				convictionsInLast7Years++
 				if i.Eligibilities[conviction.Index] != nil {
-					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination;
-						determination == "Eligible for Dismissal" {
+					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" {
 						countConvictionsDismissedInLast7years++
 					}
 				}
@@ -285,8 +279,6 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() in
 	}
 	return countIndividuals
 }
-
-
 
 func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string, eligibilityFlow EligibilityFlow) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)

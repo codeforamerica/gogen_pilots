@@ -1,14 +1,13 @@
 package data
 
 import (
-	"time"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"time"
 )
 
 var _ = Describe("sanJoaquinEligibilityFlow", func() {
 	const COUNTY = "SAN JOAQUIN"
-
 
 	var flow EligibilityFlow
 
@@ -79,18 +78,18 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			birthDate = time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
 			conviction1 = DOJRow{
 				DOB:             birthDate,
-				WasConvicted:       true,
+				WasConvicted:    true,
 				CodeSection:     "11357 HS",
 				DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
 				OFN:             "1234",
 				County:          COUNTY,
 				CountOrder:      "101001001000",
 				Index:           0,
-				IsFelony:          false,
+				IsFelony:        false,
 			}
 			nonConviction = DOJRow{
 				DOB:             birthDate,
-				WasConvicted:       false,
+				WasConvicted:    false,
 				CodeSection:     "11357 HS",
 				DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC),
 				OFN:             "1235",
@@ -100,7 +99,7 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			}
 			conviction2 = DOJRow{
 				DOB:             birthDate,
-				WasConvicted:       true,
+				WasConvicted:    true,
 				CodeSection:     "602 PC",
 				DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
 				OFN:             "1119999",
@@ -110,7 +109,7 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			}
 			conviction3 = DOJRow{
 				DOB:             birthDate,
-				WasConvicted:       true,
+				WasConvicted:    true,
 				CodeSection:     "187 PC",
 				DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC),
 				OFN:             "1118888",
@@ -120,18 +119,18 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			}
 			conviction4 = DOJRow{
 				DOB:             birthDate,
-				WasConvicted:       true,
+				WasConvicted:    true,
 				CodeSection:     "11360 HS",
 				DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC),
 				OFN:             "1236 12345678-00",
 				County:          COUNTY,
 				CountOrder:      "104001005000",
 				Index:           4,
-				IsFelony:          true,
+				IsFelony:        true,
 			}
 			conviction5 = DOJRow{
 				DOB:             birthDate,
-				WasConvicted:       true,
+				WasConvicted:    true,
 				CodeSection:     "266J PC",
 				DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
 				OFN:             "1236 334455-00",
@@ -142,7 +141,7 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 			}
 			conviction5Prison = DOJRow{
 				DOB:                  birthDate,
-				WasConvicted:            true,
+				WasConvicted:         true,
 				CodeSection:          "11360 HS",
 				DispositionDate:      time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
 				OFN:                  "1236 334455-00",
@@ -150,18 +149,18 @@ var _ = Describe("sanJoaquinEligibilityFlow", func() {
 				CountOrder:           "104001006000",
 				Index:                6,
 				SentencePartDuration: time.Duration(30 * days),
-				IsFelony:               true,
+				IsFelony:             true,
 			}
 			registration := DOJRow{
-				DOB:               birthDate,
-				WasConvicted:         false,
-				CodeSection:       "290 PC",
-				DispositionDate:   time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC),
-				OFN:               "1236 12345678-00",
+				DOB:                 birthDate,
+				WasConvicted:        false,
+				CodeSection:         "290 PC",
+				DispositionDate:     time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC),
+				OFN:                 "1236 12345678-00",
 				IsPC290Registration: true,
-				County:            "",
-				CountOrder:        "105001007000",
-				Index:             7,
+				County:              "",
+				CountOrder:          "105001007000",
+				Index:               7,
 			}
 
 			comparisonTime = time.Date(2019, 4, 10, 0, 0, 0, 0, time.UTC)

@@ -69,6 +69,5 @@ func main() {
 
 	dataProcessor := processor.NewDataProcessor(countyDojInformation, dismissAllProp64DojInformation, dismissAllProp64AndRelatedDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 
-
 	dataProcessor.Process(opts.County)
 }
