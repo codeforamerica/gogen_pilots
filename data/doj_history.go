@@ -1,22 +1,16 @@
 package data
 
 import (
-	"strings"
 	"time"
 )
 
 type DOJHistory struct {
 	SubjectID               string
 	Name                    string
-	WeakName                string
-	CII                     string
 	DOB                     time.Time
-	SSN                     string
-	CDL                     string
 	Convictions             []*DOJRow
 	seenConvictions         map[string]bool
 	PC290Registration       bool
-	OriginalCII             string
 	CyclesWithProp64Charges map[string]bool
 	CaseNumbers             map[string][]string
 	IsDeceased              bool
@@ -27,12 +21,7 @@ func (history *DOJHistory) PushRow(row DOJRow, eligibilityFlow EligibilityFlow) 
 	if history.SubjectID == "" {
 		history.SubjectID = row.SubjectID
 		history.Name = row.Name
-		history.WeakName = strings.Split(row.Name, " ")[0]
-		history.CII = row.CII
-		history.OriginalCII = row.CII
 		history.DOB = row.DOB
-		history.SSN = row.SSN
-		history.CDL = row.CDL
 		history.seenConvictions = make(map[string]bool)
 		history.CyclesWithProp64Charges = make(map[string]bool)
 		history.CaseNumbers = make(map[string][]string)

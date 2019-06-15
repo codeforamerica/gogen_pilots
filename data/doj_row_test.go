@@ -23,7 +23,6 @@ var _ = Describe("DojRow", func() {
 
 		row := NewDOJRow(rawRow, 1)
 		Expect(row.Name).To(Equal("SKYWALKER,LUKE S"))
-		Expect(row.WeakName).To(Equal("SKYWALKER,LUKE"))
 		Expect(row.SubjectID).To(Equal("18675309"))
 		Expect(row.DOB).To(Equal(expectedDob))
 		Expect(row.IsPC290Registration).To(BeFalse())
