@@ -8,13 +8,13 @@ import (
 )
 
 type DataProcessor struct {
-	dojInformation                   *data.DOJInformation
-	dismissAllProp64DojInformation   *data.DOJInformation
-	dismissAllProp64AndRelatedDojInformation   *data.DOJInformation
-	outputDOJWriter                  DOJWriter
-	outputCondensedDOJWriter         DOJWriter
-	outputProp64ConvictionsDOJWriter DOJWriter
-	prop64Matcher                    *regexp.Regexp
+	dojInformation                           *data.DOJInformation
+	dismissAllProp64DojInformation           *data.DOJInformation
+	dismissAllProp64AndRelatedDojInformation *data.DOJInformation
+	outputDOJWriter                          DOJWriter
+	outputCondensedDOJWriter                 DOJWriter
+	outputProp64ConvictionsDOJWriter         DOJWriter
+	prop64Matcher                            *regexp.Regexp
 }
 
 func NewDataProcessor(
@@ -26,15 +26,14 @@ func NewDataProcessor(
 	outputProp64ConvictionsDOJWriter DOJWriter,
 ) DataProcessor {
 	return DataProcessor{
-		dojInformation:                   dojInformation,
-		dismissAllProp64DojInformation:   dismissAllProp64DojInformation,
-		dismissAllProp64AndRelatedDojInformation:   dismissAllProp64AndRelatedDojInformation,
-		outputDOJWriter:                  outputDOJWriter,
-		outputCondensedDOJWriter:         outputCondensedDOJWriter,
-		outputProp64ConvictionsDOJWriter: outputProp64ConvictionsDOJWriter,
+		dojInformation:                           dojInformation,
+		dismissAllProp64DojInformation:           dismissAllProp64DojInformation,
+		dismissAllProp64AndRelatedDojInformation: dismissAllProp64AndRelatedDojInformation,
+		outputDOJWriter:                          outputDOJWriter,
+		outputCondensedDOJWriter:                 outputCondensedDOJWriter,
+		outputProp64ConvictionsDOJWriter:         outputProp64ConvictionsDOJWriter,
 	}
 }
-
 
 func (d *DataProcessor) Process(county string) {
 	fmt.Printf("Processing Histories\n")
@@ -112,30 +111,53 @@ func printSummaryByCodeSection(description string, resultsByCodeSection map[stri
 }
 
 func printSummaryByCodeSectionByEligibility(resultsByCodeSectionByEligibility map[string]map[string]int) {
+	codeSections := make([]string, 0, len(resultsByCodeSectionByEligibility))
+	for key := range resultsByCodeSectionByEligibility {
+		codeSections = append(codeSections, key)
+	}
+	sort.Strings(codeSections)
 
-	for determination, codeSectionMap := range resultsByCodeSectionByEligibility {
-		fmt.Printf("\n%v", determination)
+	for _, codeSection := range codeSections {
+		fmt.Printf("\n%v", codeSection)
 
 		total := 0
-		for codeSection, value := range codeSectionMap {
-
-			total += value
-			fmt.Printf("\nFound %v %v convictions that are %v", value, codeSection, determination)
+		eligibilityMap := resultsByCodeSectionByEligibility[codeSection]
+		eligibilities := make([]string, 0, len(eligibilityMap))
+		for key := range eligibilityMap {
+			eligibilities = append(eligibilities, key)
 		}
-		fmt.Printf("\nFound %v convictions total that are %v\n", total, determination)
+		sort.Strings(eligibilities)
+
+		for _, eligibility := range eligibilities {
+
+			total += eligibilityMap[eligibility]
+			fmt.Printf("\nFound %v %v convictions that are %v", eligibilityMap[eligibility], eligibility, codeSection)
+		}
+		fmt.Printf("\nFound %v convictions total that are %v\n", total, codeSection)
 	}
 }
 
-func printSummaryByEligibilityByReason(resultsByCodeSectionByEligibility map[string]map[string]int) {
+func printSummaryByEligibilityByReason(resultsByEligibilityByReason map[string]map[string]int) {
+	determinations := make([]string, 0, len(resultsByEligibilityByReason))
+	for key := range resultsByEligibilityByReason {
+		determinations = append(determinations, key)
+	}
+	sort.Strings(determinations)
 
-	for determination, eligibilityMap := range resultsByCodeSectionByEligibility {
+	for _, determination := range determinations {
 		fmt.Printf("\n%v", determination)
 
 		total := 0
-		for eligibilityReason, value := range eligibilityMap {
+		reasonMap := resultsByEligibilityByReason[determination]
+		reasons := make([]string, 0, len(reasonMap))
+		for key := range reasonMap {
+			reasons = append(reasons, key)
+		}
+		sort.Strings(reasons)
 
-			total += value
-			fmt.Printf("\nFound %v convictions with eligibility reason %v", value, eligibilityReason)
+		for _, reason := range reasons {
+			total += reasonMap[reason]
+			fmt.Printf("\nFound %v convictions with eligibility reason %v", reasonMap[reason], reason)
 		}
 		fmt.Println()
 	}
