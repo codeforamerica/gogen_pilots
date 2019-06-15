@@ -191,9 +191,9 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("4 individuals currently have convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------"))
-		Expect(sessionString).To(ContainSubstring("2 individual(s) who had a felony will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("1 individual(s) who had convictions will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("1 individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("2 individuals who had a felony will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("1 individuals who had convictions will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("1 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have a felony on their record"))
@@ -292,9 +292,9 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("7 individuals currently have convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------"))
-		Expect(sessionString).To(ContainSubstring("1 individual(s) who had a felony will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("3 individual(s) who had convictions will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("2 individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("1 individuals who had a felony will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals who had convictions will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("2 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have a felony on their record"))
@@ -392,9 +392,9 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("6 individuals currently have convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------"))
-		Expect(sessionString).To(ContainSubstring("1 individual(s) who had a felony will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("3 individual(s) who had convictions will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("2 individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("1 individuals who had a felony will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("3 individuals who had convictions will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("2 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have a felony on their record"))
@@ -493,9 +493,9 @@ var _ = Describe("gogen", func() {
 		Expect(sessionString).To(ContainSubstring("4 individuals currently have convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------"))
-		Expect(sessionString).To(ContainSubstring("1 individual(s) who had a felony will no longer have a felony on their record"))
-		Expect(sessionString).To(ContainSubstring("1 individual(s) who had convictions will no longer have any convictions on their record"))
-		Expect(sessionString).To(ContainSubstring("0 individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
+		Expect(sessionString).To(ContainSubstring("1 individuals who had a felony will no longer have a felony on their record"))
+		Expect(sessionString).To(ContainSubstring("1 individuals who had convictions will no longer have any convictions on their record"))
+		Expect(sessionString).To(ContainSubstring("0 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Expect(sessionString).To(ContainSubstring("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
 		Expect(sessionString).To(ContainSubstring("2 individuals will no longer have a felony on their record"))

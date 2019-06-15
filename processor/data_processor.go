@@ -90,9 +90,9 @@ func (d *DataProcessor) PrintAggregateStatistics(county string) {
 	fmt.Println()
 
 	fmt.Println("----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------")
-	fmt.Printf("%d individual(s) who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony())
-	fmt.Printf("%d individual(s) who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction())
-	fmt.Printf("%d individual(s) who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
+	fmt.Printf("%d individuals who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony())
+	fmt.Printf("%d individuals who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction())
+	fmt.Printf("%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
 	fmt.Println()
 	fmt.Println("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
 	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveFelony())
