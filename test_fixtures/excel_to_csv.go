@@ -4,7 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"github.com/tealeg/xlsx"
-	. "gogen/processor"
+	"gogen/processor"
 	"io/ioutil"
 	"os"
 	path "path/filepath"
@@ -43,7 +43,7 @@ func writeInputCSV(xlsxPath string) string {
 		for rowIndex, row := range sheet.Rows {
 			var rowSlice []string
 			for cellIndex, cell := range row.Cells {
-				lengthOfInputFile := len(DojFullHeaders) + 1
+				lengthOfInputFile := len(processor.DojFullHeaders) + 1
 				if cellIndex >= lengthOfInputFile {
 					break
 				}

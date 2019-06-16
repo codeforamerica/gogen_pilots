@@ -1,7 +1,7 @@
 package data
 
 import (
-	. "gogen/matchers"
+	"gogen/matchers"
 	"strings"
 	"time"
 )
@@ -86,7 +86,7 @@ func (info *EligibilityInfo) hasTwoPriors(row *DOJRow, subject *Subject) bool {
 	codeSectionRune := []rune(row.CodeSection)
 	codeSectionPrefix := string(codeSectionRune[0:5])
 	for _, conviction := range subject.Convictions {
-		prop64Conviction, _ := Prop64Matcher(conviction.CodeSection)
+		prop64Conviction, _ := matchers.Prop64Matcher(conviction.CodeSection)
 		if prop64Conviction {
 			if conviction.DispositionDate.Before(row.DispositionDate) {
 				if strings.HasPrefix(conviction.CodeSection, codeSectionPrefix) {
