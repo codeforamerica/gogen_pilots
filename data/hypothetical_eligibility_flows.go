@@ -1,7 +1,7 @@
 package data
 
 import (
-	. "gogen/matchers"
+	"gogen/matchers"
 	"regexp"
 	"time"
 )
@@ -42,7 +42,7 @@ func (ef dismissAllProp64EligibilityFlow) checkRelevancy(codeSection string, con
 }
 
 func (ef dismissAllProp64EligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := Prop64Matcher(codeSection)
+	ok, _ := matchers.Prop64Matcher(codeSection)
 	return ok
 }
 
@@ -95,7 +95,7 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) checkRelevancy(codeSection s
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := Prop64Matcher(codeSection)
+	ok, _ := matchers.Prop64Matcher(codeSection)
 	return ok
 }
 
@@ -117,6 +117,6 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) MatchedRelatedCodeSection(co
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) IsRelatedCharge(codeSection string) bool {
-	ok, _ := RelatedChargeMatcher(codeSection)
+	ok, _ := matchers.RelatedChargeMatcher(codeSection)
 	return ok
 }
