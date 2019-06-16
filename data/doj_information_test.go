@@ -17,7 +17,7 @@ type testEligibilityFlow struct {
 	prop64Matcher *regexp.Regexp
 }
 
-func (ef testEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+func (ef testEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	ef.EligibleDismissal(info, "Because")
 }
 
@@ -26,12 +26,12 @@ func (ef testEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason st
 	info.EligibilityReason = reason
 }
 
-func (ef testEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
+func (ef testEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
-	for _, conviction := range history.Convictions {
+	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
-			info := NewEligibilityInfo(conviction, history, comparisonTime, "SACRAMENTO")
-			ef.BeginEligibilityFlow(info, conviction, history)
+			info := NewEligibilityInfo(conviction, subject, comparisonTime, "SACRAMENTO")
+			ef.BeginEligibilityFlow(info, conviction, subject)
 			infos[conviction.Index] = info
 		}
 	}

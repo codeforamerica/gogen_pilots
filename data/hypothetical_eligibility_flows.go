@@ -10,12 +10,12 @@ type dismissAllProp64EligibilityFlow struct {
 	prop64Matcher *regexp.Regexp
 }
 
-func (ef dismissAllProp64EligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
+func (ef dismissAllProp64EligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
-	for _, conviction := range history.Convictions {
+	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County, county) {
-			info := NewEligibilityInfo(conviction, history, comparisonTime, county)
-			ef.BeginEligibilityFlow(info, conviction, history)
+			info := NewEligibilityInfo(conviction, subject, comparisonTime, county)
+			ef.BeginEligibilityFlow(info, conviction, subject)
 			infos[conviction.Index] = info
 		}
 	}
@@ -26,7 +26,7 @@ func (ef dismissAllProp64EligibilityFlow) ChecksRelatedCharges() bool {
 	return true
 }
 
-func (ef dismissAllProp64EligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+func (ef dismissAllProp64EligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if ef.IsProp64Charge(row.CodeSection) {
 		ef.EligibleDismissal(info, "Dismiss all Prop 64 charges")
 	}
@@ -63,12 +63,12 @@ type dismissAllProp64AndRelatedEligibilityFlow struct {
 	relatedChargeMatcher *regexp.Regexp
 }
 
-func (ef dismissAllProp64AndRelatedEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
+func (ef dismissAllProp64AndRelatedEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
-	for _, conviction := range history.Convictions {
+	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County, county) {
-			info := NewEligibilityInfo(conviction, history, comparisonTime, county)
-			ef.BeginEligibilityFlow(info, conviction, history)
+			info := NewEligibilityInfo(conviction, subject, comparisonTime, county)
+			ef.BeginEligibilityFlow(info, conviction, subject)
 			infos[conviction.Index] = info
 		}
 	}
@@ -79,7 +79,7 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) ChecksRelatedCharges() bool 
 	return true
 }
 
-func (ef dismissAllProp64AndRelatedEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+func (ef dismissAllProp64AndRelatedEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if ef.IsProp64Charge(row.CodeSection) || ef.IsRelatedCharge(row.CodeSection) {
 		ef.EligibleDismissal(info, "Dismiss all Prop 64 and related charges")
 	}

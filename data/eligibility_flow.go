@@ -6,8 +6,8 @@ import (
 )
 
 type EligibilityFlow interface {
-	ProcessHistory(history *DOJHistory, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo
-	BeginEligibilityFlow(info *EligibilityInfo, conviction *DOJRow, history *DOJHistory)
+	ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo
+	BeginEligibilityFlow(info *EligibilityInfo, conviction *DOJRow, subject *Subject)
 	ChecksRelatedCharges() (result bool)
 	IsProp64Charge(codeSection string) (result bool)
 	MatchedCodeSection(codeSection string) (matchedCodeSection string)

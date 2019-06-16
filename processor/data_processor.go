@@ -36,7 +36,7 @@ func NewDataProcessor(
 }
 
 func (d *DataProcessor) Process(county string) {
-	fmt.Printf("Processing Histories\n")
+	fmt.Printf("Processing Subjects\n")
 
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.dojInformation.Eligibilities[i])

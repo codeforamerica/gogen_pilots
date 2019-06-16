@@ -12,12 +12,12 @@ type contraCostaEligibilityFlow struct {
 	relatedChargeMatcher *regexp.Regexp
 }
 
-func (ef contraCostaEligibilityFlow) ProcessHistory(history *DOJHistory, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
+func (ef contraCostaEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
-	for _, conviction := range history.Convictions {
+	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
-			info := NewEligibilityInfo(conviction, history, comparisonTime, "CONTRA COSTA")
-			ef.BeginEligibilityFlow(info, conviction, history)
+			info := NewEligibilityInfo(conviction, subject, comparisonTime, "CONTRA COSTA")
+			ef.BeginEligibilityFlow(info, conviction, subject)
 			infos[conviction.Index] = info
 		}
 	}
@@ -59,7 +59,7 @@ func (ef contraCostaEligibilityFlow) isRelatedCharge(codeSection string) bool {
 	return ok
 }
 
-func (ef contraCostaEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, history *DOJHistory) {
+func (ef contraCostaEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)
 	}
