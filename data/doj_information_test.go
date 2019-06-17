@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "gogen/data"
-	. "gogen/matchers"
+	"gogen/matchers"
 	. "gogen/test_fixtures"
 
 	"io/ioutil"
@@ -43,8 +43,7 @@ func (ef testEligibilityFlow) checkRelevancy(codeSection string, county string) 
 }
 
 func (ef testEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := Prop64Matcher(codeSection)
-	return ok
+	return matchers.IsProp64Charge(codeSection)
 }
 
 func (ef testEligibilityFlow) MatchedCodeSection(codeSection string) string {

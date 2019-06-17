@@ -1,6 +1,7 @@
 package data
 
 import (
+	"gogen/matchers"
 	"time"
 )
 
@@ -48,7 +49,7 @@ func (subject *Subject) PushRow(row DOJRow, eligibilityFlow EligibilityFlow) {
 		subject.seenConvictions[row.CountOrder] = true
 	}
 
-	if eligibilityFlow.IsProp64Charge(row.CodeSection) {
+	if matchers.IsProp64Charge(row.CodeSection) {
 		subject.CyclesWithProp64Charges[row.CountOrder[0:3]] = true
 		for _, conviction := range subject.Convictions {
 			if conviction.CountOrder[0:3] == row.CountOrder[0:3] {
@@ -95,7 +96,7 @@ func (subject *Subject) PC290CodeSections() []string {
 func (subject *Subject) NumberOfProp64Convictions(county string) int {
 	result := 0
 	for _, row := range subject.Convictions {
-		if EligibilityFlows[county].IsProp64Charge(row.CodeSection) {
+		if matchers.IsProp64Charge(row.CodeSection) {
 			result++
 		}
 	}

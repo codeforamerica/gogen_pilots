@@ -72,7 +72,7 @@ func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int 
 	allProp64Convictions := make(map[string]int)
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
-			ok, codeSection := matchers.Prop64Matcher(conviction.CodeSection)
+			ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
 			if ok {
 				allProp64Convictions[codeSection]++
 			}
@@ -85,7 +85,7 @@ func (i *DOJInformation) OverallRelatedConvictionsByCodeSection() map[string]int
 	relatedConvictions := make(map[string]int)
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
-			ok, codeSection := matchers.RelatedChargeMatcher(conviction.CodeSection)
+			ok, codeSection := matchers.ExtractRelatedChargeSection(conviction.CodeSection)
 			if ok {
 				relatedConvictions[codeSection]++
 			}
@@ -99,7 +99,7 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county strin
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
 			if conviction.County == county {
-				ok, codeSection := matchers.Prop64Matcher(conviction.CodeSection)
+				ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
 				if ok {
 					prop64ConvictionsInCounty[codeSection]++
 				}
@@ -114,7 +114,7 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
 			if conviction.County == county {
-				ok, codeSection := matchers.Prop64Matcher(conviction.CodeSection)
+				ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
 				if ok {
 					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
 					if prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
@@ -137,7 +137,7 @@ func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibilit
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
 			if conviction.County == county {
-				ok, codeSection := matchers.RelatedChargeMatcher(conviction.CodeSection)
+				ok, codeSection := matchers.ExtractRelatedChargeSection(conviction.CodeSection)
 				if ok {
 					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
 					if relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
@@ -158,8 +158,7 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(coun
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
 			if conviction.County == county {
-				ok, _ := matchers.Prop64Matcher(conviction.CodeSection)
-				if ok {
+				if matchers.IsProp64Charge(conviction.CodeSection) {
 					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
 					eligibilityReason := i.Eligibilities[conviction.Index].EligibilityReason
 					if prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] == nil {
