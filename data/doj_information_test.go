@@ -9,12 +9,10 @@ import (
 
 	"io/ioutil"
 	"path"
-	"regexp"
 	"time"
 )
 
 type testEligibilityFlow struct {
-	prop64Matcher *regexp.Regexp
 }
 
 func (ef testEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
@@ -69,7 +67,7 @@ var _ = Describe("DojInformation", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		comparisonTime = time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-		testFlow := testEligibilityFlow{prop64Matcher: regexp.MustCompile(`(11357|11358|11359|11360)`)}
+		testFlow := testEligibilityFlow{}
 		contraCostaFlow := EligibilityFlows["CONTRA COSTA"]
 		testDojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county, testFlow)
 		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county, contraCostaFlow)

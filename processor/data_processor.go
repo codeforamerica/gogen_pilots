@@ -3,7 +3,6 @@ package processor
 import (
 	"fmt"
 	"gogen/data"
-	"regexp"
 	"sort"
 )
 
@@ -14,7 +13,6 @@ type DataProcessor struct {
 	outputDOJWriter                          DOJWriter
 	outputCondensedDOJWriter                 DOJWriter
 	outputProp64ConvictionsDOJWriter         DOJWriter
-	prop64Matcher                            *regexp.Regexp
 }
 
 func NewDataProcessor(
