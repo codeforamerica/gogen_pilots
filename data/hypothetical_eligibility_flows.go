@@ -2,12 +2,10 @@ package data
 
 import (
 	"gogen/matchers"
-	"regexp"
 	"time"
 )
 
 type dismissAllProp64EligibilityFlow struct {
-	prop64Matcher *regexp.Regexp
 }
 
 func (ef dismissAllProp64EligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
@@ -45,13 +43,7 @@ func (ef dismissAllProp64EligibilityFlow) IsProp64Charge(codeSection string) boo
 	return matchers.IsProp64Charge(codeSection)
 }
 
-func (ef dismissAllProp64EligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
-	return ""
-}
-
 type dismissAllProp64AndRelatedEligibilityFlow struct {
-	prop64Matcher        *regexp.Regexp
-	relatedChargeMatcher *regexp.Regexp
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string) map[int]*EligibilityInfo {
@@ -87,13 +79,4 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) checkRelevancy(codeSection s
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
-}
-
-func (ef dismissAllProp64AndRelatedEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
-	relatedChargeMatches := ef.relatedChargeMatcher.FindStringSubmatch(codeSection)
-	if len(relatedChargeMatches) > 0 {
-		return relatedChargeMatches[1]
-	}
-
-	return ""
 }

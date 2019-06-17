@@ -2,14 +2,11 @@ package data
 
 import (
 	"gogen/matchers"
-	"regexp"
 	"strings"
 	"time"
 )
 
 type sanJoaquinEligibilityFlow struct {
-	prop64Matcher        *regexp.Regexp
-	relatedChargeMatcher *regexp.Regexp
 }
 
 func (ef sanJoaquinEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
@@ -34,15 +31,6 @@ func (ef sanJoaquinEligibilityFlow) checkRelevancy(codeSection string, county st
 
 func (ef sanJoaquinEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
-}
-
-func (ef sanJoaquinEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
-	relatedChargeMatches := ef.relatedChargeMatcher.FindStringSubmatch(codeSection)
-	if len(relatedChargeMatches) > 0 {
-		return relatedChargeMatches[1]
-	}
-
-	return ""
 }
 
 func (ef sanJoaquinEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
