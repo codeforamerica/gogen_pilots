@@ -35,14 +35,6 @@ func (ef losAngelesEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
 }
 
-func (ef losAngelesEligibilityFlow) MatchedCodeSection(codeSection string) string {
-	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
-	if len(matches) > 0 {
-		return matches[1]
-	}
-	return ""
-}
-
 func (ef losAngelesEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
 	return ""
 }
@@ -87,7 +79,8 @@ func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 }
 
 func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if ef.MatchedCodeSection(row.CodeSection) == "11357" {
+	ok, codeSection := matchers.ExtractProp64Section(row.CodeSection)
+	if ok && codeSection == "11357" {
 		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
 			ef.EligibleDismissal(info, "11357(a) or 11357(b)")
 		} else {

@@ -35,15 +35,6 @@ func (ef contraCostaEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
 }
 
-func (ef contraCostaEligibilityFlow) MatchedCodeSection(codeSection string) string {
-	prop64Matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
-	if len(prop64Matches) > 0 {
-		return prop64Matches[1]
-	}
-
-	return ""
-}
-
 func (ef contraCostaEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
 	relatedChargeMatches := ef.relatedChargeMatcher.FindStringSubmatch(codeSection)
 	if len(relatedChargeMatches) > 0 {

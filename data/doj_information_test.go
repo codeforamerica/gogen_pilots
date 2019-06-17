@@ -46,18 +46,6 @@ func (ef testEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
 }
 
-func (ef testEligibilityFlow) MatchedCodeSection(codeSection string) string {
-	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
-	if len(matches) > 0 {
-		return matches[1]
-	}
-	return ""
-}
-
-func (ef testEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
-	return ""
-}
-
 func (ef testEligibilityFlow) ChecksRelatedCharges() bool {
 	return false
 }

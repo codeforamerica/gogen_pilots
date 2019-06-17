@@ -15,16 +15,6 @@ var _ = Describe("sacramentoEligibilityFlow", func() {
 		flow = EligibilityFlows[COUNTY]
 	})
 
-	Describe("MatchedCodeSection", func() {
-		It("returns the matched substring for a given code section", func() {
-			Expect(flow.MatchedCodeSection("11358(c) HS")).To(Equal("11358"))
-		})
-
-		It("returns empty string if there is no match", func() {
-			Expect(flow.MatchedCodeSection("12345(c) HS")).To(Equal(""))
-		})
-	})
-
 	Describe("Processing a subject", func() {
 		var (
 			subject           Subject
