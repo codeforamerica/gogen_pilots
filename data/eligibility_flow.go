@@ -9,8 +9,6 @@ type EligibilityFlow interface {
 	ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo
 	BeginEligibilityFlow(info *EligibilityInfo, conviction *DOJRow, subject *Subject)
 	ChecksRelatedCharges() (result bool)
-	MatchedCodeSection(codeSection string) (matchedCodeSection string)
-	MatchedRelatedCodeSection(codeSection string) (matchedCodeSection string)
 }
 
 var EligibilityFlows = map[string]EligibilityFlow{

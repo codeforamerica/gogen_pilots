@@ -45,14 +45,6 @@ func (ef dismissAllProp64EligibilityFlow) IsProp64Charge(codeSection string) boo
 	return matchers.IsProp64Charge(codeSection)
 }
 
-func (ef dismissAllProp64EligibilityFlow) MatchedCodeSection(codeSection string) string {
-	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
-	if len(matches) > 0 {
-		return matches[1]
-	}
-	return ""
-}
-
 func (ef dismissAllProp64EligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
 	return ""
 }
@@ -95,14 +87,6 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) checkRelevancy(codeSection s
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
-}
-
-func (ef dismissAllProp64AndRelatedEligibilityFlow) MatchedCodeSection(codeSection string) string {
-	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
-	if len(matches) > 0 {
-		return matches[1]
-	}
-	return ""
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {

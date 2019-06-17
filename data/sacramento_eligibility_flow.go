@@ -35,14 +35,6 @@ func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
 }
 
-func (ef sacramentoEligibilityFlow) MatchedCodeSection(codeSection string) string {
-	matches := ef.prop64Matcher.FindStringSubmatch(codeSection)
-	if len(matches) > 0 {
-		return matches[1]
-	}
-	return ""
-}
-
 func (ef sacramentoEligibilityFlow) MatchedRelatedCodeSection(codeSection string) string {
 	return ""
 }
