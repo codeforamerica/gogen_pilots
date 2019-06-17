@@ -32,8 +32,7 @@ func (ef losAngelesEligibilityFlow) checkRelevancy(codeSection string, county st
 }
 
 func (ef losAngelesEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := matchers.Prop64Matcher(codeSection)
-	return ok
+	return matchers.IsProp64Charge(codeSection)
 }
 
 func (ef losAngelesEligibilityFlow) MatchedCodeSection(codeSection string) string {

@@ -28,12 +28,11 @@ func (ef contraCostaEligibilityFlow) ChecksRelatedCharges() bool {
 }
 
 func (ef contraCostaEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
-	return county == "CONTRA COSTA" && (ef.IsProp64Charge(codeSection) || ef.isRelatedCharge(codeSection))
+	return county == "CONTRA COSTA" && (matchers.IsProp64Charge(codeSection) || matchers.IsRelatedCharge(codeSection))
 }
 
 func (ef contraCostaEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := matchers.Prop64Matcher(codeSection)
-	return ok
+	return matchers.IsProp64Charge(codeSection)
 }
 
 func (ef contraCostaEligibilityFlow) MatchedCodeSection(codeSection string) string {
@@ -54,13 +53,8 @@ func (ef contraCostaEligibilityFlow) MatchedRelatedCodeSection(codeSection strin
 	return ""
 }
 
-func (ef contraCostaEligibilityFlow) isRelatedCharge(codeSection string) bool {
-	ok, _ := matchers.RelatedChargeMatcher(codeSection)
-	return ok
-}
-
 func (ef contraCostaEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if ef.IsProp64Charge(row.CodeSection) || ef.isRelatedCharge(row.CodeSection) {
+	if matchers.IsProp64Charge(row.CodeSection) || matchers.IsRelatedCharge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)
 	}
 }
@@ -94,7 +88,7 @@ func (ef contraCostaEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibili
 }
 
 func (ef contraCostaEligibilityFlow) convictionIsRelatedCharge(info *EligibilityInfo, row *DOJRow) {
-	if ef.isRelatedCharge(row.CodeSection) {
+	if matchers.IsRelatedCharge(row.CodeSection) {
 		ef.hasProp64ChargeInCycle(info, row)
 	} else {
 		ef.ConvictionIsNotFelony(info, row)

@@ -42,8 +42,7 @@ func (ef dismissAllProp64EligibilityFlow) checkRelevancy(codeSection string, con
 }
 
 func (ef dismissAllProp64EligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := matchers.Prop64Matcher(codeSection)
-	return ok
+	return matchers.IsProp64Charge(codeSection)
 }
 
 func (ef dismissAllProp64EligibilityFlow) MatchedCodeSection(codeSection string) string {
@@ -80,7 +79,7 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) ChecksRelatedCharges() bool 
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if ef.IsProp64Charge(row.CodeSection) || ef.IsRelatedCharge(row.CodeSection) {
+	if matchers.IsProp64Charge(row.CodeSection) || matchers.IsRelatedCharge(row.CodeSection) {
 		ef.EligibleDismissal(info, "Dismiss all Prop 64 and related charges")
 	}
 }
@@ -91,12 +90,11 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) EligibleDismissal(info *Elig
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) checkRelevancy(codeSection string, convictionCounty string, flowCounty string) bool {
-	return convictionCounty == flowCounty && (ef.IsProp64Charge(codeSection) || ef.IsRelatedCharge(codeSection))
+	return convictionCounty == flowCounty && (matchers.IsProp64Charge(codeSection) || matchers.IsRelatedCharge(codeSection))
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	ok, _ := matchers.Prop64Matcher(codeSection)
-	return ok
+	return matchers.IsProp64Charge(codeSection)
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) MatchedCodeSection(codeSection string) string {
@@ -114,9 +112,4 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) MatchedRelatedCodeSection(co
 	}
 
 	return ""
-}
-
-func (ef dismissAllProp64AndRelatedEligibilityFlow) IsRelatedCharge(codeSection string) bool {
-	ok, _ := matchers.RelatedChargeMatcher(codeSection)
-	return ok
 }
