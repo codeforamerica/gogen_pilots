@@ -18,6 +18,7 @@ type DOJInformation struct {
 	comparisonTime           time.Time
 	TotalConvictions         int
 	TotalConvictionsInCounty int
+	checksRelatedCharges     bool
 }
 
 func (i *DOJInformation) aggregateSubjects(eligibilityFlow EligibilityFlow) {
@@ -129,7 +130,7 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility
 	return prop64ConvictionsInCountyByCodeSectionByEligibility
 }
 func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]map[string]int {
-	if EligibilityFlows[county].ChecksRelatedCharges() == false {
+	if !i.checksRelatedCharges {
 		emptyMap := make(map[string]map[string]int)
 		return emptyMap
 	}
@@ -297,10 +298,11 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 		panic(err)
 	}
 	info := DOJInformation{
-		Rows:           rows,
-		Subjects:       make(map[string]*Subject),
-		Eligibilities:  make(map[int]*EligibilityInfo),
-		comparisonTime: comparisonTime,
+		Rows:                 rows,
+		Subjects:             make(map[string]*Subject),
+		Eligibilities:        make(map[int]*EligibilityInfo),
+		comparisonTime:       comparisonTime,
+		checksRelatedCharges: eligibilityFlow.ChecksRelatedCharges(),
 	}
 
 	info.aggregateSubjects(eligibilityFlow)
