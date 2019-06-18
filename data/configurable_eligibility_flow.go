@@ -70,26 +70,11 @@ func (ef configurableEligibilityFlow) checkRelevancy(codeSection string, county 
 	return county == ef.county && matchers.IsProp64Charge(codeSection)
 }
 
-func (ef configurableEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
-	info.EligibilityReason = reason
-}
-
-func (ef configurableEligibilityFlow) EligibleReduction(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Reduction"
-	info.EligibilityReason = reason
-}
-
-func (ef configurableEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Not eligible"
-	info.EligibilityReason = reason
-}
-
 func (ef configurableEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if ef.isDismissedCodeSection(row.CodeSection) {
-		ef.EligibleDismissal(info, fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
+		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
 	} else if ef.isReducedCodeSection(row.CodeSection) {
-		ef.EligibleReduction(info, fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
+		info.SetEligibleForReduction(fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
 	}
 }
 

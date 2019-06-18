@@ -135,3 +135,29 @@ func (info *EligibilityInfo) noConvictionsPastTenYears(row *DOJRow, subject *Sub
 	}
 	return true
 }
+
+func (info *EligibilityInfo) SetEligibleForDismissal(reason string) {
+	info.EligibilityDetermination = "Eligible for Dismissal"
+	info.EligibilityReason = strings.TrimSpace(reason)
+}
+
+func (info *EligibilityInfo) SetEligibleForReduction(reason string) {
+	info.EligibilityDetermination = "Eligible for Reduction"
+	info.EligibilityReason = strings.TrimSpace(reason)
+}
+
+func (info *EligibilityInfo) SetNotEligible(reason string) {
+	info.EligibilityDetermination = "Not eligible"
+	info.EligibilityReason = strings.TrimSpace(reason)
+}
+
+func (info *EligibilityInfo) SetMaybeEligible(reason string) {
+	info.EligibilityDetermination = "Maybe Eligible - Flag for Review"
+	info.EligibilityReason = strings.TrimSpace(reason)
+}
+
+func (info *EligibilityInfo) SetHandReview(reason string) {
+	info.EligibilityDetermination = "Hand Review"
+	info.EligibilityReason = strings.TrimSpace(reason)
+}
+

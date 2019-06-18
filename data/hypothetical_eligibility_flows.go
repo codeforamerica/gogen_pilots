@@ -25,22 +25,13 @@ func (ef dismissAllProp64EligibilityFlow) ChecksRelatedCharges() bool {
 }
 
 func (ef dismissAllProp64EligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if ef.IsProp64Charge(row.CodeSection) {
-		ef.EligibleDismissal(info, "Dismiss all Prop 64 charges")
+	if matchers.IsProp64Charge(row.CodeSection) {
+		info.SetEligibleForDismissal("Dismiss all Prop 64 charges")
 	}
 }
 
-func (ef dismissAllProp64EligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
-	info.EligibilityReason = reason
-}
-
 func (ef dismissAllProp64EligibilityFlow) checkRelevancy(codeSection string, convictionCounty string, flowCounty string) bool {
-	return convictionCounty == flowCounty && ef.IsProp64Charge(codeSection)
-}
-
-func (ef dismissAllProp64EligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return matchers.IsProp64Charge(codeSection)
+	return convictionCounty == flowCounty && matchers.IsProp64Charge(codeSection)
 }
 
 type dismissAllProp64AndRelatedEligibilityFlow struct {
@@ -64,19 +55,10 @@ func (ef dismissAllProp64AndRelatedEligibilityFlow) ChecksRelatedCharges() bool 
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if matchers.IsProp64Charge(row.CodeSection) || matchers.IsRelatedCharge(row.CodeSection) {
-		ef.EligibleDismissal(info, "Dismiss all Prop 64 and related charges")
+		info.SetEligibleForDismissal("Dismiss all Prop 64 and related charges")
 	}
-}
-
-func (ef dismissAllProp64AndRelatedEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
-	info.EligibilityReason = reason
 }
 
 func (ef dismissAllProp64AndRelatedEligibilityFlow) checkRelevancy(codeSection string, convictionCounty string, flowCounty string) bool {
 	return convictionCounty == flowCounty && (matchers.IsProp64Charge(codeSection) || matchers.IsRelatedCharge(codeSection))
-}
-
-func (ef dismissAllProp64AndRelatedEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return matchers.IsProp64Charge(codeSection)
 }

@@ -26,45 +26,26 @@ func (ef sacramentoEligibilityFlow) ChecksRelatedCharges() bool {
 }
 
 func (ef sacramentoEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
-	return county == "SACRAMENTO" && ef.IsProp64Charge(codeSection)
-}
-
-func (ef sacramentoEligibilityFlow) IsProp64Charge(codeSection string) bool {
-	return matchers.IsProp64Charge(codeSection)
+	return county == "SACRAMENTO" && matchers.IsProp64Charge(codeSection)
 }
 
 func (ef sacramentoEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if ef.IsProp64Charge(row.CodeSection) {
+	if matchers.IsProp64Charge(row.CodeSection) {
 		ef.ConvictionBeforeNovNine2016(info, row)
 	}
-}
-
-func (ef sacramentoEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Dismissal"
-	info.EligibilityReason = reason
-}
-
-func (ef sacramentoEligibilityFlow) EligibleReduction(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Eligible for Reduction"
-	info.EligibilityReason = reason
-}
-
-func (ef sacramentoEligibilityFlow) NotEligible(info *EligibilityInfo, reason string) {
-	info.EligibilityDetermination = "Not eligible"
-	info.EligibilityReason = reason
 }
 
 func (ef sacramentoEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow) {
 	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
 		ef.ConvictionIsNotFelony(info, row)
 	} else {
-		ef.NotEligible(info, "Occurred after 11/09/2016")
+		info.SetNotEligible("Occurred after 11/09/2016")
 	}
 }
 
 func (ef sacramentoEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo, row *DOJRow) {
 	if !row.IsFelony {
-		ef.EligibleDismissal(info, "Misdemeanor or Infraction")
+		info.SetEligibleForDismissal("Misdemeanor or Infraction")
 	} else {
 		ef.Is11357b(info, row)
 	}
@@ -72,7 +53,7 @@ func (ef sacramentoEligibilityFlow) ConvictionIsNotFelony(info *EligibilityInfo,
 
 func (ef sacramentoEligibilityFlow) Is11357b(info *EligibilityInfo, row *DOJRow) {
 	if strings.HasPrefix(row.CodeSection, "11357(b)") {
-		ef.EligibleDismissal(info, "HS 11357(b)")
+		info.SetEligibleForDismissal("HS 11357(b)")
 	} else {
 		ef.MoreThanOneConviction(info, row)
 	}
@@ -88,16 +69,16 @@ func (ef sacramentoEligibilityFlow) MoreThanOneConviction(info *EligibilityInfo,
 
 func (ef sacramentoEligibilityFlow) HasConvictionsInPast10Years(info *EligibilityInfo, row *DOJRow) {
 	if info.YearsSinceMostRecentConviction > 10 {
-		ef.EligibleDismissal(info, "No convictions in past 10 years")
+		info.SetEligibleForDismissal("No convictions in past 10 years")
 	} else {
-		ef.EligibleReduction(info, "Has convictions in past 10 years")
+		info.SetEligibleForReduction("Has convictions in past 10 years")
 	}
 }
 
 func (ef sacramentoEligibilityFlow) CurrentlyServingSentence(info *EligibilityInfo, row *DOJRow) {
 	if row.SentenceEndDate.Before(info.comparisonTime) {
-		ef.EligibleDismissal(info, "Sentence Completed")
+		info.SetEligibleForDismissal("Sentence Completed")
 	} else {
-		ef.EligibleReduction(info, "Sentence not Completed")
+		info.SetEligibleForReduction("Sentence not Completed")
 	}
 }

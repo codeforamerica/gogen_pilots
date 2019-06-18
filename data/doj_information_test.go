@@ -37,10 +37,6 @@ func (ef testEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime ti
 }
 
 func (ef testEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
-	return ef.IsProp64Charge(codeSection)
-}
-
-func (ef testEligibilityFlow) IsProp64Charge(codeSection string) bool {
 	return matchers.IsProp64Charge(codeSection)
 }
 
