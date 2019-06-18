@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gogen/data"
-	"gogen/processor"
+	"gogen/exporter"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -88,11 +88,11 @@ func main() {
 	dismissAllProp64DojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County, dismissAllProp64EligibilityFlow)
 	dismissAllProp64AndRelatedDojInformation := data.NewDOJInformation(opts.DOJFile, computeAtDate, opts.County, dismissAllProp64AndRelatedEligibilityFlow)
 
-	dojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
-	condensedDojWriter := processor.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
-	prop64ConvictionsDojWriter := processor.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_convictions.csv"))
+	dojWriter := exporter.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results.csv"))
+	condensedDojWriter := exporter.NewCondensedDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_condensed.csv"))
+	prop64ConvictionsDojWriter := exporter.NewDOJWriter(filepath.Join(opts.OutputFolder, "doj_results_convictions.csv"))
 
-	dataProcessor := processor.NewDataProcessor(countyDojInformation, dismissAllProp64DojInformation, dismissAllProp64AndRelatedDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dataExporter := exporter.NewDataExporter(countyDojInformation, dismissAllProp64DojInformation, dismissAllProp64AndRelatedDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 
-	dataProcessor.Process(opts.County)
+	dataExporter.Export(opts.County)
 }

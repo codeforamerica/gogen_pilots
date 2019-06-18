@@ -19,7 +19,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			},
 		}, COUNTY)
 
-
 	})
 
 	Describe("Processing a subject", func() {
@@ -228,13 +227,13 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		Context("When a matcher is empty", func() {
 			var (
-				subject      Subject
-				conviction1  DOJRow
-				conviction2  DOJRow
-				conviction3  DOJRow
-				conviction4  DOJRow
-				conviction5  DOJRow
-				conviction6  DOJRow
+				subject     Subject
+				conviction1 DOJRow
+				conviction2 DOJRow
+				conviction3 DOJRow
+				conviction4 DOJRow
+				conviction5 DOJRow
+				conviction6 DOJRow
 			)
 
 			BeforeEach(func() {

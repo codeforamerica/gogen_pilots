@@ -54,11 +54,11 @@ var _ = Describe("MatchedCodeSection", func() {
 
 var _ = Describe("MatchedRelatedCodeSection", func() {
 	It("returns the matched substring for a given related charge code section", func() {
-	Expect(getMatchedRelatedChargeCodeSection("647(f) PC")).To(Equal("647(f) PC"))
-	Expect(getMatchedRelatedChargeCodeSection("148.9 PC")).To(Equal("148.9 PC"))
-	Expect(getMatchedRelatedChargeCodeSection("4060    BP")).To(Equal("4060    BP"))
-	Expect(getMatchedRelatedChargeCodeSection("--40508 VC--")).To(Equal("40508 VC"))
-	Expect(getMatchedRelatedChargeCodeSection("1320(a) PC")).To(Equal("1320(a) PC"))
+		Expect(getMatchedRelatedChargeCodeSection("647(f) PC")).To(Equal("647(f) PC"))
+		Expect(getMatchedRelatedChargeCodeSection("148.9 PC")).To(Equal("148.9 PC"))
+		Expect(getMatchedRelatedChargeCodeSection("4060    BP")).To(Equal("4060    BP"))
+		Expect(getMatchedRelatedChargeCodeSection("--40508 VC--")).To(Equal("40508 VC"))
+		Expect(getMatchedRelatedChargeCodeSection("1320(a) PC")).To(Equal("1320(a) PC"))
 	})
 
 	It("returns empty string if there is no match", func() {

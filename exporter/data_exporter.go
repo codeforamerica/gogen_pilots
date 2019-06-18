@@ -1,4 +1,4 @@
-package processor
+package exporter
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-type DataProcessor struct {
+type DataExporter struct {
 	dojInformation                           *data.DOJInformation
 	dismissAllProp64DojInformation           *data.DOJInformation
 	dismissAllProp64AndRelatedDojInformation *data.DOJInformation
@@ -15,15 +15,15 @@ type DataProcessor struct {
 	outputProp64ConvictionsDOJWriter         DOJWriter
 }
 
-func NewDataProcessor(
+func NewDataExporter(
 	dojInformation *data.DOJInformation,
 	dismissAllProp64DojInformation *data.DOJInformation,
 	dismissAllProp64AndRelatedDojInformation *data.DOJInformation,
 	outputDOJWriter DOJWriter,
 	outputCondensedDOJWriter DOJWriter,
 	outputProp64ConvictionsDOJWriter DOJWriter,
-) DataProcessor {
-	return DataProcessor{
+) DataExporter {
+	return DataExporter{
 		dojInformation:                           dojInformation,
 		dismissAllProp64DojInformation:           dismissAllProp64DojInformation,
 		dismissAllProp64AndRelatedDojInformation: dismissAllProp64AndRelatedDojInformation,
@@ -33,7 +33,7 @@ func NewDataProcessor(
 	}
 }
 
-func (d *DataProcessor) Process(county string) {
+func (d *DataExporter) Export(county string) {
 	fmt.Printf("Processing Subjects\n")
 
 	for i, row := range d.dojInformation.Rows {
@@ -51,7 +51,7 @@ func (d *DataProcessor) Process(county string) {
 	d.PrintAggregateStatistics(county)
 }
 
-func (d *DataProcessor) PrintAggregateStatistics(county string) {
+func (d *DataExporter) PrintAggregateStatistics(county string) {
 	fmt.Println()
 	fmt.Println("----------- Overall summary of DOJ file --------------------")
 	fmt.Printf("Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())

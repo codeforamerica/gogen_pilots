@@ -1,4 +1,4 @@
-package processor_test
+package exporter_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestProcessor(t *testing.T) {
+func TestExporter(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Processor Suite")
+	RunSpecs(t, "Exporter Suite")
 }
