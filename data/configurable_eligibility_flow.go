@@ -54,7 +54,7 @@ func (ef configurableEligibilityFlow) ProcessSubject(subject *Subject, compariso
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
-			info := NewEligibilityInfo(conviction, subject, comparisonTime, "LOS ANGELES")
+			info := NewEligibilityInfo(conviction, subject, comparisonTime, ef.county)
 			ef.BeginEligibilityFlow(info, conviction, subject)
 			infos[conviction.Index] = info
 		}
