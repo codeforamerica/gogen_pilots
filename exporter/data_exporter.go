@@ -92,14 +92,14 @@ func (d *DataExporter) PrintAggregateStatistics(county string) {
 	fmt.Printf("%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
 	fmt.Println()
 	fmt.Println("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
-	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveFelony())
-	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveConviction())
-	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
+	fmt.Printf("%d individuals who had a felony will no longer have a felony on their record\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveFelony())
+	fmt.Printf("%d individuals who had convictions will no longer have any convictions on their record\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveConviction())
+	fmt.Printf("%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dismissAllProp64DojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
 	fmt.Println()
 	fmt.Println("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------")
-	fmt.Printf("%d individuals will no longer have a felony on their record\n", d.dismissAllProp64AndRelatedDojInformation.CountIndividualsNoLongerHaveFelony())
-	fmt.Printf("%d individuals will no longer have any convictions on their record\n", d.dismissAllProp64AndRelatedDojInformation.CountIndividualsNoLongerHaveConviction())
-	fmt.Printf("%d individuals will no longer have any convictions on their record in the last 7 years\n", d.dismissAllProp64AndRelatedDojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
+	fmt.Printf("%d individuals who had a felony will no longer have a felony on their record\n", d.dismissAllProp64AndRelatedDojInformation.CountIndividualsNoLongerHaveFelony())
+	fmt.Printf("%d individuals who had convictions will no longer have any convictions on their record\n", d.dismissAllProp64AndRelatedDojInformation.CountIndividualsNoLongerHaveConviction())
+	fmt.Printf("%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dismissAllProp64AndRelatedDojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years())
 }
 
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {

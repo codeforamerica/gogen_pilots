@@ -201,14 +201,14 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("1 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("runs and has output for San Joaquin", func() {
@@ -307,14 +307,14 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("2 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("4 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("5 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("4 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("5 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("runs and has output for Contra Costa", func() {
@@ -413,14 +413,14 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("2 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("4 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("5 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("4 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("5 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("runs and has output for Los Angeles", func() {
@@ -516,14 +516,14 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("0 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 	})
 
 	It("can accept path to eligibility options file", func() {
@@ -603,14 +603,14 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("2 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If ALL Prop 64 convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("2 individuals will no longer have any convictions on their record"))
-		Eventually(session).Should(gbytes.Say("3 individuals will no longer have any convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had a felony will no longer have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("2 individuals who had convictions will no longer have any convictions on their record"))
+		Eventually(session).Should(gbytes.Say("3 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 	})
 
 })
