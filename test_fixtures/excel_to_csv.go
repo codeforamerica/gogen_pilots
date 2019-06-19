@@ -3,19 +3,29 @@ package test_fixtures
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/tealeg/xlsx"
 	"gogen/exporter"
 	"io/ioutil"
 	"os"
 	path "path/filepath"
 	"strconv"
+
+	"github.com/tealeg/xlsx"
 )
+
+func ExportFullCSVFixtures(inputPathString string, outputPathString string) (string, string, error) {
+	xlsxPath, err := path.Abs(path.Join(inputPathString))
+
+	inputCSV := writeInputCSV(xlsxPath, outputPathString)
+	expectedResultsCSV := writeFullResultsCSV(xlsxPath, outputPathString)
+
+	return inputCSV, expectedResultsCSV, err
+}
 
 func ExtractFullCSVFixtures(inputPathString string) (string, string, error) {
 	xlsxPath, err := path.Abs(path.Join(inputPathString))
 
-	inputCSV := writeInputCSV(xlsxPath)
-	expectedResultsCSV := writeFullResultsCSV(xlsxPath)
+	inputCSV := writeInputCSV(xlsxPath, "")
+	expectedResultsCSV := writeFullResultsCSV(xlsxPath, "")
 
 	return inputCSV, expectedResultsCSV, err
 }
@@ -36,8 +46,18 @@ func ExtractProp64ConvictionsCSVFixture(inputPathString string) (string, error) 
 	return expectedCondensedResultsCSV, err
 }
 
-func writeInputCSV(xlsxPath string) string {
-	tmpCSVfile, excelFile := createTempFile(xlsxPath)
+func writeInputCSV(xlsxPath string, outputPath string) string {
+	var (
+		tmpCSVfile *os.File
+		excelFile  *xlsx.File
+	)
+
+	if outputPath != "" {
+		tmpCSVfile, excelFile = createExportFile(xlsxPath, path.Join(outputPath, "input.csv"))
+	} else {
+		tmpCSVfile, excelFile = createTempFile(xlsxPath)
+	}
+
 	inputCSV := csv.NewWriter(tmpCSVfile)
 	for _, sheet := range excelFile.Sheets {
 		for rowIndex, row := range sheet.Rows {
@@ -65,8 +85,18 @@ func writeInputCSV(xlsxPath string) string {
 	return tmpCSVfile.Name()
 }
 
-func writeFullResultsCSV(xlsxPath string) string {
-	tmpCSVfile, excelFile := createTempFile(xlsxPath)
+func writeFullResultsCSV(xlsxPath string, outputPath string) string {
+	var (
+		tmpCSVfile *os.File
+		excelFile  *xlsx.File
+	)
+
+	if outputPath != "" {
+		tmpCSVfile, excelFile = createExportFile(xlsxPath, path.Join(outputPath, "full_results.csv"))
+	} else {
+		tmpCSVfile, excelFile = createTempFile(xlsxPath)
+	}
+
 	fullResultsCSV := csv.NewWriter(tmpCSVfile)
 	for _, sheet := range excelFile.Sheets {
 		for rowIndex, row := range sheet.Rows {
@@ -160,4 +190,16 @@ func createTempFile(xlsxPath string) (*os.File, *xlsx.File) {
 		fmt.Println(err)
 	}
 	return tmpCSVfile, excelFile
+}
+
+func createExportFile(xlsxPath, outputPath string) (*os.File, *xlsx.File) {
+	exportCSVFile, err := os.Create(outputPath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	excelFile, err := xlsx.OpenFile(xlsxPath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return exportCSVFile, excelFile
 }

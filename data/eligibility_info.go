@@ -160,4 +160,3 @@ func (info *EligibilityInfo) SetHandReview(reason string) {
 	info.EligibilityDetermination = "Hand Review"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
-
