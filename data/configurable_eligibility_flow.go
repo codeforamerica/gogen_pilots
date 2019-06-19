@@ -9,15 +9,13 @@ import (
 )
 
 type configurableEligibilityFlow struct {
-	county         string
-	dismissMatcher *regexp.Regexp
-	reduceMatcher  *regexp.Regexp
+	county                         string
+	dismissMatcher                 *regexp.Regexp
+	reduceMatcher                  *regexp.Regexp
+	dismissConvictionsUnderAgeOf21 bool
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
-	fmt.Printf("Dismiss : %v\n", options.BaselineEligibility.Dismiss)
-	fmt.Printf("Reduce : %v\n", options.BaselineEligibility.Reduce)
-
 	var dismissMatcherRegexSource string
 	var dismissMatcherRegex *regexp.Regexp
 	dismissMatcherRegexSource = strings.Join(escapeRegexMetaChars(options.BaselineEligibility.Dismiss), "|")
@@ -36,9 +34,10 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 	}
 
 	return configurableEligibilityFlow{
-		county:         county,
-		dismissMatcher: dismissMatcherRegex,
-		reduceMatcher:  reduceMatcherRegex,
+		county:                         county,
+		dismissMatcher:                 dismissMatcherRegex,
+		reduceMatcher:                  reduceMatcherRegex,
+		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.Under21,
 	}
 }
 
@@ -73,6 +72,8 @@ func (ef configurableEligibilityFlow) checkRelevancy(codeSection string, county 
 func (ef configurableEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if ef.isDismissedCodeSection(row.CodeSection) {
 		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
+	} else if row.wasConvictionAt21OrUnder(subject) {
+		info.SetEligibleForDismissal("21 years or younger")
 	} else if ef.isReducedCodeSection(row.CodeSection) {
 		info.SetEligibleForReduction(fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
 	}
@@ -85,3 +86,4 @@ func (ef configurableEligibilityFlow) isDismissedCodeSection(codeSection string)
 func (ef configurableEligibilityFlow) isReducedCodeSection(codeSection string) bool {
 	return ef.reduceMatcher != nil && ef.reduceMatcher.MatchString(codeSection)
 }
+

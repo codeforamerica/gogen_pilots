@@ -21,9 +21,14 @@ var EligibilityFlows = map[string]EligibilityFlow{
 
 type EligibilityOptions struct {
 	BaselineEligibility BaselineEligibility `json:"baselineEligibility"`
+	AdditionalRelief AdditionalRelief `json:"additionalRelief"`
 }
 
 type BaselineEligibility struct {
 	Dismiss []string `json:"dismiss"`
 	Reduce  []string `json:"reduce"`
+}
+
+type AdditionalRelief struct {
+	Under21 bool `json:"under21"`
 }

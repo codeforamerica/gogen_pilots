@@ -22,7 +22,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 	})
 
 	Describe("Processing a subject", func() {
-		birthDate := time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
+		birthDate := time.Date(1978, time.April, 10, 0, 0, 0, 0, time.UTC)
 		comparisonTime := time.Date(2020, 7, 1, 0, 0, 0, 0, time.UTC)
 
 		Context("Filtering relevant convictions", func() {
@@ -211,7 +211,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				//Expect(len(infos)).To(Equal(3))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
 				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
@@ -318,7 +317,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				//Expect(len(infos)).To(Equal(3))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[0].EligibilityReason).To(Equal("Reduce all 11357(A) HS convictions"))
 				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
@@ -331,5 +329,78 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				Expect(infos[4].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
 			})
 		})
+
+		Context("When additionalRelief -> under21", func() {
+			var (
+				subject           Subject
+				conviction1       DOJRow
+				under21Conviction DOJRow
+				conviction3       DOJRow
+			)
+
+			BeforeEach(func() {
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
+						Reduce:  []string{"11358", "11359", "11360"},
+					},
+					AdditionalRelief: AdditionalRelief{
+						Under21: true,
+					},
+				}, COUNTY)
+
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        false,
+				}
+
+				dateWhenSubjectWas16 := birthDate.AddDate(16, 0, 0)
+				under21Conviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: dateWhenSubjectWas16,
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        false,
+				}
+				conviction3 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11360 HS",
+					DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+				}
+
+				rows := []DOJRow{conviction1, under21Conviction, conviction3}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+			})
+
+			It("returns the correct eligibility determination for each conviction", func() {
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("21 years or younger"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[2].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
+			})
+		})
+
 	})
 })
