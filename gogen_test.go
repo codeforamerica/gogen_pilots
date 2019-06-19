@@ -7,11 +7,12 @@ import (
 	path "path/filepath"
 	"regexp"
 
+	. "gogen/test_fixtures"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
-	. "gogen/test_fixtures"
 )
 
 var _ = Describe("gogen", func() {
@@ -31,12 +32,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
 		computeAtFlag := "--compute-at=2019-11-11"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -60,12 +62,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
 		computeAtFlag := "--compute-at=2019-11-11"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -89,12 +92,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
 		computeAtFlag := "--compute-at=2019-11-11"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -127,12 +131,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
 		computeAtFlag := "--compute-at=2019-11-11"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -222,12 +227,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
 		computeAtDate := "--compute-at=2019-05-01"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtDate)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtDate)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -327,12 +333,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "CONTRA COSTA")
 		computeAtFlag := "--compute-at=2019-11-11"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -434,12 +441,13 @@ var _ = Describe("gogen", func() {
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "LOS ANGELES")
 		computeAtFlag := "--compute-at=2019-11-11"
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
@@ -539,13 +547,14 @@ var _ = Describe("gogen", func() {
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
 
+		runCommand := "run"
 		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
 		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
 		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
 		computeAtFlag := "--compute-at=2019-11-11"
 		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
 
-		command := exec.Command(pathToGogen, outputsFlag, dojFlag, countyFlag, computeAtFlag, eligibilityOptionsFlag)
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, eligibilityOptionsFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
