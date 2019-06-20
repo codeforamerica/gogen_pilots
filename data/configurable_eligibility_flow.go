@@ -12,6 +12,7 @@ type configurableEligibilityFlow struct {
 	county                         string
 	dismissMatcher                 *regexp.Regexp
 	dismissConvictionsUnderAgeOf21 bool
+	dismissSubjectsOlderThan       int
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
@@ -27,6 +28,7 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		county:                         county,
 		dismissMatcher:                 dismissMatcherRegex,
 		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.Under21,
+		dismissSubjectsOlderThan:       options.AdditionalRelief.DismissByAge,
 	}
 }
 
@@ -71,6 +73,11 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		info.SetEligibleForDismissal("21 years or younger")
 		return
 	}
+	if ef.dismissSubjectsOlderThan != 0 && subject.olderThan(ef.dismissSubjectsOlderThan, info.comparisonTime) {
+		info.SetEligibleForDismissal(fmt.Sprintf("%d years or older", ef.dismissSubjectsOlderThan))
+		return
+	}
+
 	info.SetEligibleForReduction(fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
 }
 

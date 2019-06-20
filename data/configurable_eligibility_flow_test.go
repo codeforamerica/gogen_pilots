@@ -160,7 +160,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
-					IsFelony:		 true,
+					IsFelony:        true,
 				}
 				conviction4 = DOJRow{
 					DOB:             birthDate,
@@ -424,5 +424,156 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		})
 
+		Context("When additionalRelief -> dismissByAge is set", func() {
+			var (
+				conviction1                DOJRow
+				dismissableByAgeConviction DOJRow
+				DismissByAgeSetting        int
+			)
+
+			BeforeEach(func() {
+				DismissByAgeSetting = 45
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
+					},
+					AdditionalRelief: AdditionalRelief{
+						DismissByAge: DismissByAgeSetting,
+					},
+				}, COUNTY)
+			})
+
+			It("dismisses convictions for subjects over the dismissbyAge setting", func() {
+				olderSubject := Subject{DOB: comparisonTime.AddDate(-DismissByAgeSetting-1, 0, 0)}
+				conviction1 = DOJRow{
+					DOB:             olderSubject.DOB,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				dismissableByAgeConviction = DOJRow{
+					DOB:             olderSubject.DOB,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, dismissableByAgeConviction}
+				for _, row := range rows {
+					olderSubject.PushRow(row, flow)
+				}
+
+				infos := flow.ProcessSubject(&olderSubject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("45 years or older"))
+			})
+
+			It("does not dismiss convictions for subjects under the dismissbyAge setting", func() {
+				youngerSubject := Subject{DOB: comparisonTime.AddDate(-DismissByAgeSetting+1, 0, 0)}
+				conviction1 = DOJRow{
+					DOB:             youngerSubject.DOB,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				dismissableByAgeConviction = DOJRow{
+					DOB:             youngerSubject.DOB,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, dismissableByAgeConviction}
+				for _, row := range rows {
+					youngerSubject.PushRow(row, flow)
+				}
+
+				infos := flow.ProcessSubject(&youngerSubject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[1].EligibilityReason).To(Equal("Reduce all 11359 HS convictions"))
+			})
+
+		})
+
+		Context("When additionalRelief -> dismissByAge is not set", func() {
+			var (
+				conviction1                DOJRow
+				dismissableByAgeConviction DOJRow
+				DismissByAgeSetting        int
+			)
+
+			BeforeEach(func() {
+				DismissByAgeSetting = 45
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
+					},
+				}, COUNTY)
+			})
+
+			It("does not dismisses convictions for subjects with the reason of being over a certain age", func() {
+				olderSubject := Subject{DOB: comparisonTime.AddDate(-DismissByAgeSetting-1, 0, 0)}
+				conviction1 = DOJRow{
+					DOB:             olderSubject.DOB,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				dismissableByAgeConviction = DOJRow{
+					DOB:             olderSubject.DOB,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, dismissableByAgeConviction}
+				for _, row := range rows {
+					olderSubject.PushRow(row, flow)
+				}
+
+				infos := flow.ProcessSubject(&olderSubject, comparisonTime, COUNTY)
+				for _, info := range infos {
+					Expect(info.EligibilityReason).To(Not(MatchRegexp("years or older")))
+				}
+			})
+
+		})
 	})
 })

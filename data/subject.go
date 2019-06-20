@@ -154,3 +154,7 @@ func (subject *Subject) computeEligibilities(infos map[int]*EligibilityInfo, com
 		}
 	}
 }
+
+func (subject *Subject) olderThan(years int, t time.Time) bool {
+	return !subject.DOB.AddDate(years, 0, 0).After(t)
+}

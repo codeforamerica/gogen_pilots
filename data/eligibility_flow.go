@@ -29,4 +29,5 @@ type BaselineEligibility struct {
 
 type AdditionalRelief struct {
 	Under21 bool `json:"under21"`
+	DismissByAge int `json:"dismissByAge"`
 }
