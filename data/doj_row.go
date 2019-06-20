@@ -196,5 +196,5 @@ const (
 )
 
 func (row *DOJRow) wasConvictionAt21OrUnder(subject *Subject) bool {
-	return row.DispositionDate.Sub(subject.DOB).Hours() <= 21 * 365.25 * 24
+	return subject.DOB.AddDate(21, 0, 0).After(row.DispositionDate)
 }
