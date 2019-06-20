@@ -341,15 +341,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			)
 
 			BeforeEach(func() {
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
-					BaselineEligibility: BaselineEligibility{
-						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
-					},
-					AdditionalRelief: AdditionalRelief{
-						Under21: true,
-					},
-				}, COUNTY)
-
 				conviction1 = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
@@ -393,7 +384,16 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				}
 			})
 
-			It("returns the correct eligibility determination for each conviction", func() {
+			It("dismisses convictions under the age of 21 if Under21 option is set", func() {
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
+					},
+					AdditionalRelief: AdditionalRelief{
+						Under21: true,
+					},
+				}, COUNTY)
+
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
@@ -402,6 +402,26 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[2].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
 			})
+
+			It("does not dismiss convictions under the age of 21 if Under21 option is not set", func() {
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
+					},
+					AdditionalRelief: AdditionalRelief{
+						Under21: false,
+					},
+				}, COUNTY)
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[1].EligibilityReason).To(Equal("Reduce all 11359 HS convictions"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[2].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
+			})
+
 		})
 
 	})

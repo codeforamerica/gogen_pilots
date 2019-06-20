@@ -67,7 +67,7 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
 		return
 	}
-	if row.wasConvictionAt21OrUnder(subject) {
+	if ef.dismissConvictionsUnderAgeOf21 && row.wasConvictionUnderAgeOf21(subject) {
 		info.SetEligibleForDismissal("21 years or younger")
 		return
 	}

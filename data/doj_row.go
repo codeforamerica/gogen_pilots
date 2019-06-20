@@ -195,6 +195,6 @@ const (
 	END_OF_REC
 )
 
-func (row *DOJRow) wasConvictionAt21OrUnder(subject *Subject) bool {
+func (row *DOJRow) wasConvictionUnderAgeOf21(subject *Subject) bool {
 	return subject.DOB.AddDate(21, 0, 0).After(row.DispositionDate)
 }

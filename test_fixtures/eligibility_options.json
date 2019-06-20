@@ -11,5 +11,10 @@
       "11359",
       "11360"
     ]
+  },
+  "additionalRelief": {
+    "under21": true,
+    "dismissByAge": 45,
+    "dismissOlderThan": -1
   }
 }
