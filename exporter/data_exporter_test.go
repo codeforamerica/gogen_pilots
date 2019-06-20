@@ -298,7 +298,6 @@ var _ = Describe("DataExporter", func() {
 			flow := data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
 				BaselineEligibility: data.BaselineEligibility{
 					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
-					Reduce:  []string{"11357(B)", "11359", "11360"},
 				},
 				AdditionalRelief: data.AdditionalRelief{
 					Under21: true,

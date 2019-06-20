@@ -11,7 +11,6 @@ import (
 type configurableEligibilityFlow struct {
 	county                         string
 	dismissMatcher                 *regexp.Regexp
-	reduceMatcher                  *regexp.Regexp
 	dismissConvictionsUnderAgeOf21 bool
 }
 
@@ -24,19 +23,9 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		dismissMatcherRegex = regexp.MustCompile(dismissMatcherRegexSource)
 	}
 
-	var reduceMatcherRegexSource string
-	var reduceMatcherRegex *regexp.Regexp
-	escapeRegexMetaChars(options.BaselineEligibility.Reduce)
-	reduceMatcherRegexSource = strings.Join(escapeRegexMetaChars(options.BaselineEligibility.Reduce), "|")
-	if reduceMatcherRegexSource != "" {
-		reduceMatcherRegexSource = ".*(" + reduceMatcherRegexSource + ").*HS"
-		reduceMatcherRegex = regexp.MustCompile(reduceMatcherRegexSource)
-	}
-
 	return configurableEligibilityFlow{
 		county:                         county,
 		dismissMatcher:                 dismissMatcherRegex,
-		reduceMatcher:                  reduceMatcherRegex,
 		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.Under21,
 	}
 }

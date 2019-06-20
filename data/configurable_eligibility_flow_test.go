@@ -15,7 +15,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 		flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 			BaselineEligibility: BaselineEligibility{
 				Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11358", "11359"},
-				Reduce:  []string{"11357(D)", "11360"},
 			},
 		}, COUNTY)
 
@@ -240,7 +239,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{},
-						Reduce:  []string{"11357(A)", "11357(B)", "11357(C)", "11358", "11359", "11357(D)", "11360"},
 					},
 				}, COUNTY)
 
@@ -346,7 +344,6 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
-						Reduce:  []string{"11358", "11359", "11360"},
 					},
 					AdditionalRelief: AdditionalRelief{
 						Under21: true,
