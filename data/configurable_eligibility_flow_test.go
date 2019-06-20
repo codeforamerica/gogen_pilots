@@ -150,7 +150,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "101001001000",
 					Index:           1,
-					IsFelony:        false,
+					IsFelony:        true,
 				}
 				conviction3 = DOJRow{
 					DOB:             birthDate,
@@ -161,6 +161,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
+					IsFelony:		 true,
 				}
 				conviction4 = DOJRow{
 					DOB:             birthDate,
@@ -212,13 +213,13 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
-				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[1].EligibilityReason).To(Equal("Reduce all 11357(D) HS convictions"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[2].EligibilityReason).To(Equal("Dismiss all 11358 HS convictions"))
 				Expect(infos[3].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
-				Expect(infos[3].EligibilityReason).To(Equal("Dismiss all 11359 HS convictions"))
+				Expect(infos[3].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[4].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[4].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
 			})
@@ -252,7 +253,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "101001001000",
 					Index:           0,
-					IsFelony:        false,
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
@@ -274,6 +275,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
+					IsFelony:        true,
 				}
 				conviction4 = DOJRow{
 					DOB:             birthDate,
@@ -284,6 +286,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "103001004000",
 					Index:           3,
+					IsFelony:        true,
 				}
 				conviction5 = DOJRow{
 					DOB:             birthDate,
@@ -305,6 +308,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          "OTHER COUNTY",
 					CountOrder:      "104001006000",
 					Index:           5,
+					IsFelony:        true,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
 				}
 
@@ -319,8 +323,8 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[0].EligibilityReason).To(Equal("Reduce all 11357(A) HS convictions"))
-				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
-				Expect(infos[1].EligibilityReason).To(Equal("Reduce all 11357(D) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[2].EligibilityReason).To(Equal("Reduce all 11358 HS convictions"))
 				Expect(infos[3].EligibilityDetermination).To(Equal("Eligible for Reduction"))
@@ -358,7 +362,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "101001001000",
 					Index:           0,
-					IsFelony:        false,
+					IsFelony:        true,
 				}
 
 				dateWhenSubjectWas16 := birthDate.AddDate(16, 0, 0)
@@ -371,7 +375,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "101001001000",
 					Index:           1,
-					IsFelony:        false,
+					IsFelony:        true,
 				}
 				conviction3 = DOJRow{
 					DOB:             birthDate,
@@ -382,6 +386,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
+					IsFelony:        true,
 				}
 
 				rows := []DOJRow{conviction1, under21Conviction, conviction3}

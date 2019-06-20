@@ -70,13 +70,7 @@ func (ef configurableEligibilityFlow) checkRelevancy(codeSection string, county 
 }
 
 func (ef configurableEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if ef.isDismissedCodeSection(row.CodeSection) {
-		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
-	} else if row.wasConvictionAt21OrUnder(subject) {
-		info.SetEligibleForDismissal("21 years or younger")
-	} else if ef.isReducedCodeSection(row.CodeSection) {
-		info.SetEligibleForReduction(fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
-	}
+	ef.dismissMisdemeanorsAndInfractions(info, row, subject)
 }
 
 func (ef configurableEligibilityFlow) isDismissedCodeSection(codeSection string) bool {
@@ -87,3 +81,32 @@ func (ef configurableEligibilityFlow) isReducedCodeSection(codeSection string) b
 	return ef.reduceMatcher != nil && ef.reduceMatcher.MatchString(codeSection)
 }
 
+func (ef configurableEligibilityFlow) dismissByCodeSection(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if ef.isDismissedCodeSection(row.CodeSection) {
+		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
+	} else {
+		ef.checkAgeAtConviction(info, row, subject)
+	}
+}
+
+func (ef configurableEligibilityFlow) dismissMisdemeanorsAndInfractions(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if !row.IsFelony {
+		info.SetEligibleForDismissal("Misdemeanor or Infraction")
+	} else {
+		ef.dismissByCodeSection(info, row, subject)
+	}
+}
+
+func (ef configurableEligibilityFlow) checkAgeAtConviction(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if row.wasConvictionAt21OrUnder(subject) {
+		info.SetEligibleForDismissal("21 years or younger")
+	} else {
+		ef.reduceByCodeSection(info, row, subject)
+	}
+}
+
+func (ef configurableEligibilityFlow) reduceByCodeSection(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if ef.isReducedCodeSection(row.CodeSection) {
+		info.SetEligibleForReduction(fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
+	}
+}
