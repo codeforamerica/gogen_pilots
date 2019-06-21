@@ -27,7 +27,7 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 	return configurableEligibilityFlow{
 		county:                         county,
 		dismissMatcher:                 dismissMatcherRegex,
-		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.Under21,
+		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.SubjectUnder21AtConviction,
 		dismissSubjectsOlderThan:       options.AdditionalRelief.DismissByAge,
 	}
 }

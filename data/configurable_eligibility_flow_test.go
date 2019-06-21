@@ -332,7 +332,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 		})
 
-		Context("When additionalRelief -> under21", func() {
+		Context("When additionalRelief -> subjectUnder21AtConviction", func() {
 			var (
 				subject           Subject
 				conviction1       DOJRow
@@ -384,13 +384,13 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				}
 			})
 
-			It("dismisses convictions under the age of 21 if Under21 option is set", func() {
+			It("dismisses convictions under the age of 21 if subjectUnder21AtConviction option is set", func() {
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
 					},
 					AdditionalRelief: AdditionalRelief{
-						Under21: true,
+						SubjectUnder21AtConviction: true,
 					},
 				}, COUNTY)
 
@@ -403,13 +403,13 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				Expect(infos[2].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
 			})
 
-			It("does not dismiss convictions under the age of 21 if Under21 option is not set", func() {
+			It("does not dismiss convictions under the age of 21 if subjectUnder21AtConviction option is not set", func() {
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
 					},
 					AdditionalRelief: AdditionalRelief{
-						Under21: false,
+						SubjectUnder21AtConviction: false,
 					},
 				}, COUNTY)
 

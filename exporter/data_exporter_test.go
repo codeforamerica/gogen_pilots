@@ -300,8 +300,8 @@ var _ = Describe("DataExporter", func() {
 					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
 				},
 				AdditionalRelief: data.AdditionalRelief{
-					Under21:      true,
-					DismissByAge: 57,
+					SubjectUnder21AtConviction: true,
+					DismissByAge:               57,
 				},
 			}, COUNTY)
 
