@@ -14,7 +14,7 @@
   },
   "additionalRelief": {
     "under21": true,
-    "dismissByAge": 0,
+    "dismissByAge": 57,
     "dismissOlderThan": -1
   }
 }

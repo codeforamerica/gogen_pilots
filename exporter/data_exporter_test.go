@@ -300,10 +300,10 @@ var _ = Describe("DataExporter", func() {
 					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
 				},
 				AdditionalRelief: data.AdditionalRelief{
-					Under21: true,
+					Under21:      true,
+					DismissByAge: 57,
 				},
 			}, COUNTY)
-
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, COUNTY, flow)
 			dismissAllProp64DojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
@@ -320,7 +320,6 @@ var _ = Describe("DataExporter", func() {
 			dataExporter.Export(COUNTY)
 			format.TruncatedDiff = false
 
-
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
 			Expect(err).ToNot(HaveOccurred())
 			OutputDOJFile, err := os.Open(pathToDOJOutput)
@@ -332,7 +331,6 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
-
 
 			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
 		})
