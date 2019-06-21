@@ -14,7 +14,7 @@
   },
   "additionalRelief": {
     "subjectUnder21AtConviction": true,
-    "dismissByAge": 57,
+    "subjectAgeThreshold": 57,
     "dismissOlderThan": -1
   }
 }

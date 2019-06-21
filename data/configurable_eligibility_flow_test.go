@@ -424,27 +424,27 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		})
 
-		Context("When additionalRelief -> dismissByAge is set", func() {
+		Context("When additionalRelief -> subjectAgeThreshold is set", func() {
 			var (
 				conviction1                DOJRow
 				dismissableByAgeConviction DOJRow
-				DismissByAgeSetting        int
+				subjectAgeThreshold        int
 			)
 
 			BeforeEach(func() {
-				DismissByAgeSetting = 45
+				subjectAgeThreshold = 45
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
 					},
 					AdditionalRelief: AdditionalRelief{
-						DismissByAge: DismissByAgeSetting,
+						SubjectAgeThreshold: subjectAgeThreshold,
 					},
 				}, COUNTY)
 			})
 
-			It("dismisses convictions for subjects over the dismissbyAge setting", func() {
-				olderSubject := Subject{DOB: comparisonTime.AddDate(-DismissByAgeSetting-1, 0, 0)}
+			It("dismisses convictions for subjects over the subjectAgeThreshold setting", func() {
+				olderSubject := Subject{DOB: comparisonTime.AddDate(-subjectAgeThreshold-1, 0, 0)}
 				conviction1 = DOJRow{
 					DOB:             olderSubject.DOB,
 					WasConvicted:    true,
@@ -481,8 +481,8 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				Expect(infos[1].EligibilityReason).To(Equal("45 years or older"))
 			})
 
-			It("does not dismiss convictions for subjects under the dismissbyAge setting", func() {
-				youngerSubject := Subject{DOB: comparisonTime.AddDate(-DismissByAgeSetting+1, 0, 0)}
+			It("does not dismiss convictions for subjects under the subjectAgeThreshold setting", func() {
+				youngerSubject := Subject{DOB: comparisonTime.AddDate(-subjectAgeThreshold+1, 0, 0)}
 				conviction1 = DOJRow{
 					DOB:             youngerSubject.DOB,
 					WasConvicted:    true,
@@ -521,15 +521,15 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		})
 
-		Context("When additionalRelief -> dismissByAge is not set", func() {
+		Context("When additionalRelief -> subjectAgeThreshold is not set", func() {
 			var (
 				conviction1                DOJRow
 				dismissableByAgeConviction DOJRow
-				DismissByAgeSetting        int
+				subjectAgeThreshold        int
 			)
 
 			BeforeEach(func() {
-				DismissByAgeSetting = 45
+				subjectAgeThreshold = 45
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)",},
@@ -538,7 +538,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 
 			It("does not dismisses convictions for subjects with the reason of being over a certain age", func() {
-				olderSubject := Subject{DOB: comparisonTime.AddDate(-DismissByAgeSetting-1, 0, 0)}
+				olderSubject := Subject{DOB: comparisonTime.AddDate(-subjectAgeThreshold-1, 0, 0)}
 				conviction1 = DOJRow{
 					DOB:             olderSubject.DOB,
 					WasConvicted:    true,

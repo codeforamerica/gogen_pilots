@@ -301,7 +301,7 @@ var _ = Describe("DataExporter", func() {
 				},
 				AdditionalRelief: data.AdditionalRelief{
 					SubjectUnder21AtConviction: true,
-					DismissByAge:               57,
+					SubjectAgeThreshold:        57,
 				},
 			}, COUNTY)
 
