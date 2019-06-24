@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/exec"
 	path "path/filepath"
 	"regexp"
@@ -118,6 +119,50 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Occurred after 11/09/2016"))
+	})
+
+	FIt("can accept an optional date for file name option for more informative file names", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToInputExcel := path.Join("test_fixtures", "sacramento.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
+		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
+		computeAtFlag := "--compute-at=2019-11-11"
+		dateForFileFlag := fmt.Sprintf("--date-for-file-name=%s", "some date")
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateForFileFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		expectedResultsPath := "/tmp/gogen/doj_results_some date.csv"
+		expectedCondensedPath := "/tmp/gogen/doj_condensed_some date.csv"
+		expectedConvictionsPath := "/tmp/gogen/doj_convictions_some date.csv"
+
+		Eventually(session).Should(gexec.Exit())
+		Expect(session.Err).ToNot(gbytes.Say("required"))
+
+		if _, err := os.Stat(expectedResultsPath); os.IsNotExist(err) {
+			fmt.Printf("\nfile does not exist\n")
+			Expect(true).To(Equal(false))
+		}
+
+		os.Open(expectedResultsPath)
+		Expect(err).ToNot(HaveOccurred())
+
+		os.Open(expectedCondensedPath)
+		Expect(err).ToNot(HaveOccurred())
+
+		os.Open(expectedConvictionsPath)
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	It("runs and has output for Sacramento", func() {

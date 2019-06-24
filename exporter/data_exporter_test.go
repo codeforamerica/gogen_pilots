@@ -23,7 +23,6 @@ var _ = Describe("DataExporter", func() {
 		pathToExpectedDOJResults string
 		err                      error
 	)
-
 	Describe("Sacramento", func() {
 		BeforeEach(func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")

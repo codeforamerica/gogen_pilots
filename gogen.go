@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/jessevdk/go-flags"
@@ -26,6 +27,7 @@ type runOpts struct {
 	County             string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 	EligibilityOptions string `long:"eligibility-options" description:"File containing options for which eligibility logic to apply"`
+	DateForFileName    string `long:"date-for-file-name" short:"date" hidden:"true" description:"Date to append to file names for clarity"`
 }
 
 type exportTestCSVOpts struct {
@@ -89,9 +91,18 @@ func (r runOpts) Execute(args []string) error {
 	dismissAllProp64DojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, dismissAllProp64EligibilityFlow)
 	dismissAllProp64AndRelatedDojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, dismissAllProp64AndRelatedEligibilityFlow)
 
-	dojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, "doj_results.csv"))
-	condensedDojWriter := exporter.NewCondensedDOJWriter(filepath.Join(r.OutputFolder, "doj_results_condensed.csv"))
-	prop64ConvictionsDojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, "doj_results_convictions.csv"))
+	resultsStrings := []string{"doj", "results", r.DateForFileName}
+	dojResultsFileName := strings.Join(resultsStrings, "_")
+
+	condensedStrings := []string{"doj", "results", "condensed", r.DateForFileName}
+	dojResultsCondensedFileName := strings.Join(condensedStrings, "_")
+
+	convictionsStrings := []string{"doj", "results", "convictions", r.DateForFileName}
+	dojResultsConvictionsFileName := strings.Join(convictionsStrings, "_")
+
+	dojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, dojResultsFileName))
+	condensedDojWriter := exporter.NewCondensedDOJWriter(filepath.Join(r.OutputFolder, dojResultsCondensedFileName))
+	prop64ConvictionsDojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, dojResultsConvictionsFileName))
 
 	dataExporter := exporter.NewDataExporter(countyDojInformation, dismissAllProp64DojInformation, dismissAllProp64AndRelatedDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 
