@@ -15,7 +15,6 @@ type Subject struct {
 	CyclesWithProp64Charges map[string]bool
 	CaseNumbers             map[string][]string
 	IsDeceased              bool
-	EligibilityInfos        map[int]*EligibilityInfo
 }
 
 func (subject *Subject) PushRow(row DOJRow, eligibilityFlow EligibilityFlow) {
