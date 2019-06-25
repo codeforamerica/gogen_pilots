@@ -81,19 +81,17 @@ func (r runOpts) Execute(args []string) error {
 		countyEligibilityFlow = data.EligibilityFlows[r.County]
 	}
 
-	countyDojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, countyEligibilityFlow)
+	dojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, countyEligibilityFlow)
+	countyEligibilities := dojInformation.DetermineEligibility(r.County, countyEligibilityFlow)
 
-	dismissAllProp64EligibilityFlow := data.EligibilityFlows["DISMISS ALL PROP 64"]
-	dismissAllProp64AndRelatedEligibilityFlow := data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"]
-
-	dismissAllProp64DojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, dismissAllProp64EligibilityFlow)
-	dismissAllProp64AndRelatedDojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, dismissAllProp64AndRelatedEligibilityFlow)
+	dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
+	dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
 	dojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, "doj_results.csv"))
 	condensedDojWriter := exporter.NewCondensedDOJWriter(filepath.Join(r.OutputFolder, "doj_results_condensed.csv"))
 	prop64ConvictionsDojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, "doj_results_convictions.csv"))
 
-	dataExporter := exporter.NewDataExporter(countyDojInformation, dismissAllProp64DojInformation, dismissAllProp64AndRelatedDojInformation, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 
 	dataExporter.Export(r.County)
 

@@ -14,10 +14,7 @@ import (
 type DOJInformation struct {
 	Rows                     [][]string
 	Subjects                 map[string]*Subject
-	Eligibilities            map[int]*EligibilityInfo
 	comparisonTime           time.Time
-	TotalConvictions         int
-	TotalConvictionsInCounty int
 	checksRelatedCharges     bool
 }
 
@@ -43,22 +40,15 @@ func (i *DOJInformation) aggregateSubjects(eligibilityFlow EligibilityFlow) {
 	fmt.Println("\nComplete...")
 }
 
-func (i *DOJInformation) determineEligibility(county string, eligibilityFlow EligibilityFlow) {
+func (i *DOJInformation) DetermineEligibility(county string, eligibilityFlow EligibilityFlow) map[int]*EligibilityInfo{
+	eligibilities := make(map[int]*EligibilityInfo)
 	for _, subject := range i.Subjects {
 		infos := eligibilityFlow.ProcessSubject(subject, i.comparisonTime, county)
-
-		i.TotalConvictions += len(subject.Convictions)
-		for _, conviction := range subject.Convictions {
-
-			if conviction.County == county {
-				i.TotalConvictionsInCounty++
-			}
-		}
-
 		for index, info := range infos {
-			i.Eligibilities[index] = info
+			eligibilities[index] = info
 		}
 	}
+	return eligibilities
 }
 
 func (i *DOJInformation) TotalIndividuals() int {
@@ -67,6 +57,26 @@ func (i *DOJInformation) TotalIndividuals() int {
 
 func (i *DOJInformation) TotalRows() int {
 	return len(i.Rows)
+}
+
+func (i *DOJInformation) TotalConvictions() int {
+	totalConvictions := 0
+	for _, subject := range i.Subjects {
+		totalConvictions += len(subject.Convictions)
+	}
+	return totalConvictions
+}
+
+func (i *DOJInformation) TotalConvictionsInCounty(county string) int {
+	totalConvictionsInCounty := 0
+	for _, subject := range i.Subjects {
+		for _, conviction := range subject.Convictions {
+			if conviction.County == county {
+				totalConvictionsInCounty++
+			}
+		}
+	}
+	return totalConvictionsInCounty
 }
 
 func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int {
@@ -110,14 +120,14 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county strin
 	return prop64ConvictionsInCounty
 }
 
-func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]map[string]int {
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
 	prop64ConvictionsInCountyByCodeSectionByEligibility := make(map[string]map[string]int)
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
 			if conviction.County == county {
 				ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
 				if ok {
-					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+					eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
 					if prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
 						prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
 					}
@@ -129,7 +139,7 @@ func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility
 	}
 	return prop64ConvictionsInCountyByCodeSectionByEligibility
 }
-func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibility(county string) map[string]map[string]int {
+func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibility(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
 	if !i.checksRelatedCharges {
 		emptyMap := make(map[string]map[string]int)
 		return emptyMap
@@ -140,7 +150,7 @@ func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibilit
 			if conviction.County == county {
 				ok, codeSection := matchers.ExtractRelatedChargeSection(conviction.CodeSection)
 				if ok {
-					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
+					eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
 					if relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
 						relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
 					}
@@ -154,14 +164,14 @@ func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibilit
 	return relatedConvictionsInThisCountyByCodeSectionByEligibility
 }
 
-func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string) map[string]map[string]int {
+func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
 	prop64ConvictionsInCountyByEligibilityByReason := make(map[string]map[string]int)
 	for _, subject := range i.Subjects {
 		for _, conviction := range subject.Convictions {
 			if conviction.County == county {
 				if matchers.IsProp64Charge(conviction.CodeSection) {
-					eligibilityDetermination := i.Eligibilities[conviction.Index].EligibilityDetermination
-					eligibilityReason := i.Eligibilities[conviction.Index].EligibilityReason
+					eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
+					eligibilityReason := eligibilities[conviction.Index].EligibilityReason
 					if prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] == nil {
 						prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] = make(map[string]int)
 					}
@@ -216,7 +226,7 @@ OuterLoop:
 	return countIndividuals
 }
 
-func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
+func (i *DOJInformation) CountIndividualsNoLongerHaveFelony(eligibilities map[int]*EligibilityInfo) int {
 	countIndividuals := 0
 	for _, subject := range i.Subjects {
 		countFelonies := 0
@@ -224,8 +234,8 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
 		for _, conviction := range subject.Convictions {
 			if conviction.IsFelony {
 				countFelonies++
-				if i.Eligibilities[conviction.Index] != nil {
-					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" || determination == "Eligible for Reduction" {
+				if eligibilities[conviction.Index] != nil {
+					if determination := eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" || determination == "Eligible for Reduction" {
 						countFeloniesReducedOrDismissed++
 					}
 				}
@@ -238,13 +248,13 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveFelony() int {
 	return countIndividuals
 }
 
-func (i *DOJInformation) CountIndividualsNoLongerHaveConviction() int {
+func (i *DOJInformation) CountIndividualsNoLongerHaveConviction(eligibilities map[int]*EligibilityInfo) int {
 	countIndividuals := 0
 	for _, subject := range i.Subjects {
 		countConvictionsDismissed := 0
 		for _, conviction := range subject.Convictions {
-			if i.Eligibilities[conviction.Index] != nil {
-				if determination := i.Eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" {
+			if eligibilities[conviction.Index] != nil {
+				if determination := eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" {
 					countConvictionsDismissed++
 				}
 			}
@@ -257,7 +267,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConviction() int {
 	return countIndividuals
 }
 
-func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() int {
+func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years(eligibilities map[int]*EligibilityInfo) int {
 	countIndividuals := 0
 	for _, subject := range i.Subjects {
 		convictionsInLast7Years := 0
@@ -265,8 +275,8 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years() in
 		for _, conviction := range subject.Convictions {
 			if conviction.OccurredInLast7Years() {
 				convictionsInLast7Years++
-				if i.Eligibilities[conviction.Index] != nil {
-					if determination := i.Eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" {
+				if eligibilities[conviction.Index] != nil {
+					if determination := eligibilities[conviction.Index].EligibilityDetermination; determination == "Eligible for Dismissal" {
 						countConvictionsDismissedInLast7years++
 					}
 				}
@@ -298,15 +308,13 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, county stri
 		panic(err)
 	}
 	info := DOJInformation{
-		Rows:                 rows,
-		Subjects:             make(map[string]*Subject),
-		Eligibilities:        make(map[int]*EligibilityInfo),
-		comparisonTime:       comparisonTime,
-		checksRelatedCharges: eligibilityFlow.ChecksRelatedCharges(),
+		Rows:                     rows,
+		Subjects:                 make(map[string]*Subject),
+		comparisonTime:           comparisonTime,
+		checksRelatedCharges:     eligibilityFlow.ChecksRelatedCharges(),
 	}
 
 	info.aggregateSubjects(eligibilityFlow)
-	info.determineEligibility(county, eligibilityFlow)
 
 	return &info
 }
