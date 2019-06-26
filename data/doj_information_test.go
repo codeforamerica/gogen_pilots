@@ -50,7 +50,6 @@ var _ = Describe("DojInformation", func() {
 		pathToDOJ          string
 		comparisonTime     time.Time
 		err                error
-		testDojInformation *DOJInformation
 		testEligibilities  map[int]*EligibilityInfo
 		dojInformation     *DOJInformation
 		dojEligibilities   map[int]*EligibilityInfo
@@ -68,10 +67,9 @@ var _ = Describe("DojInformation", func() {
 		comparisonTime = time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 		testFlow := testEligibilityFlow{}
 		contraCostaFlow := EligibilityFlows["CONTRA COSTA"]
-		testDojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county, testFlow)
-		testEligibilities = testDojInformation.DetermineEligibility(county, testFlow)
+		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, contraCostaFlow)
 
-		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, county, contraCostaFlow)
+		testEligibilities = dojInformation.DetermineEligibility(county, testFlow)
 		dojEligibilities = dojInformation.DetermineEligibility(county, contraCostaFlow)
 
 	})

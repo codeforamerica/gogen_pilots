@@ -35,7 +35,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "SACRAMENTO", data.EligibilityFlows["SACRAMENTO"])
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["SACRAMENTO"])
 			dojEligibilities := dojInformation.DetermineEligibility("SACRAMENTO", data.EligibilityFlows["SACRAMENTO"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("SACRAMENTO", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("SACRAMENTO", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -79,7 +79,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "SAN JOAQUIN", data.EligibilityFlows["SAN JOAQUIN"])
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["SAN JOAQUIN"])
 			dojEligibilities := dojInformation.DetermineEligibility("SAN JOAQUIN", data.EligibilityFlows["SAN JOAQUIN"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("SAN JOAQUIN", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("SAN JOAQUIN", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -123,7 +123,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["CONTRA COSTA"])
 			dojEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -167,7 +167,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
 			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -211,7 +211,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["CONTRA COSTA"])
 			dojEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -260,7 +260,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, "LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
 			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -317,7 +317,7 @@ var _ = Describe("DataExporter", func() {
 				},
 			}, COUNTY)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, COUNTY, flow)
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])

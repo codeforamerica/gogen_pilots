@@ -290,7 +290,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years(elig
 	return countIndividuals
 }
 
-func NewDOJInformation(dojFileName string, comparisonTime time.Time, county string, eligibilityFlow EligibilityFlow) *DOJInformation {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibilityFlow EligibilityFlow) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
 		panic(err)

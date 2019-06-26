@@ -81,7 +81,7 @@ func (r runOpts) Execute(args []string) error {
 		countyEligibilityFlow = data.EligibilityFlows[r.County]
 	}
 
-	dojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, r.County, countyEligibilityFlow)
+	dojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, countyEligibilityFlow)
 	countyEligibilities := dojInformation.DetermineEligibility(r.County, countyEligibilityFlow)
 
 	dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
