@@ -198,3 +198,7 @@ const (
 func (row *DOJRow) wasConvictionUnderAgeOf21(subject *Subject) bool {
 	return subject.DOB.AddDate(21, 0, 0).After(row.DispositionDate)
 }
+
+func (row *DOJRow) convictionBefore(years int, comparisonTime time.Time) bool {
+	return !row.DispositionDate.After(comparisonTime.AddDate(-years, 0, 0))
+}

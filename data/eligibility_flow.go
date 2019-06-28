@@ -20,7 +20,7 @@ var EligibilityFlows = map[string]EligibilityFlow{
 
 type EligibilityOptions struct {
 	BaselineEligibility BaselineEligibility `json:"baselineEligibility"`
-	AdditionalRelief AdditionalRelief `json:"additionalRelief"`
+	AdditionalRelief    AdditionalRelief    `json:"additionalRelief"`
 }
 
 type BaselineEligibility struct {
@@ -28,6 +28,7 @@ type BaselineEligibility struct {
 }
 
 type AdditionalRelief struct {
-	SubjectUnder21AtConviction bool `json:"subjectUnder21AtConviction"`
-	SubjectAgeThreshold        int  `json:"subjectAgeThreshold"`
+	SubjectUnder21AtConviction    bool `json:"subjectUnder21AtConviction"`
+	SubjectAgeThreshold           int  `json:"subjectAgeThreshold"`
+	YearsSinceConvictionThreshold int  `json:"yearsSinceConvictionThreshold"`
 }

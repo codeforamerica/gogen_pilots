@@ -13,6 +13,7 @@ type configurableEligibilityFlow struct {
 	dismissMatcher                 *regexp.Regexp
 	dismissConvictionsUnderAgeOf21 bool
 	subjectAgeThreshold            int
+	yearsSinceConvictionThreshold  int
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
@@ -30,11 +31,18 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		}
 	}
 
+	if options.AdditionalRelief.YearsSinceConvictionThreshold != 0 {
+		if options.AdditionalRelief.YearsSinceConvictionThreshold > 15 || options.AdditionalRelief.YearsSinceConvictionThreshold < 1 {
+			panic("YearsSinceConvictionThreshold should be between 1 and 15, or 0")
+		}
+	}
+
 	return configurableEligibilityFlow{
 		county:                         county,
 		dismissMatcher:                 dismissMatcherRegex,
 		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.SubjectUnder21AtConviction,
 		subjectAgeThreshold:            options.AdditionalRelief.SubjectAgeThreshold,
+		yearsSinceConvictionThreshold:  options.AdditionalRelief.YearsSinceConvictionThreshold,
 	}
 }
 
@@ -81,6 +89,10 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 	}
 	if ef.subjectAgeThreshold != 0 && subject.olderThan(ef.subjectAgeThreshold, info.comparisonTime) {
 		info.SetEligibleForDismissal(fmt.Sprintf("%d years or older", ef.subjectAgeThreshold))
+		return
+	}
+	if ef.yearsSinceConvictionThreshold != 0 && row.convictionBefore(ef.yearsSinceConvictionThreshold, info.comparisonTime) {
+		info.SetEligibleForDismissal(fmt.Sprintf("Conviction occurred %d years ago", ef.yearsSinceConvictionThreshold))
 		return
 	}
 
