@@ -131,7 +131,6 @@ var _ = Describe("DataExporter", func() {
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-
 			dataExporter = NewDataExporter(dojInformation,
 				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
 		})
@@ -312,8 +311,9 @@ var _ = Describe("DataExporter", func() {
 					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
 				},
 				AdditionalRelief: data.AdditionalRelief{
-					SubjectUnder21AtConviction: true,
-					SubjectAgeThreshold:        57,
+					SubjectUnder21AtConviction:    true,
+					SubjectAgeThreshold:           57,
+					YearsSinceConvictionThreshold: 10,
 				},
 			}, COUNTY)
 
