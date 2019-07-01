@@ -92,7 +92,7 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		return
 	}
 	if ef.yearsSinceConvictionThreshold != 0 && row.convictionBefore(ef.yearsSinceConvictionThreshold, info.comparisonTime) {
-		info.SetEligibleForDismissal(fmt.Sprintf("Conviction occurred %d years ago", ef.yearsSinceConvictionThreshold))
+		info.SetEligibleForDismissal(fmt.Sprintf("Conviction occurred %d or more years ago", ef.yearsSinceConvictionThreshold))
 		return
 	}
 
