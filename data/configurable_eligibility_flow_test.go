@@ -479,7 +479,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
 				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
-				Expect(infos[1].EligibilityReason).To(MatchRegexp("Conviction occurred .* years ago"))
+				Expect(infos[1].EligibilityReason).To(MatchRegexp("Conviction occurred .* or more years ago"))
 			})
 
 			It("does not dismiss convictions under the yearsSinceConvictionThreshold setting", func() {

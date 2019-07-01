@@ -635,7 +635,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason 21 years or younger"))
 		Eventually(session).Should(gbytes.Say("Found 2 convictions with eligibility reason 57 years or older"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Conviction occurred 10 years ago"))
+		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Conviction occurred 10 or more years ago"))
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason Dismiss all 11357(C)HS convictions")))
 		Eventually(session).Should(gbytes.Say("Found 6 convictions with eligibility reason Dismiss all 11358 HS convictions"))
 		Eventually(session).Should(gbytes.Say("Found 3 convictions with eligibility reason Misdemeanor or Infraction"))
