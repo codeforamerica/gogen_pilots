@@ -24,137 +24,6 @@ var _ = Describe("DataExporter", func() {
 		err                      error
 	)
 
-	Describe("Sacramento", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
-
-			inputPath := path.Join("..", "test_fixtures", "sacramento.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["SACRAMENTO"])
-			dojEligibilities := dojInformation.DetermineEligibility("SACRAMENTO", data.EligibilityFlows["SACRAMENTO"])
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("SACRAMENTO", data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("SACRAMENTO", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
-
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
-		})
-
-		It("runs and has output", func() {
-			dataExporter.Export("SACRAMENTO")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
-
-	Describe("San Joaquin", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
-
-			inputPath := path.Join("..", "test_fixtures", "san_joaquin.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["SAN JOAQUIN"])
-			dojEligibilities := dojInformation.DetermineEligibility("SAN JOAQUIN", data.EligibilityFlows["SAN JOAQUIN"])
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("SAN JOAQUIN", data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("SAN JOAQUIN", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
-
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
-		})
-
-		It("runs and has output", func() {
-			dataExporter.Export("SAN JOAQUIN")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
-
-	Describe("Contra Costa", func() {
-		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
-			Expect(err).ToNot(HaveOccurred())
-
-			inputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
-			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
-			Expect(err).ToNot(HaveOccurred())
-
-			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["CONTRA COSTA"])
-			dojEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
-
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
-		})
-
-		It("runs and has output", func() {
-			dataExporter.Export("CONTRA COSTA")
-			format.TruncatedDiff = false
-
-			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
-			Expect(err).ToNot(HaveOccurred())
-			OutputDOJFile, err := os.Open(pathToDOJOutput)
-			Expect(err).ToNot(HaveOccurred())
-			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			ExpectedDOJResultsFile, err := os.Open(pathToExpectedDOJResults)
-			Expect(err).ToNot(HaveOccurred())
-			expectedDOJResultsCSV, err := csv.NewReader(ExpectedDOJResultsFile).ReadAll()
-			Expect(err).ToNot(HaveOccurred())
-
-			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
-		})
-	})
-
 	Describe("Los Angeles", func() {
 		BeforeEach(func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")
@@ -200,20 +69,33 @@ var _ = Describe("DataExporter", func() {
 	})
 
 	Describe("Condensed columns output file", func() {
+		county := "SACRAMENTO"
 		BeforeEach(func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")
 			Expect(err).ToNot(HaveOccurred())
 
-			inputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
+			inputPath := path.Join("..", "test_fixtures", "configurable_flow.xlsx")
 			pathToDOJ, pathToExpectedDOJResults, err = ExtractFullCSVFixtures(inputPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["CONTRA COSTA"])
-			dojEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["CONTRA COSTA"])
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("CONTRA COSTA", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+			flow := data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
+				BaselineEligibility: data.BaselineEligibility{
+					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
+				},
+				AdditionalRelief: data.AdditionalRelief{
+					SubjectUnder21AtConviction:    true,
+					SubjectAgeThreshold:           57,
+					YearsSinceConvictionThreshold: 10,
+				},
+			}, county)
+
+
+			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
+			dojEligibilities := dojInformation.DetermineEligibility(county, flow)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(county, data.EligibilityFlows["DISMISS ALL PROP 64"])
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(county, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
@@ -227,7 +109,7 @@ var _ = Describe("DataExporter", func() {
 		})
 
 		It("runs and has condensed output", func() {
-			dataExporter.Export("CONTRA COSTA")
+			dataExporter.Export(county)
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "condensed.csv"))
@@ -237,7 +119,7 @@ var _ = Describe("DataExporter", func() {
 			outputDOJCSV, err := csv.NewReader(OutputDOJFile).ReadAll()
 			Expect(err).ToNot(HaveOccurred())
 
-			condensedInputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
+			condensedInputPath := path.Join("..", "test_fixtures", "configurable_flow.xlsx")
 			expectedCondensedCSVResult, err := ExtractCondensedCSVFixture(condensedInputPath)
 			ExpectedDOJResultsFile, err := os.Open(expectedCondensedCSVResult)
 			Expect(err).ToNot(HaveOccurred())

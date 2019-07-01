@@ -10,9 +10,6 @@ type EligibilityFlow interface {
 }
 
 var EligibilityFlows = map[string]EligibilityFlow{
-	"SACRAMENTO":                      sacramentoEligibilityFlow{},
-	"SAN JOAQUIN":                     sanJoaquinEligibilityFlow{},
-	"CONTRA COSTA":                    contraCostaEligibilityFlow{},
 	"LOS ANGELES":                     losAngelesEligibilityFlow{},
 	"DISMISS ALL PROP 64":             dismissAllProp64EligibilityFlow{},
 	"DISMISS ALL PROP 64 AND RELATED": dismissAllProp64AndRelatedEligibilityFlow{},

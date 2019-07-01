@@ -45,118 +45,124 @@ func (ef testEligibilityFlow) ChecksRelatedCharges() bool {
 }
 
 var _ = Describe("DojInformation", func() {
-	county := "CONTRA COSTA"
+	county := "SACRAMENTO"
 	var (
-		pathToDOJ          string
-		comparisonTime     time.Time
-		err                error
-		testEligibilities  map[int]*EligibilityInfo
-		dojInformation     *DOJInformation
-		dojEligibilities   map[int]*EligibilityInfo
-
+		pathToDOJ         string
+		comparisonTime    time.Time
+		err               error
+		testEligibilities map[int]*EligibilityInfo
+		dojInformation    *DOJInformation
+		dojEligibilities  map[int]*EligibilityInfo
 	)
 
 	BeforeEach(func() {
 		_, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
 
-		inputPath := path.Join("..", "test_fixtures", "contra_costa.xlsx")
+		inputPath := path.Join("..", "test_fixtures", "configurable_flow.xlsx")
 		pathToDOJ, _, err = ExtractFullCSVFixtures(inputPath)
 		Expect(err).ToNot(HaveOccurred())
 
 		comparisonTime = time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 		testFlow := testEligibilityFlow{}
-		contraCostaFlow := EligibilityFlows["CONTRA COSTA"]
-		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, contraCostaFlow)
+		configurableFlow := NewConfigurableEligibilityFlow(EligibilityOptions{
+			BaselineEligibility: BaselineEligibility{
+				Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
+			},
+			AdditionalRelief: AdditionalRelief{
+				SubjectUnder21AtConviction:    true,
+				SubjectAgeThreshold:           57,
+				YearsSinceConvictionThreshold: 10,
+			},
+		}, county)
+		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, configurableFlow)
 
 		testEligibilities = dojInformation.DetermineEligibility(county, testFlow)
-		dojEligibilities = dojInformation.DetermineEligibility(county, contraCostaFlow)
+		dojEligibilities = dojInformation.DetermineEligibility(county, configurableFlow)
 
 	})
 
 	It("Uses the provided eligibility flow", func() {
 		Expect(testEligibilities[11].EligibilityDetermination).To(Equal("Test is Eligible"))
-		Expect(testEligibilities[11].CaseNumber).To(Equal("998877; 34345"))
+		Expect(testEligibilities[11].CaseNumber).To(Equal("140194; 140195"))
 	})
 
 	It("Populates ToBeRemovedEligibilities based on Index of Conviction", func() {
 		Expect(dojEligibilities[11].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
-		Expect(dojEligibilities[11].CaseNumber).To(Equal("998877; 34345"))
+		Expect(dojEligibilities[11].CaseNumber).To(Equal("140194; 140195"))
 	})
 
 	Context("Computing Aggregate Statistics for convictions", func() {
 		It("Counts total number of rows in file", func() {
-			Expect(dojInformation.TotalRows()).To(Equal(39))
+			Expect(dojInformation.TotalRows()).To(Equal(33))
 		})
 
 		It("Counts total convictions", func() {
-			Expect(dojInformation.TotalConvictions()).To(Equal(29))
+			Expect(dojInformation.TotalConvictions()).To(Equal(26))
 		})
 
 		It("Counts total convictions in this county", func() {
-			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(26))
+			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(23))
 		})
 
 		It("Counts all Prop64 convictions sorted by code section", func() {
-			Expect(dojInformation.OverallProp64ConvictionsByCodeSection()).To(Equal(map[string]int{"11357": 3, "11358": 10, "11359": 5}))
+			Expect(dojInformation.OverallProp64ConvictionsByCodeSection()).To(Equal(map[string]int{"11357": 3, "11358": 9, "11359": 7}))
 		})
 
 		It("Counts Prop64 convictions in this county sorted by code section", func() {
-			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 3, "11358": 8, "11359": 4}))
+			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 3, "11358": 7, "11359": 6}))
 		})
 
 		It("Prop64 convictions in this county by code section and eligibility determination", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
-					"Eligible for Dismissal":           {"11357": 3, "11358": 4, "11359": 3},
-					"Maybe Eligible - Flag for Review": {"11358": 3, "11359": 1},
-					"Not eligible":                     {"11358": 1}}))
+					"Eligible for Dismissal": {"11357": 3, "11358": 7, "11359": 4},
+					"Eligible for Reduction": {"11359": 2}}))
 		})
 
 		It("Prop64 convictions in this county by eligibility determination and reason", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
 					"Eligible for Dismissal": {
-						"No convictions in past 5 years": 5,
-						"11357 HS":                       2,
-						"Misdemeanor or Infraction":      2,
-						"Sentence Completed":             1,
-					},
-					"Maybe Eligible - Flag for Review": {
-						"Has convictions in past 5 years": 3,
-						"Sentence not Completed":          1},
-					"Not eligible": {"Occurred after 11/09/2016": 1}}))
+						"Dismiss all 11357(C)HS convictions": 1,
+						"57 years or older":                  2,
+						"Dismiss all 11358 HS convictions":   6,
+						"Conviction occurred 10 or more years ago":   1,
+						"Misdemeanor or Infraction":          3,
+						"21 years or younger": 1,},
+					"Eligible for Reduction": {
+						"Reduce all 11359HS convictions": 1,
+						"Reduce all 11359 HS convictions": 1,},
+				}))
 		})
 
 		It("Related convictions in this county by code section and eligibility determination", func() {
 			Expect(dojInformation.RelatedConvictionsInThisCountyByCodeSectionByEligibility(county, dojEligibilities)).To(Equal(
-				map[string]map[string]int{
-					"Eligible for Dismissal":           {"4149 BP": 1, "148 PC": 1},
-					"Maybe Eligible - Flag for Review": {"4149 BP": 1, "4060 BP": 1}}))
+				map[string]map[string]int{}))
 		})
 
 		Context("Computing aggregate statistics for individuals", func() {
 			It("Counts total number of individuals in file", func() {
-				Expect(dojInformation.TotalIndividuals()).To(Equal(11))
+				Expect(dojInformation.TotalIndividuals()).To(Equal(10))
 			})
 
 			Context("Before eligibility is run", func() {
 				It("Calculates individuals with a felony", func() {
-					Expect(dojInformation.CountIndividualsWithFelony()).To(Equal(9))
+					Expect(dojInformation.CountIndividualsWithFelony()).To(Equal(10))
 				})
 
 				It("Calculates individuals with any conviction", func() {
-					Expect(dojInformation.CountIndividualsWithConviction()).To(Equal(11))
+					Expect(dojInformation.CountIndividualsWithConviction()).To(Equal(10))
 				})
 
 				It("Calculates individuals with any conviction in the last 7 years", func() {
-					Expect(dojInformation.CountIndividualsWithConvictionInLast7Years()).To(Equal(6))
+					Expect(dojInformation.CountIndividualsWithConvictionInLast7Years()).To(Equal(3))
 				})
 			})
 
 			Context("After eligibility is run", func() {
 				It("Calculates individuals who will no longer have a felony ", func() {
-					Expect(dojInformation.CountIndividualsNoLongerHaveFelony(dojEligibilities)).To(Equal(1))
+					Expect(dojInformation.CountIndividualsNoLongerHaveFelony(dojEligibilities)).To(Equal(3))
 				})
 
 				It("Calculates individuals who no longer have any conviction", func() {
