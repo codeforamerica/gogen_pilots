@@ -26,6 +26,7 @@ type runOpts struct {
 	County             string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 	EligibilityOptions string `long:"eligibility-options" description:"File containing options for which eligibility logic to apply"`
+	DateForFileName    string `long:"date-for-file-name" hidden:"true" description:"string containing date time to append to file names"`
 }
 
 type exportTestCSVOpts struct {
@@ -87,9 +88,27 @@ func (r runOpts) Execute(args []string) error {
 	dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
 	dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-	dojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, "doj_results.csv"))
-	condensedDojWriter := exporter.NewCondensedDOJWriter(filepath.Join(r.OutputFolder, "doj_results_condensed.csv"))
-	prop64ConvictionsDojWriter := exporter.NewDOJWriter(filepath.Join(r.OutputFolder, "doj_results_convictions.csv"))
+	var dojFilePath string
+	var condensedFilePath string
+	var prop64ConvictionsFilePath string
+
+	if r.DateForFileName != "" {
+		dojFile := fmt.Sprintf("doj_results_%s.csv", r.DateForFileName)
+		condensedFile := fmt.Sprintf("doj_results_condensed_%s.csv", r.DateForFileName)
+		convictionsFile := fmt.Sprintf("doj_results_convictions_%s.csv", r.DateForFileName)
+
+		dojFilePath = filepath.Join(r.OutputFolder, dojFile)
+		condensedFilePath = filepath.Join(r.OutputFolder, condensedFile)
+		prop64ConvictionsFilePath = filepath.Join(r.OutputFolder, convictionsFile)
+	} else {
+		dojFilePath = filepath.Join(r.OutputFolder, "doj_results.csv")
+		condensedFilePath = filepath.Join(r.OutputFolder, "doj_results_condensed.csv")
+		prop64ConvictionsFilePath = filepath.Join(r.OutputFolder, "doj_results_convictions.csv")
+	}
+
+	dojWriter := exporter.NewDOJWriter(dojFilePath)
+	condensedDojWriter := exporter.NewCondensedDOJWriter(condensedFilePath)
+	prop64ConvictionsDojWriter := exporter.NewDOJWriter(prop64ConvictionsFilePath)
 
 	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
 

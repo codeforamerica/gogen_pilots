@@ -120,6 +120,47 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Occurred after 11/09/2016"))
 	})
 
+	It("can accept a date for the output file names", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma.csv"))
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+		date:= "Feb_8_2019_3.32.43.PM"
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
+		computeAtFlag := "--compute-at=2019-11-11"
+		dateTimeFlag := fmt.Sprintf("--date-for-file-name=%s", date)
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateTimeFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit())
+		Expect(session.Err).ToNot(gbytes.Say("required"))
+
+		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 11 Total individuals in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
+
+		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_%s.csv", outputDir, date )
+		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, date )
+		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_%s.csv", outputDir, date )
+
+		Ω(expectedDojResultsFileName).Should(BeAnExistingFile())
+		Ω(expectedCondensedFileName).Should(BeAnExistingFile())
+		Ω(expectedConvictionsFileName).Should(BeAnExistingFile())
+	})
+
+
 	It("runs and has output for Sacramento", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
