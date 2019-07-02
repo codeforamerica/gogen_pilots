@@ -9,11 +9,12 @@ import (
 )
 
 type configurableEligibilityFlow struct {
-	county                         string
-	dismissMatcher                 *regexp.Regexp
-	dismissConvictionsUnderAgeOf21 bool
-	subjectAgeThreshold            int
-	yearsSinceConvictionThreshold  int
+	county                               string
+	dismissMatcher                       *regexp.Regexp
+	dismissConvictionsUnderAgeOf21       bool
+	dismissIfSubjectHasOnlyProp64Charges bool
+	subjectAgeThreshold                  int
+	yearsSinceConvictionThreshold        int
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
@@ -38,11 +39,12 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 	}
 
 	return configurableEligibilityFlow{
-		county:                         county,
-		dismissMatcher:                 dismissMatcherRegex,
-		dismissConvictionsUnderAgeOf21: options.AdditionalRelief.SubjectUnder21AtConviction,
-		subjectAgeThreshold:            options.AdditionalRelief.SubjectAgeThreshold,
-		yearsSinceConvictionThreshold:  options.AdditionalRelief.YearsSinceConvictionThreshold,
+		county:                               county,
+		dismissMatcher:                       dismissMatcherRegex,
+		dismissConvictionsUnderAgeOf21:       options.AdditionalRelief.SubjectUnder21AtConviction,
+		dismissIfSubjectHasOnlyProp64Charges: options.AdditionalRelief.SubjectHasOnlyProp64Charges,
+		subjectAgeThreshold:                  options.AdditionalRelief.SubjectAgeThreshold,
+		yearsSinceConvictionThreshold:        options.AdditionalRelief.YearsSinceConvictionThreshold,
 	}
 }
 
@@ -93,6 +95,10 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 	}
 	if ef.yearsSinceConvictionThreshold != 0 && row.convictionBefore(ef.yearsSinceConvictionThreshold, info.comparisonTime) {
 		info.SetEligibleForDismissal(fmt.Sprintf("Conviction occurred %d or more years ago", ef.yearsSinceConvictionThreshold))
+		return
+	}
+	if ef.dismissIfSubjectHasOnlyProp64Charges && info.onlyProp64Convictions(row, subject) {
+		info.SetEligibleForDismissal("Only has 11357-60 charges")
 		return
 	}
 

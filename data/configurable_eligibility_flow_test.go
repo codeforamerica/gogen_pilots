@@ -578,5 +578,115 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		})
 
+		Context("When additionalRelief -> subjectHasOnlyProp64Charges", func() {
+			var (
+				subject              Subject
+				prop64Conviction1    DOJRow
+				prop64Conviction2    DOJRow
+				prop64Conviction3    DOJRow
+				nonProp64Conviction1 DOJRow
+			)
+
+			BeforeEach(func() {
+				prop64Conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+				prop64Conviction2 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+				prop64Conviction3 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11360 HS",
+					DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+					IsFelony:        true,
+				}
+			})
+
+			It("dismisses all convictions if they are all prop 64 convictions", func() {
+				rows := []DOJRow{prop64Conviction1, prop64Conviction2, prop64Conviction3}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)"},
+					},
+					AdditionalRelief: AdditionalRelief{
+						SubjectHasOnlyProp64Charges: true,
+					},
+				}, COUNTY)
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("Only has 11357-60 charges"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[2].EligibilityReason).To(Equal("Only has 11357-60 charges"))
+			})
+
+			It("does not dismiss convictions if there are any non prop 64 convictions", func() {
+
+				nonProp64Conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "5555 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{prop64Conviction1, prop64Conviction2, prop64Conviction3, nonProp64Conviction1}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(A)", "11357(B)", "11357(C)", "11357(D)"},
+					},
+					AdditionalRelief: AdditionalRelief{
+						SubjectHasOnlyProp64Charges: true,
+					},
+				}, COUNTY)
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all 11357(A) HS convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[1].EligibilityReason).To(Equal("Reduce all 11359 HS convictions"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[2].EligibilityReason).To(Equal("Reduce all 11360 HS convictions"))
+			})
+
+		})
+
 	})
 })

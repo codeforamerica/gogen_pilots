@@ -26,6 +26,7 @@ type BaselineEligibility struct {
 
 type AdditionalRelief struct {
 	SubjectUnder21AtConviction    bool `json:"subjectUnder21AtConviction"`
+	SubjectHasOnlyProp64Charges   bool `json:"subjectHasOnlyProp64Charges"`
 	SubjectAgeThreshold           int  `json:"subjectAgeThreshold"`
 	YearsSinceConvictionThreshold int  `json:"yearsSinceConvictionThreshold"`
 }
