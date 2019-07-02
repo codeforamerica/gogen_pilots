@@ -69,7 +69,7 @@ var _ = Describe("DataExporter", func() {
 	})
 
 	Describe("Condensed columns output file", func() {
-		county := "SACRAMENTO"
+		COUNTY := "SACRAMENTO"
 		BeforeEach(func() {
 			outputDir, err = ioutil.TempDir("/tmp", "gogen")
 			Expect(err).ToNot(HaveOccurred())
@@ -80,22 +80,14 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			flow := data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
-				BaselineEligibility: data.BaselineEligibility{
-					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
-				},
-				AdditionalRelief: data.AdditionalRelief{
-					SubjectUnder21AtConviction:    true,
-					SubjectAgeThreshold:           57,
-					YearsSinceConvictionThreshold: 10,
-					SubjectHasOnlyProp64Charges:   true,
-				},
-			}, county)
+			dismissCodeSections := []string{"11357(A)", "11357(C)", "11357(D)", "11358"}
+			flow := createFlow(dismissCodeSections, COUNTY)
+
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
-			dojEligibilities := dojInformation.DetermineEligibility(county, flow)
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(county, data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(county, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
@@ -109,7 +101,7 @@ var _ = Describe("DataExporter", func() {
 		})
 
 		It("runs and has condensed output", func() {
-			dataExporter.Export(county)
+			dataExporter.Export(COUNTY)
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "condensed.csv"))
@@ -188,17 +180,8 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			flow := data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
-				BaselineEligibility: data.BaselineEligibility{
-					Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
-				},
-				AdditionalRelief: data.AdditionalRelief{
-					SubjectUnder21AtConviction:    true,
-					SubjectAgeThreshold:           57,
-					YearsSinceConvictionThreshold: 10,
-					SubjectHasOnlyProp64Charges:   true,
-				},
-			}, COUNTY)
+			dismissCodeSections := []string{"11357(A)", "11357(C)", "11357(D)", "11358"}
+			flow := createFlow(dismissCodeSections, COUNTY)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
@@ -241,4 +224,18 @@ func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
 		}
 	}
 	Expect(actualCSV).To(Equal(expectedCSV))
+}
+
+func createFlow(dismissCodeSections []string, county string) data.EligibilityFlow {
+	return data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
+		BaselineEligibility: data.BaselineEligibility{
+			Dismiss: dismissCodeSections,
+		},
+		AdditionalRelief: data.AdditionalRelief{
+			SubjectUnder21AtConviction:    true,
+			SubjectAgeThreshold:           57,
+			YearsSinceConvictionThreshold: 10,
+			SubjectHasOnlyProp64Charges:   true,
+		},
+	}, county)
 }
