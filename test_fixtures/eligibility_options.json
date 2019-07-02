@@ -15,6 +15,7 @@
   "additionalRelief": {
     "subjectUnder21AtConviction": true,
     "subjectAgeThreshold": 57,
-    "yearsSinceConvictionThreshold": 10
+    "yearsSinceConvictionThreshold": 10,
+    "subjectHasOnlyProp64Charges": true
   }
 }

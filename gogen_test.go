@@ -124,7 +124,6 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 3 convictions with eligibility reason Misdemeanor or Infraction"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Reduction"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Reduce all 11359 HS convictions"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Reduce all 11359HS convictions"))
 		})
 
@@ -323,12 +322,12 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions that are Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 7 11358 convictions that are Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 4 11359 convictions that are Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 14 convictions total that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 5 11359 convictions that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 15 convictions total that are Eligible for Dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Reduction"))
-		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are Eligible for Reduction"))
-		Eventually(session).Should(gbytes.Say("Found 2 convictions total that are Eligible for Reduction"))
+		Eventually(session).Should(gbytes.Say("Found 1 11359 convictions that are Eligible for Reduction"))
+		Eventually(session).Should(gbytes.Say("Found 1 convictions total that are Eligible for Reduction"))
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 
@@ -339,9 +338,9 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason Dismiss all 11357(C)HS convictions")))
 		Eventually(session).Should(gbytes.Say("Found 6 convictions with eligibility reason Dismiss all 11358 HS convictions"))
 		Eventually(session).Should(gbytes.Say("Found 3 convictions with eligibility reason Misdemeanor or Infraction"))
+		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Only has 11357-60 charges"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Reduction"))
-		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason Reduce all 11359 HS convictions")))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Reduce all 11359HS convictions"))
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Related Convictions In This County --------------------"))

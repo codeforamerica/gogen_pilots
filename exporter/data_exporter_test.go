@@ -88,9 +88,9 @@ var _ = Describe("DataExporter", func() {
 					SubjectUnder21AtConviction:    true,
 					SubjectAgeThreshold:           57,
 					YearsSinceConvictionThreshold: 10,
+					SubjectHasOnlyProp64Charges:   true,
 				},
 			}, county)
-
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(county, flow)
@@ -196,6 +196,7 @@ var _ = Describe("DataExporter", func() {
 					SubjectUnder21AtConviction:    true,
 					SubjectAgeThreshold:           57,
 					YearsSinceConvictionThreshold: 10,
+					SubjectHasOnlyProp64Charges:   true,
 				},
 			}, COUNTY)
 
