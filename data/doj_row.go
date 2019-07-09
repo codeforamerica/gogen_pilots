@@ -19,7 +19,6 @@ type DOJRow struct {
 	County                 string
 	IsFelony               bool
 	NumCrtCase             string
-	CycleDate              time.Time
 	CourtNoParts           []string
 	CountOrder             string
 	Index                  int
