@@ -92,14 +92,21 @@ func (subject *Subject) PC290CodeSections() []string {
 	return result
 }
 
-func (subject *Subject) NumberOfProp64Convictions(county string) int {
-	result := 0
-	for _, row := range subject.Convictions {
-		if matchers.IsProp64Charge(row.CodeSection) {
-			result++
+func (subject *Subject) Prop64ConvictionsBySection() (int, int, int, int, int) {
+	convictionCountBySection := make(map[string]int)
+
+	for _, conviction := range subject.Convictions {
+		matched, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
+		if matched {
+			convictionCountBySection[codeSection]++
 		}
 	}
-	return result
+
+	return convictionCountBySection["11357"] + convictionCountBySection["11358"] + convictionCountBySection["11359"] + convictionCountBySection["11360"],
+		convictionCountBySection["11357"],
+		convictionCountBySection["11358"],
+		convictionCountBySection["11359"],
+		convictionCountBySection["11360"]
 }
 
 func (subject *Subject) NumberOfConvictionsInCounty(county string) int {

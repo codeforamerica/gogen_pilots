@@ -12,6 +12,10 @@ type EligibilityInfo struct {
 	YearsSinceThisConviction       float64
 	YearsSinceMostRecentConviction float64
 	NumberOfProp64Convictions      int
+	NumberOf11357Convictions       int
+	NumberOf11358Convictions       int
+	NumberOf11359Convictions       int
+	NumberOf11360Convictions       int
 	comparisonTime                 time.Time
 	Superstrikes                   string
 	PC290CodeSections              string
@@ -64,7 +68,7 @@ func NewEligibilityInfo(row *DOJRow, subject *Subject, comparisonTime time.Time,
 	}
 
 	info.NumberOfConvictionsOnRecord = len(subject.Convictions)
-	info.NumberOfProp64Convictions = subject.NumberOfProp64Convictions(county)
+	info.NumberOfProp64Convictions, info.NumberOf11357Convictions, info.NumberOf11358Convictions, info.NumberOf11359Convictions, info.NumberOf11360Convictions = subject.Prop64ConvictionsBySection()
 	info.DateOfConviction = row.DispositionDate
 	info.CaseNumber = strings.Join(subject.CaseNumbers[row.CountOrder[0:6]], "; ")
 
