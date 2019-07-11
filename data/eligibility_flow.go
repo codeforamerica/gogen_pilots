@@ -22,6 +22,7 @@ type EligibilityOptions struct {
 
 type BaselineEligibility struct {
 	Dismiss []string `json:"dismiss"`
+	Reduce  []string `json:"reduce"`
 }
 
 type AdditionalRelief struct {

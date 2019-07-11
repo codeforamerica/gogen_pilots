@@ -67,7 +67,8 @@ var _ = Describe("DojInformation", func() {
 		testFlow := testEligibilityFlow{}
 		configurableFlow := NewConfigurableEligibilityFlow(EligibilityOptions{
 			BaselineEligibility: BaselineEligibility{
-				Dismiss: []string{"11357(A)", "11357(C)", "11357(D)", "11358"},
+				Dismiss: []string{"11357(a)", "11357(c)", "11357(d)", "11358"},
+				Reduce:  []string{"11357(b)", "11359", "11360"},
 			},
 			AdditionalRelief: AdditionalRelief{
 				SubjectUnder21AtConviction:    true,
@@ -124,15 +125,15 @@ var _ = Describe("DojInformation", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
 					"Eligible for Dismissal": {
-						"Dismiss all 11357(C)HS convictions": 1,
-						"57 years or older":                  2,
-						"Dismiss all 11358 HS convictions":   6,
-						"Conviction occurred 10 or more years ago":   1,
-						"Misdemeanor or Infraction":          3,
-						"21 years or younger": 1,},
+						"Dismiss all HS 11357(c) convictions":      1,
+						"57 years or older":                        2,
+						"Dismiss all HS 11358 convictions":         6,
+						"Conviction occurred 10 or more years ago": 1,
+						"Misdemeanor or Infraction":                3,
+						"21 years or younger":                      1,},
 					"Eligible for Reduction": {
-						"Reduce all 11359HS convictions": 1,
-						"Reduce all 11359 HS convictions": 1,},
+						"Reduce all HS 11359 convictions": 2,
+					},
 				}))
 		})
 
