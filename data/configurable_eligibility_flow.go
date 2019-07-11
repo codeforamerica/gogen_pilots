@@ -28,7 +28,7 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 
 	if options.AdditionalRelief.SubjectAgeThreshold != 0 {
 		if options.AdditionalRelief.SubjectAgeThreshold > 65 || options.AdditionalRelief.SubjectAgeThreshold < 40 {
-			panic("SubjectAgeTheshold should be between 40 and 65, or 0")
+			panic("SubjectAgeThreshold should be between 40 and 65, or 0")
 		}
 	}
 
