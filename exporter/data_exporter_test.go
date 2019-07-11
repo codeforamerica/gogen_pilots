@@ -80,8 +80,9 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dismissCodeSections := []string{"11357(A)", "11357(C)", "11357(D)", "11358"}
-			flow := createFlow(dismissCodeSections, COUNTY)
+			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11358"}
+			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
+			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
@@ -180,8 +181,9 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dismissCodeSections := []string{"11357(A)", "11357(C)", "11357(D)", "11358"}
-			flow := createFlow(dismissCodeSections, COUNTY)
+			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11358"}
+			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
+			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
@@ -226,10 +228,11 @@ func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
 	Expect(actualCSV).To(Equal(expectedCSV))
 }
 
-func createFlow(dismissCodeSections []string, county string) data.EligibilityFlow {
+func createFlow(dismissCodeSections []string, reduceCodeSections []string, county string) data.EligibilityFlow {
 	return data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
 		BaselineEligibility: data.BaselineEligibility{
 			Dismiss: dismissCodeSections,
+			Reduce: reduceCodeSections,
 		},
 		AdditionalRelief: data.AdditionalRelief{
 			SubjectUnder21AtConviction:    true,

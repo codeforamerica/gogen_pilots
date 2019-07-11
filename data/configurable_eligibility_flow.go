@@ -9,7 +9,8 @@ import (
 
 type configurableEligibilityFlow struct {
 	county                               string
-	dismissMatcher                       []*regexp.Regexp
+	dismissSections                      []string
+	reduceSections						 []string
 	dismissConvictionsUnderAgeOf21       bool
 	dismissIfSubjectHasOnlyProp64Charges bool
 	subjectAgeThreshold                  int
@@ -17,7 +18,6 @@ type configurableEligibilityFlow struct {
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
-	dismissMatcherRegex := makeRegexes(options.BaselineEligibility.Dismiss)
 
 	if options.AdditionalRelief.SubjectAgeThreshold != 0 {
 		if options.AdditionalRelief.SubjectAgeThreshold > 65 || options.AdditionalRelief.SubjectAgeThreshold < 40 {
@@ -33,7 +33,8 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 
 	return configurableEligibilityFlow{
 		county:                               county,
-		dismissMatcher:                       dismissMatcherRegex,
+		dismissSections:                      options.BaselineEligibility.Dismiss,
+		reduceSections:                       options.BaselineEligibility.Reduce,
 		dismissConvictionsUnderAgeOf21:       options.AdditionalRelief.SubjectUnder21AtConviction,
 		dismissIfSubjectHasOnlyProp64Charges: options.AdditionalRelief.SubjectHasOnlyProp64Charges,
 		subjectAgeThreshold:                  options.AdditionalRelief.SubjectAgeThreshold,
@@ -41,10 +42,10 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 	}
 }
 
-func makeRegexes(source []string) []*regexp.Regexp {
-	result := make([]*regexp.Regexp, len(source))
-	for i, s := range source {
-		result[i] = regexp.MustCompile(regexp.QuoteMeta(s) + ".*HS")
+func makeRegexes(source []string) map[string]*regexp.Regexp {
+	result := make(map[string]*regexp.Regexp)
+	for _, s := range source {
+		result[s] = matchers.Prop64MatchersByCodeSection[s]
 	}
 	return result
 }
@@ -74,8 +75,8 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		info.SetEligibleForDismissal("Misdemeanor or Infraction")
 		return
 	}
-	if ef.isDismissedCodeSection(row.CodeSection) {
-		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all %s convictions", row.CodeSection))
+	if matched, canonicalCodeSection := ef.isDismissedCodeSection(row.CodeSection); matched {
+		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all HS %s convictions", canonicalCodeSection))
 		return
 	}
 	if ef.dismissConvictionsUnderAgeOf21 && row.wasConvictionUnderAgeOf21(subject) {
@@ -94,17 +95,26 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		info.SetEligibleForDismissal("Only has 11357-60 charges")
 		return
 	}
-
-	info.SetEligibleForReduction(fmt.Sprintf("Reduce all %s convictions", row.CodeSection))
+	if matched, canonicalCodeSection := ef.isReducedCodeSection(row.CodeSection); matched {
+		info.SetEligibleForReduction(fmt.Sprintf("Reduce all HS %s convictions", canonicalCodeSection))
+		return
+	}
 }
 
-func (ef configurableEligibilityFlow) isDismissedCodeSection(codeSection string) bool {
-	if len(ef.dismissMatcher) > 0 {
-		for _, regex := range ef.dismissMatcher {
-			if regex.MatchString(codeSection) {
-				return true
-			}
+func (ef configurableEligibilityFlow) isDismissedCodeSection(candidateCodeSection string) (bool, string) {
+	for _, codeSection := range ef.dismissSections {
+		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection){
+			return true, codeSection
 		}
 	}
-	return false
+	return false, ""
+}
+
+func (ef configurableEligibilityFlow) isReducedCodeSection(candidateCodeSection string) (bool, string) {
+	for _, codeSection := range ef.reduceSections {
+		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection){
+			return true, codeSection
+		}
+	}
+	return false, ""
 }
