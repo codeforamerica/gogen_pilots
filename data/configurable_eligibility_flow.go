@@ -4,13 +4,12 @@ import (
 	"fmt"
 	"gogen/matchers"
 	"regexp"
-	"strings"
 	"time"
 )
 
 type configurableEligibilityFlow struct {
 	county                               string
-	dismissMatcher                       *regexp.Regexp
+	dismissMatcher                       []*regexp.Regexp
 	dismissConvictionsUnderAgeOf21       bool
 	dismissIfSubjectHasOnlyProp64Charges bool
 	subjectAgeThreshold                  int
@@ -18,13 +17,7 @@ type configurableEligibilityFlow struct {
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
-	var dismissMatcherRegexSource string
-	var dismissMatcherRegex *regexp.Regexp
-	dismissMatcherRegexSource = strings.Join(escapeRegexMetaChars(options.BaselineEligibility.Dismiss), "|")
-	if dismissMatcherRegexSource != "" {
-		dismissMatcherRegexSource = ".*(" + dismissMatcherRegexSource + ").*HS"
-		dismissMatcherRegex = regexp.MustCompile(dismissMatcherRegexSource)
-	}
+	dismissMatcherRegex := makeRegexes(options.BaselineEligibility.Dismiss)
 
 	if options.AdditionalRelief.SubjectAgeThreshold != 0 {
 		if options.AdditionalRelief.SubjectAgeThreshold > 65 || options.AdditionalRelief.SubjectAgeThreshold < 40 {
@@ -48,10 +41,10 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 	}
 }
 
-func escapeRegexMetaChars(source []string) []string {
-	result := make([]string, len(source))
+func makeRegexes(source []string) []*regexp.Regexp {
+	result := make([]*regexp.Regexp, len(source))
 	for i, s := range source {
-		result[i] = regexp.QuoteMeta(s)
+		result[i] = regexp.MustCompile(regexp.QuoteMeta(s) + ".*HS")
 	}
 	return result
 }
@@ -106,5 +99,12 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 }
 
 func (ef configurableEligibilityFlow) isDismissedCodeSection(codeSection string) bool {
-	return ef.dismissMatcher != nil && ef.dismissMatcher.MatchString(codeSection)
+	if len(ef.dismissMatcher) > 0 {
+		for _, regex := range ef.dismissMatcher {
+			if regex.MatchString(codeSection) {
+				return true
+			}
+		}
+	}
+	return false
 }
