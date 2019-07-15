@@ -3,7 +3,6 @@ package data
 import (
 	"fmt"
 	"gogen/matchers"
-	"regexp"
 	"time"
 )
 
@@ -40,14 +39,6 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		subjectAgeThreshold:                  options.AdditionalRelief.SubjectAgeThreshold,
 		yearsSinceConvictionThreshold:        options.AdditionalRelief.YearsSinceConvictionThreshold,
 	}
-}
-
-func makeRegexes(source []string) map[string]*regexp.Regexp {
-	result := make(map[string]*regexp.Regexp)
-	for _, s := range source {
-		result[s] = matchers.Prop64MatchersByCodeSection[s]
-	}
-	return result
 }
 
 func (ef configurableEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
