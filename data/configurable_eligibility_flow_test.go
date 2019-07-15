@@ -226,6 +226,88 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 		})
 
+		Context("Dismissing by unspecified 11357 subsection", func() {
+			var (
+				subject     Subject
+				conviction1 DOJRow
+				conviction2 DOJRow
+				conviction3 DOJRow
+				conviction4 DOJRow
+			)
+
+			BeforeEach(func() {
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+				conviction2 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(E) unknown subsection HS",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+				conviction3 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357 no subsection HS",
+					DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+					IsFelony:        true,
+				}
+				conviction4 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357 known subsection occurs later (A) HS",
+					DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1118888",
+					County:          COUNTY,
+					CountOrder:      "103001004000",
+					Index:           3,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, conviction2, conviction3, conviction4}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+			})
+
+			It("returns the correct eligibility determination for each conviction", func() {
+				flow := NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(no-sub-section)"},
+						Reduce:  []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)", "11358", "11359", "11360"},
+					},
+				}, COUNTY)
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[0].EligibilityReason).To(Equal("Reduce all HS 11357(a) convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("Dismiss all HS 11357 convictions (when no sub-section is specified)"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[2].EligibilityReason).To(Equal("Dismiss all HS 11357 convictions (when no sub-section is specified)"))
+				Expect(infos[3].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[3].EligibilityReason).To(Equal("Dismiss all HS 11357 convictions (when no sub-section is specified)"))
+			})
+		})
+
 		Context("When a matcher is empty", func() {
 			var (
 				subject     Subject
@@ -241,7 +323,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{},
-						Reduce:  []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)", "11358", "11359", "11360",},
+						Reduce:  []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)", "11357(no-sub-section)", "11358", "11359", "11360",},
 					},
 				}, COUNTY)
 
