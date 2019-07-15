@@ -80,7 +80,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11358"}
+			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11357(no-sub-section)", "11358"}
 			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
@@ -181,7 +181,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11358"}
+			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11357(no-sub-section)", "11358"}
 			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 

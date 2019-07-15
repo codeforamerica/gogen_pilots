@@ -67,7 +67,7 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		return
 	}
 	if matched, canonicalCodeSection := ef.isDismissedCodeSection(row.CodeSection); matched {
-		info.SetEligibleForDismissal(fmt.Sprintf("Dismiss all HS %s convictions", canonicalCodeSection))
+		info.SetEligibleForDismissal(composeEligibilityReason(canonicalCodeSection, true))
 		return
 	}
 	if ef.dismissConvictionsUnderAgeOf21 && row.wasConvictionUnderAgeOf21(subject) {
@@ -87,7 +87,7 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		return
 	}
 	if matched, canonicalCodeSection := ef.isReducedCodeSection(row.CodeSection); matched {
-		info.SetEligibleForReduction(fmt.Sprintf("Reduce all HS %s convictions", canonicalCodeSection))
+		info.SetEligibleForReduction(composeEligibilityReason(canonicalCodeSection, false))
 		return
 	}
 }
@@ -108,4 +108,17 @@ func (ef configurableEligibilityFlow) isReducedCodeSection(candidateCodeSection 
 		}
 	}
 	return false, ""
+}
+
+func composeEligibilityReason(canonicalCodeSection string, isDismiss bool) string {
+	var verb string
+	if isDismiss {
+		verb = "Dismiss"
+	} else {
+		verb = "Reduce"
+	}
+	if canonicalCodeSection == "11357(no-sub-section)" {
+		return fmt.Sprintf("%s all HS 11357 convictions (when no sub-section is specified)", verb)
+	}
+	return fmt.Sprintf("%s all HS %s convictions", verb, canonicalCodeSection)
 }
