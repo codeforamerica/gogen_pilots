@@ -301,6 +301,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gexec.Exit())
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
+		Eventually(session).Should(gbytes.Say("&&&&&&"))
 		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
 		Eventually(session).Should(gbytes.Say("Found 33 Total rows in DOJ file"))
 		Eventually(session).Should(gbytes.Say("Found 10 Total individuals in DOJ file"))
@@ -366,41 +367,4 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("3 individuals who had convictions will no longer have any convictions on their record"))
 		Eventually(session).Should(gbytes.Say("2 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
 	})
-
-	It("outputs JSON at the end of the process", func() {
-
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
-		Expect(err).ToNot(HaveOccurred())
-
-		pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
-		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
-
-		pathToGogen, err := gexec.Build("gogen")
-		Expect(err).ToNot(HaveOccurred())
-
-		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
-
-		runCommand := "run"
-		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
-		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
-		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
-		computeAtFlag := "--compute-at=2019-11-11"
-		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
-
-		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, eligibilityOptionsFlag)
-		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
-		Expect(err).ToNot(HaveOccurred())
-
-		Eventually(session).Should(gexec.Exit())
-		Expect(session.Err).ToNot(gbytes.Say("required"))
-
-		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
-		Eventually(session).Should(gbytes.Say("Found 33 Total rows in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 10 Total individuals in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 26 Total convictions in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 23 convictions in this county"))
-
-		Eventually(session).Should(gbytes.Say("{\"noLongerHaveFelony\": 3, \"noConvictions\": 3, \"noConvictionsLast7\": 2}"))
-	})
-
 })

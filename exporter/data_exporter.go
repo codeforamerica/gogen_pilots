@@ -56,6 +56,7 @@ func (d *DataExporter) Export(county string) {
 
 func (d *DataExporter) PrintAggregateStatistics(county string) {
 	fmt.Println()
+	fmt.Println("&&&&&&")
 	fmt.Println("----------- Overall summary of DOJ file --------------------")
 	fmt.Printf("Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())
 	fmt.Printf("Found %d Total individuals in DOJ file\n", d.dojInformation.TotalIndividuals())
@@ -103,8 +104,6 @@ func (d *DataExporter) PrintAggregateStatistics(county string) {
 	fmt.Printf("%d individuals who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony(d.dismissAllProp64AndRelatedEligibilities))
 	fmt.Printf("%d individuals who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction(d.dismissAllProp64AndRelatedEligibilities))
 	fmt.Printf("%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.dismissAllProp64AndRelatedEligibilities))
-	fmt.Println("&&&&&&")
-	fmt.Printf("{\"noLongerHaveFelony\": %d, \"noConvictions\": %d, \"noConvictionsLast7\": %d}", d.dojInformation.CountIndividualsNoLongerHaveFelony(d.normalFlowEligibilities), d.dojInformation.CountIndividualsNoLongerHaveConviction(d.normalFlowEligibilities), d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.normalFlowEligibilities))
 }
 
 func printSummaryByCodeSection(description string, resultsByCodeSection map[string]int) {
