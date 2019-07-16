@@ -12,6 +12,7 @@ type configurableEligibilityFlow struct {
 	reduceSections                       []string
 	dismissConvictionsUnderAgeOf21       bool
 	dismissIfSubjectHasOnlyProp64Charges bool
+	dismissIfSubjectIsDeceased           bool
 	subjectAgeThreshold                  int
 	yearsSinceConvictionThreshold        int
 	yearsCrimeFreeThreshold              int
@@ -42,6 +43,7 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		dismissSections:                      options.BaselineEligibility.Dismiss,
 		reduceSections:                       options.BaselineEligibility.Reduce,
 		dismissConvictionsUnderAgeOf21:       options.AdditionalRelief.SubjectUnder21AtConviction,
+		dismissIfSubjectIsDeceased:           options.AdditionalRelief.SubjectIsDeceased,
 		dismissIfSubjectHasOnlyProp64Charges: options.AdditionalRelief.SubjectHasOnlyProp64Charges,
 		subjectAgeThreshold:                  options.AdditionalRelief.SubjectAgeThreshold,
 		yearsSinceConvictionThreshold:        options.AdditionalRelief.YearsSinceConvictionThreshold,
@@ -98,6 +100,12 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		info.SetEligibleForDismissal("Only has 11357-60 charges")
 		return
 	}
+
+	if ef.dismissIfSubjectIsDeceased && subject.IsDeceased {
+		info.SetEligibleForDismissal("Individual is deceased")
+		return
+	}
+
 	if matched, canonicalCodeSection := ef.isReducedCodeSection(row.CodeSection); matched {
 		info.SetEligibleForReduction(composeEligibilityReason(canonicalCodeSection, false))
 		return

@@ -981,5 +981,125 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		})
 
+		Context("When additionalRelief -> subjectIsDeceased", func() {
+			var (
+				subject              Subject
+				prop64Conviction1    DOJRow
+				prop64Conviction2    DOJRow
+				prop64Conviction3    DOJRow
+				randomConviction1    DOJRow
+			)
+
+			BeforeEach(func() {
+				prop64Conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+				prop64Conviction2 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+				prop64Conviction3 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11360 HS",
+					DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+					IsFelony:        true,
+				}
+				randomConviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "57675 HS",
+					DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+					IsFelony:        true,
+				}
+			})
+
+			It("dismisses all p64 convictions if individual is deceased", func() {
+				rows := []DOJRow{prop64Conviction1, prop64Conviction2, prop64Conviction3, randomConviction1}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				subject.IsDeceased = true
+
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)"},
+					},
+					AdditionalRelief: AdditionalRelief{
+						SubjectIsDeceased: true,
+					},
+				}, COUNTY)
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all HS 11357(a) convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("Individual is deceased"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[2].EligibilityReason).To(Equal("Individual is deceased"))
+			})
+
+			It("does not dismiss convictions for a deceased person if additional relief is not selected", func() {
+
+				prop64Conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11360 HS",
+					DispositionDate: time.Date(2008, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{prop64Conviction1}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				subject.IsDeceased = true
+
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)"},
+						Reduce:  []string{"11358", "11359", "11360",},
+					},
+					AdditionalRelief: AdditionalRelief{},
+				}, COUNTY)
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[0].EligibilityReason).To(Equal("Reduce all HS 11360 convictions"))
+			})
+
+		})
+
 	})
 })
