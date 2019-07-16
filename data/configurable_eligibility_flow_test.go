@@ -585,6 +585,209 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		})
 
+		Context("When additionalRelief -> yearsCrimeFreeThreshold is set", func() {
+			var (
+				subject                          Subject
+				conviction1                      DOJRow
+				potentiallyDismissableConviction DOJRow
+				mostRecentConviction             DOJRow
+				mostRecentConvictionDate         time.Time
+				yearsCrimeFreeThreshold          int
+			)
+
+			BeforeEach(func() {
+				yearsCrimeFreeThreshold = 6
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
+						Reduce:  []string{"11358", "11359", "11360",},
+					},
+					AdditionalRelief: AdditionalRelief{
+						YearsCrimeFreeThreshold: yearsCrimeFreeThreshold,
+					},
+				}, COUNTY)
+			})
+
+			It("dismisses Prop 64 convictions if all convictions are older than the yearsCrimeFreeThreshold setting", func() {
+				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold +1), 0, 0)
+
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: comparisonTime.AddDate(-10, 0, 0),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				potentiallyDismissableConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: comparisonTime.AddDate(-10, 0, 0),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				mostRecentConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "1234 HS",
+					DispositionDate: mostRecentConvictionDate,
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, potentiallyDismissableConviction, mostRecentConviction}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all HS 11357(a) convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(MatchRegexp("No convictions in the past .* years"))
+			})
+
+			It("does not dismiss additional Prop 64 convictions if any conviction is newer than the yearsCrimeFreeThreshold setting", func() {
+				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold -1), 0, 0)
+
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: comparisonTime.AddDate(-yearsCrimeFreeThreshold+1, 0, 0),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				potentiallyDismissableConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: comparisonTime.AddDate(-yearsCrimeFreeThreshold+1, 0, 0),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				mostRecentConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "1234 HS",
+					DispositionDate: mostRecentConvictionDate,
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, potentiallyDismissableConviction, mostRecentConviction}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all HS 11357(a) convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Reduction"))
+				Expect(infos[1].EligibilityReason).To(Not(MatchRegexp("No convictions in the past .* years")))
+			})
+
+		})
+
+		Context("When additionalRelief -> yearsCrimeFreeThreshold is not set", func() {
+			var (
+				subject                          Subject
+				conviction1                      DOJRow
+				potentiallyDismissableConviction DOJRow
+				mostRecentConviction             DOJRow
+				mostRecentConvictionDate         time.Time
+				yearsCrimeFreeThreshold          int
+			)
+
+			BeforeEach(func() {
+				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+					BaselineEligibility: BaselineEligibility{
+						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
+						Reduce:  []string{"11358", "11359", "11360",},
+					},
+				}, COUNTY)
+			})
+
+			It("does not dismiss or reduce convictions for subjects with the reason of age of last conviction", func() {
+				yearsCrimeFreeThreshold = 2
+
+				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold +1), 0, 0)
+
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A) HS",
+					DispositionDate: comparisonTime.AddDate(-10, 0, 0),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+
+				potentiallyDismissableConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11359 HS",
+					DispositionDate: comparisonTime.AddDate(-10, 0, 0),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				mostRecentConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "1234 HS",
+					DispositionDate: mostRecentConvictionDate,
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{conviction1, potentiallyDismissableConviction, mostRecentConviction}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				for _, info := range infos {
+					Expect(info.EligibilityReason).To(Not(MatchRegexp("in the past .* years")))
+				}
+			})
+
+		})
+
 		Context("When additionalRelief -> subjectHasOnlyProp64Charges", func() {
 			var (
 				subject              Subject

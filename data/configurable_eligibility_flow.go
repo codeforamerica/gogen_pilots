@@ -10,11 +10,12 @@ import (
 type configurableEligibilityFlow struct {
 	county                               string
 	dismissSections                      []string
-	reduceSections						 []string
+	reduceSections                       []string
 	dismissConvictionsUnderAgeOf21       bool
 	dismissIfSubjectHasOnlyProp64Charges bool
 	subjectAgeThreshold                  int
 	yearsSinceConvictionThreshold        int
+	yearsCrimeFreeThreshold              int
 }
 
 func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
@@ -31,6 +32,12 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		}
 	}
 
+	if options.AdditionalRelief.YearsCrimeFreeThreshold != 0 {
+		if options.AdditionalRelief.YearsCrimeFreeThreshold > 15 || options.AdditionalRelief.YearsCrimeFreeThreshold < 1 {
+			panic("YearsCrimeFreeThreshold should be between 1 and 15, or 0")
+		}
+	}
+
 	return configurableEligibilityFlow{
 		county:                               county,
 		dismissSections:                      options.BaselineEligibility.Dismiss,
@@ -39,6 +46,7 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		dismissIfSubjectHasOnlyProp64Charges: options.AdditionalRelief.SubjectHasOnlyProp64Charges,
 		subjectAgeThreshold:                  options.AdditionalRelief.SubjectAgeThreshold,
 		yearsSinceConvictionThreshold:        options.AdditionalRelief.YearsSinceConvictionThreshold,
+		yearsCrimeFreeThreshold:              options.AdditionalRelief.YearsCrimeFreeThreshold,
 	}
 }
 
@@ -91,6 +99,10 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 		info.SetEligibleForDismissal(fmt.Sprintf("Conviction occurred %d or more years ago", ef.yearsSinceConvictionThreshold))
 		return
 	}
+	if ef.yearsCrimeFreeThreshold != 0 && subject.MostRecentConvictionDate().Before(info.comparisonTime.AddDate(-ef.yearsCrimeFreeThreshold, 0, 0)) {
+		info.SetEligibleForDismissal(fmt.Sprintf("No convictions in the past %d years", ef.yearsCrimeFreeThreshold))
+		return
+	}
 	if ef.dismissIfSubjectHasOnlyProp64Charges && info.onlyProp64Convictions(row, subject) {
 		info.SetEligibleForDismissal("Only has 11357-60 charges")
 		return
@@ -103,7 +115,7 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 
 func (ef configurableEligibilityFlow) isDismissedCodeSection(candidateCodeSection string) (bool, string) {
 	for _, codeSection := range ef.dismissSections {
-		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection){
+		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection) {
 			return true, codeSection
 		}
 	}
@@ -112,7 +124,7 @@ func (ef configurableEligibilityFlow) isDismissedCodeSection(candidateCodeSectio
 
 func (ef configurableEligibilityFlow) isReducedCodeSection(candidateCodeSection string) (bool, string) {
 	for _, codeSection := range ef.reduceSections {
-		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection){
+		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection) {
 			return true, codeSection
 		}
 	}

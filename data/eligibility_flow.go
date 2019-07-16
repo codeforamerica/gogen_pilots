@@ -30,4 +30,5 @@ type AdditionalRelief struct {
 	SubjectHasOnlyProp64Charges   bool `json:"subjectHasOnlyProp64Charges"`
 	SubjectAgeThreshold           int  `json:"subjectAgeThreshold"`
 	YearsSinceConvictionThreshold int  `json:"yearsSinceConvictionThreshold"`
+	YearsCrimeFreeThreshold       int  `json:"yearsCrimeFreeThreshold"`
 }
