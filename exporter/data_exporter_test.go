@@ -239,6 +239,7 @@ func createFlow(dismissCodeSections []string, reduceCodeSections []string, count
 			SubjectAgeThreshold:           57,
 			YearsSinceConvictionThreshold: 10,
 			SubjectHasOnlyProp64Charges:   true,
+			SubjectIsDeceased: true,
 		},
 	}, county)
 }

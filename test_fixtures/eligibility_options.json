@@ -17,6 +17,7 @@
     "subjectUnder21AtConviction": true,
     "subjectAgeThreshold": 57,
     "yearsSinceConvictionThreshold": 10,
+    "subjectIsDeceased": true,
     "subjectHasOnlyProp64Charges": true
   }
 }
