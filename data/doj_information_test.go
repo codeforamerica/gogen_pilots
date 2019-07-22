@@ -74,6 +74,7 @@ var _ = Describe("DojInformation", func() {
 				SubjectUnder21AtConviction:    true,
 				SubjectAgeThreshold:           57,
 				YearsSinceConvictionThreshold: 10,
+				SubjectIsDeceased: true,
 			},
 		}, county)
 		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, configurableFlow)
@@ -95,29 +96,29 @@ var _ = Describe("DojInformation", func() {
 
 	Context("Computing Aggregate Statistics for convictions", func() {
 		It("Counts total number of rows in file", func() {
-			Expect(dojInformation.TotalRows()).To(Equal(34))
+			Expect(dojInformation.TotalRows()).To(Equal(36))
 		})
 
 		It("Counts total convictions", func() {
-			Expect(dojInformation.TotalConvictions()).To(Equal(27))
+			Expect(dojInformation.TotalConvictions()).To(Equal(28))
 		})
 
 		It("Counts total convictions in this county", func() {
-			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(24))
+			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(25))
 		})
 
 		It("Counts all Prop64 convictions sorted by code section", func() {
-			Expect(dojInformation.OverallProp64ConvictionsByCodeSection()).To(Equal(map[string]int{"11357": 4, "11358": 9, "11359": 7}))
+			Expect(dojInformation.OverallProp64ConvictionsByCodeSection()).To(Equal(map[string]int{"11357": 4, "11358": 8, "11359": 8}))
 		})
 
 		It("Counts Prop64 convictions in this county sorted by code section", func() {
-			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 4, "11358": 7, "11359": 6}))
+			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 4, "11358": 6, "11359": 7}))
 		})
 
 		It("Prop64 convictions in this county by code section and eligibility determination", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
-					"Eligible for Dismissal": {"11357": 4, "11358": 7, "11359": 4},
+					"Eligible for Dismissal": {"11357": 4, "11358": 6, "11359": 5},
 					"Eligible for Reduction": {"11359": 2}}))
 		})
 
@@ -125,10 +126,11 @@ var _ = Describe("DojInformation", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
 					"Eligible for Dismissal": {
-						"Dismiss all HS 11357(c) convictions":      1,
+						"Dismiss all HS 11357(c) convictions":                                 1,
 						"Dismiss all HS 11357 convictions (when no sub-section is specified)": 1,
 						"57 years or older":                        2,
-						"Dismiss all HS 11358 convictions":         6,
+						"Individual is deceased":                   1,
+						"Dismiss all HS 11358 convictions":         5,
 						"Conviction occurred 10 or more years ago": 1,
 						"Misdemeanor or Infraction":                3,
 						"21 years or younger":                      1,},
@@ -168,11 +170,11 @@ var _ = Describe("DojInformation", func() {
 				})
 
 				It("Calculates individuals who no longer have any conviction", func() {
-					Expect(dojInformation.CountIndividualsNoLongerHaveConviction(dojEligibilities)).To(Equal(4))
+					Expect(dojInformation.CountIndividualsNoLongerHaveConviction(dojEligibilities)).To(Equal(3))
 				})
 
 				It("Calculates individuals who no longer have any conviction in the last 7 years", func() {
-					Expect(dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(dojEligibilities)).To(Equal(2))
+					Expect(dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(dojEligibilities)).To(Equal(1))
 				})
 			})
 
