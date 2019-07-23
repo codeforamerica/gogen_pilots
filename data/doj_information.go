@@ -12,10 +12,10 @@ import (
 )
 
 type DOJInformation struct {
-	Rows                     [][]string
-	Subjects                 map[string]*Subject
-	comparisonTime           time.Time
-	checksRelatedCharges     bool
+	Rows                 [][]string
+	Subjects             map[string]*Subject
+	comparisonTime       time.Time
+	checksRelatedCharges bool
 }
 
 func (i *DOJInformation) aggregateSubjects(eligibilityFlow EligibilityFlow) {
@@ -40,7 +40,7 @@ func (i *DOJInformation) aggregateSubjects(eligibilityFlow EligibilityFlow) {
 	fmt.Println("\nComplete...")
 }
 
-func (i *DOJInformation) DetermineEligibility(county string, eligibilityFlow EligibilityFlow) map[int]*EligibilityInfo{
+func (i *DOJInformation) DetermineEligibility(county string, eligibilityFlow EligibilityFlow) map[int]*EligibilityInfo {
 	eligibilities := make(map[int]*EligibilityInfo)
 	for _, subject := range i.Subjects {
 		infos := eligibilityFlow.ProcessSubject(subject, i.comparisonTime, county)
@@ -308,10 +308,10 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 		panic(err)
 	}
 	info := DOJInformation{
-		Rows:                     rows,
-		Subjects:                 make(map[string]*Subject),
-		comparisonTime:           comparisonTime,
-		checksRelatedCharges:     eligibilityFlow.ChecksRelatedCharges(),
+		Rows:                 rows,
+		Subjects:             make(map[string]*Subject),
+		comparisonTime:       comparisonTime,
+		checksRelatedCharges: eligibilityFlow.ChecksRelatedCharges(),
 	}
 
 	info.aggregateSubjects(eligibilityFlow)
