@@ -27,7 +27,7 @@ type runOpts struct {
 	County             string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 	EligibilityOptions string `long:"eligibility-options" description:"File containing options for which eligibility logic to apply"`
-	DateForFileName    string `long:"date-for-file-name" hidden:"true" description:"string containing date time to append to file names"`
+	FileNameSuffix     string `long:"file-name-suffix" hidden:"true" description:"string to append to file names"`
 }
 
 type exportTestCSVOpts struct {
@@ -44,6 +44,10 @@ var opts struct {
 }
 
 func (r runOpts) Execute(args []string) error {
+	if r.FileNameSuffix != "" {
+		utilities.SetFileNameSuffix(r.FileNameSuffix)
+	}
+
 	if r.OutputFolder == "" || r.DOJFile == "" || r.County == "" {
 		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_OPTION_ERROR)
 	}
@@ -93,10 +97,10 @@ func (r runOpts) Execute(args []string) error {
 	var condensedFilePath string
 	var prop64ConvictionsFilePath string
 
-	if r.DateForFileName != "" {
-		dojFile := fmt.Sprintf("doj_results_%s.csv", r.DateForFileName)
-		condensedFile := fmt.Sprintf("doj_results_condensed_%s.csv", r.DateForFileName)
-		convictionsFile := fmt.Sprintf("doj_results_convictions_%s.csv", r.DateForFileName)
+	if r.FileNameSuffix != "" {
+		dojFile := fmt.Sprintf("doj_results_%s.csv", r.FileNameSuffix)
+		condensedFile := fmt.Sprintf("doj_results_condensed_%s.csv", r.FileNameSuffix)
+		convictionsFile := fmt.Sprintf("doj_results_convictions_%s.csv", r.FileNameSuffix)
 
 		dojFilePath = filepath.Join(r.OutputFolder, dojFile)
 		condensedFilePath = filepath.Join(r.OutputFolder, condensedFile)
@@ -111,7 +115,7 @@ func (r runOpts) Execute(args []string) error {
 	condensedDojWriter := exporter.NewCondensedDOJWriter(condensedFilePath)
 	prop64ConvictionsDojWriter := exporter.NewDOJWriter(prop64ConvictionsFilePath)
 
-	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter)
+	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter, r.FileNameSuffix)
 
 	dataExporter.Export(r.County)
 

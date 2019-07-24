@@ -45,7 +45,7 @@ var _ = Describe("DataExporter", func() {
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
 		})
 
 		It("runs and has output", func() {
@@ -98,7 +98,7 @@ var _ = Describe("DataExporter", func() {
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
 		})
 
 		It("runs and has condensed output", func() {
@@ -144,7 +144,7 @@ var _ = Describe("DataExporter", func() {
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
 		})
 
 		It("runs and has condensed output", func() {
@@ -195,7 +195,7 @@ var _ = Describe("DataExporter", func() {
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
 		})
 
 		It("runs and has output", func() {

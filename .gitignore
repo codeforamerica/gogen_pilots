@@ -6,3 +6,5 @@ results/
 generate_test_data/generate_test_data
 generated_test_data.csv
 ~*.xlsx
+gogen*.out
+gogen*.err
