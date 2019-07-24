@@ -45,7 +45,7 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit())
+		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
 		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
@@ -78,7 +78,7 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit())
+		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
 		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
@@ -111,7 +111,7 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit())
+		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 
@@ -127,7 +127,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Reduce all HS 11359 convictions"))
 	})
 
-	It("can accept a date for the output file names", func() {
+	It("can accept a suffix for the output file names", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen")
 		Expect(err).ToNot(HaveOccurred())
@@ -137,7 +137,7 @@ var _ = Describe("gogen", func() {
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
-		date := "Feb_8_2019_3.32.43.PM"
+		date_suffix := "Feb_8_2019_3.32.43.PM"
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
 
@@ -146,14 +146,14 @@ var _ = Describe("gogen", func() {
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
 		computeAtFlag := "--compute-at=2019-11-11"
-		dateTimeFlag := fmt.Sprintf("--date-for-file-name=%s", date)
+		dateTimeFlag := fmt.Sprintf("--file-name-suffix=%s", date_suffix)
 		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
 
 		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateTimeFlag, eligibilityOptionsFlag)
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit())
+		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
 		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
@@ -161,9 +161,9 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
 		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
 
-		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_%s.csv", outputDir, date)
-		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, date)
-		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_%s.csv", outputDir, date)
+		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_%s.csv", outputDir, date_suffix)
+		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, date_suffix)
+		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_%s.csv", outputDir, date_suffix)
 
 		Ω(expectedDojResultsFileName).Should(BeAnExistingFile())
 		Ω(expectedCondensedFileName).Should(BeAnExistingFile())
@@ -298,7 +298,7 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit())
+		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
 		Eventually(session).Should(gbytes.Say("&&&&&&"))
