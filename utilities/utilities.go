@@ -16,7 +16,7 @@ const (
 	INVALID_OPTION_ERROR = 3
 )
 
-var fileNameSuffix string
+var errorFileName string
 
 func PrintProgressBar(index, totalRows int, totalTime time.Duration, tail string) {
 	progress := float64(index) / float64(totalRows)
@@ -38,17 +38,11 @@ func Percent(num int, denom int) int {
 	return num * 100 / denom
 }
 
-func SetFileNameSuffix(suffix string) {
-	fileNameSuffix = suffix
+func SetErrorFileName(filename string) {
+	errorFileName = filename
 }
 
 func ExitWithError(originalError error, exitCode int) {
-	var errorFileName string
-	if fileNameSuffix != "" {
-		errorFileName = fmt.Sprintf("gogen_%s.err", fileNameSuffix)
-	} else {
-		errorFileName = fmt.Sprintf("gogen.err")
-	}
 	errorFile, err := os.Create(errorFileName)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)

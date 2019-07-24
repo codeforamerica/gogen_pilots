@@ -43,9 +43,8 @@ var opts struct {
 }
 
 func (r runOpts) Execute(args []string) error {
-	if r.FileNameSuffix != "" {
-		utilities.SetFileNameSuffix(r.FileNameSuffix)
-	}
+
+	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen%s.err", r.FileNameSuffix))
 
 	if r.OutputFolder == "" || r.DOJFile == "" || r.County == "" {
 		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_OPTION_ERROR)
