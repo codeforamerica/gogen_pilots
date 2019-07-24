@@ -5,6 +5,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -56,4 +57,20 @@ func ExitWithError(originalError error, exitCode int) {
 	errorWriter := io.MultiWriter(os.Stderr, errorFile)
 	fmt.Fprintln(errorWriter, originalError)
 	os.Exit(exitCode)
+}
+
+func GenerateFileName(outputFolder string, template string, suffix string) string {
+	if suffix != "" {
+		suffix = "_" + suffix
+	}
+	return filepath.Join(outputFolder, fmt.Sprintf(template, suffix))
+}
+
+func GetOutputWriter(filePath string) io.Writer {
+	summaryFile, err := os.Create(filePath)
+	if err != nil {
+		ExitWithError(err, OTHER_ERROR)
+	}
+	summaryWriter := io.MultiWriter(os.Stdout, summaryFile)
+	return summaryWriter
 }

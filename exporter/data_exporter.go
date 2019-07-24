@@ -3,9 +3,7 @@ package exporter
 import (
 	"fmt"
 	"gogen/data"
-	"gogen/utilities"
 	"io"
-	"os"
 	"sort"
 )
 
@@ -28,20 +26,8 @@ func NewDataExporter(
 	outputDOJWriter DOJWriter,
 	outputCondensedDOJWriter DOJWriter,
 	outputProp64ConvictionsDOJWriter DOJWriter,
-	fileNameSuffix string,
+	summaryWriter io.Writer,
 ) DataExporter {
-	var summaryFileName string
-	if fileNameSuffix != "" {
-		summaryFileName = fmt.Sprintf("gogen_%s.out", fileNameSuffix)
-	} else {
-		summaryFileName = fmt.Sprintf("gogen.out")
-	}
-	summaryFile, err := os.Create(summaryFileName)
-	if err != nil {
-		utilities.ExitWithError(err, utilities.OTHER_ERROR)
-	}
-
-	summaryWriter := io.MultiWriter(os.Stdout, summaryFile)
 
 	return DataExporter{
 		dojInformation:                          dojInformation,

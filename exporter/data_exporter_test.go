@@ -9,6 +9,7 @@ import (
 	"gogen/data"
 	. "gogen/exporter"
 	. "gogen/test_fixtures"
+	"gogen/utilities"
 	"io/ioutil"
 	"os"
 	path "path/filepath"
@@ -43,9 +44,11 @@ var _ = Describe("DataExporter", func() {
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			outputWriter := utilities.GetOutputWriter("gogen.out")
+
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
 		})
 
 		It("runs and has output", func() {
@@ -96,9 +99,10 @@ var _ = Describe("DataExporter", func() {
 			dojWriter := NewDOJWriter(dojResultsPath)
 			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
 		})
 
 		It("runs and has condensed output", func() {
@@ -142,9 +146,10 @@ var _ = Describe("DataExporter", func() {
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
 		})
 
 		It("runs and has condensed output", func() {
@@ -193,9 +198,10 @@ var _ = Describe("DataExporter", func() {
 			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, "")
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
 		})
 
 		It("runs and has output", func() {
