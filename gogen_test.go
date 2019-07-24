@@ -137,7 +137,7 @@ var _ = Describe("gogen", func() {
 
 		pathToGogen, err := gexec.Build("gogen")
 		Expect(err).ToNot(HaveOccurred())
-		date_suffix := "Feb_8_2019_3.32.43.PM"
+		dateSuffix := "Feb_8_2019_3.32.43.PM"
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
 
@@ -146,7 +146,7 @@ var _ = Describe("gogen", func() {
 		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
 		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
 		computeAtFlag := "--compute-at=2019-11-11"
-		dateTimeFlag := fmt.Sprintf("--file-name-suffix=%s", date_suffix)
+		dateTimeFlag := fmt.Sprintf("--file-name-suffix=%s", dateSuffix)
 		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
 
 		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateTimeFlag, eligibilityOptionsFlag)
@@ -161,13 +161,15 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
 		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
 
-		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_%s.csv", outputDir, date_suffix)
-		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, date_suffix)
-		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_%s.csv", outputDir, date_suffix)
+		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_%s.csv", outputDir, dateSuffix)
+		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, dateSuffix)
+		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_%s.csv", outputDir, dateSuffix)
+		expectedOutputFileName := fmt.Sprintf("%v/gogen_%s.out", outputDir, dateSuffix)
 
 		Ω(expectedDojResultsFileName).Should(BeAnExistingFile())
 		Ω(expectedCondensedFileName).Should(BeAnExistingFile())
 		Ω(expectedConvictionsFileName).Should(BeAnExistingFile())
+		Ω(expectedOutputFileName).Should(BeAnExistingFile())
 	})
 
 	It("runs and has output for Los Angeles", func() {
