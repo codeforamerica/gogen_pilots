@@ -1,8 +1,10 @@
 package data
 
 import (
+	"errors"
 	"fmt"
 	"gogen/matchers"
+	"gogen/utilities"
 	"time"
 )
 
@@ -22,19 +24,19 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 
 	if options.AdditionalRelief.SubjectAgeThreshold != 0 {
 		if options.AdditionalRelief.SubjectAgeThreshold > 65 || options.AdditionalRelief.SubjectAgeThreshold < 40 {
-			panic("SubjectAgeThreshold should be between 40 and 65, or 0")
+			utilities.ExitWithError(errors.New("SubjectAgeThreshold should be between 40 and 65, or 0"), utilities.INVALID_OPTION_ERROR)
 		}
 	}
 
 	if options.AdditionalRelief.YearsSinceConvictionThreshold != 0 {
 		if options.AdditionalRelief.YearsSinceConvictionThreshold > 15 || options.AdditionalRelief.YearsSinceConvictionThreshold < 1 {
-			panic("YearsSinceConvictionThreshold should be between 1 and 15, or 0")
+			utilities.ExitWithError(errors.New("YearsSinceConvictionThreshold should be between 1 and 15, or 0"), utilities.INVALID_OPTION_ERROR)
 		}
 	}
 
 	if options.AdditionalRelief.YearsCrimeFreeThreshold != 0 {
 		if options.AdditionalRelief.YearsCrimeFreeThreshold > 15 || options.AdditionalRelief.YearsCrimeFreeThreshold < 1 {
-			panic("YearsCrimeFreeThreshold should be between 1 and 15, or 0")
+			utilities.ExitWithError(errors.New("YearsCrimeFreeThreshold should be between 1 and 15, or 0"), utilities.INVALID_OPTION_ERROR)
 		}
 	}
 

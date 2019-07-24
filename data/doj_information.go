@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+
 type DOJInformation struct {
 	Rows                 [][]string
 	Subjects             map[string]*Subject
@@ -293,7 +294,7 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years(elig
 func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibilityFlow EligibilityFlow) *DOJInformation {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
-		panic(err)
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 
 	bufferedReader := bufio.NewReader(dojFile)
@@ -305,7 +306,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
-		panic(err)
+		utilities.ExitWithError(err, utilities.CSV_PARSING_ERROR)
 	}
 	info := DOJInformation{
 		Rows:                 rows,
@@ -327,7 +328,7 @@ func includesHeaders(reader *bufio.Reader) bool {
 	firstRowBytes, err := reader.Peek(128)
 
 	if err != nil {
-		panic(err)
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 
 	firstRow := string(firstRowBytes)

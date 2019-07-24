@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"gogen/data"
+	"gogen/utilities"
 	"os"
 	"time"
 )
@@ -162,7 +163,7 @@ type csvWriter struct {
 func NewWriter(outputFilePath string, headers []string) DOJWriter {
 	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
-		panic(err)
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 
 	w := new(csvWriter)
@@ -171,7 +172,7 @@ func NewWriter(outputFilePath string, headers []string) DOJWriter {
 
 	err = w.outputFileWriter.Write(headers)
 	if err != nil {
-		panic(err)
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 
 	return w
