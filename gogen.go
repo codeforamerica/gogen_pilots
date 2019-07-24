@@ -7,6 +7,7 @@ import (
 	"gogen/data"
 	"gogen/exporter"
 	"gogen/test_fixtures"
+	"gogen/utilities"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -44,7 +45,7 @@ var opts struct {
 
 func (r runOpts) Execute(args []string) error {
 	if r.OutputFolder == "" || r.DOJFile == "" || r.County == "" {
-		panic("Missing required field! Run gogen --help for more info.")
+		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_OPTION_ERROR)
 	}
 
 	computeAtDate := time.Now()
@@ -52,7 +53,7 @@ func (r runOpts) Execute(args []string) error {
 	if r.ComputeAt != "" {
 		computeAtOption, err := time.Parse("2006-01-02", r.ComputeAt)
 		if err != nil {
-			panic("Invalid --compute-at date. Must be a valid date of the format YYYY-MM-DD.")
+			utilities.ExitWithError(errors.New("invalid --compute-at date: Must be a valid date in the format YYYY-MM-DD"), utilities.INVALID_OPTION_ERROR)
 		} else {
 			computeAtDate = computeAtOption
 		}
@@ -64,18 +65,18 @@ func (r runOpts) Execute(args []string) error {
 		var options data.EligibilityOptions
 		optionsFile, err := os.Open(r.EligibilityOptions)
 		if err != nil {
-			panic(err)
+			utilities.ExitWithError(err, utilities.INVALID_OPTION_ERROR)
 		}
 		defer optionsFile.Close()
 
 		optionsBytes, err := ioutil.ReadAll(optionsFile)
 		if err != nil {
-			panic(err)
+			utilities.ExitWithError(err, utilities.INVALID_OPTION_ERROR)
 		}
 
 		err = json.Unmarshal(optionsBytes, &options)
 		if err != nil {
-			panic(err)
+			utilities.ExitWithError(err, utilities.INVALID_OPTION_ERROR)
 		}
 		countyEligibilityFlow = data.NewConfigurableEligibilityFlow(options, r.County)
 	} else {

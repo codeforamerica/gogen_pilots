@@ -2,10 +2,20 @@ package utilities
 
 import (
 	"fmt"
+	"io"
 	"math"
+	"os"
 	"strings"
 	"time"
 )
+
+const (
+	OTHER_ERROR = 1
+	CSV_PARSING_ERROR = 2
+	INVALID_OPTION_ERROR = 3
+)
+
+
 
 func PrintProgressBar(index, totalRows int, totalTime time.Duration, tail string) {
 	progress := float64(index) / float64(totalRows)
@@ -25,4 +35,15 @@ func Percent(num int, denom int) int {
 		return 0
 	}
 	return num * 100 / denom
+}
+
+func ExitWithError(originalError error, exitCode int) {
+	errorFile, err := os.Create("gogen.err")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	errorWriter := io.MultiWriter(os.Stderr, errorFile)
+	fmt.Fprintln(errorWriter, originalError)
+	os.Exit(exitCode)
 }
