@@ -154,12 +154,6 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit(0))
-		Expect(session.Err).ToNot(gbytes.Say("required"))
-
-		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 11 Total individuals in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
 
 		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_%s.csv", outputDir, dateSuffix)
 		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, dateSuffix)
@@ -170,6 +164,111 @@ var _ = Describe("gogen", func() {
 		Ω(expectedCondensedFileName).Should(BeAnExistingFile())
 		Ω(expectedConvictionsFileName).Should(BeAnExistingFile())
 		Ω(expectedOutputFileName).Should(BeAnExistingFile())
+	})
+
+	It("validates required options", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma.csv"))
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		computeAtFlag := "--compute-at=2019-11-11"
+		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, computeAtFlag, eligibilityOptionsFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit(3))
+		Eventually(session.Err).Should(gbytes.Say("missing required field: Run gogen --help for more info"))
+
+		expectedErrorFileName := fmt.Sprintf("%v/gogen%s.err", outputDir, "")
+
+		Ω(expectedErrorFileName).Should(BeAnExistingFile())
+		data, _ := ioutil.ReadFile(expectedErrorFileName)
+		Expect(string(data)).To(Equal("missing required field: Run gogen --help for more info\n"))
+	})
+
+	It("fails and reports errors for missing input files", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "missing.csv"))
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+		filenameSuffix := "a_suffix"
+
+		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
+		computeAtFlag := "--compute-at=2019-11-11"
+		dateTimeFlag := fmt.Sprintf("--file-name-suffix=%s", filenameSuffix)
+		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateTimeFlag, eligibilityOptionsFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit(1))
+		Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
+
+		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
+
+		Ω(expectedErrorFileName).Should(BeAnExistingFile())
+		data, _ := ioutil.ReadFile(expectedErrorFileName)
+		Expect(string(data)).To(MatchRegexp("open .*missing.csv: no such file or directory"))
+	})
+
+	It("fails and reports errors for invalid input files", func() {
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "bad.csv"))
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+		filenameSuffix := "a_suffix"
+
+		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToDOJ)
+		countyFlag := fmt.Sprintf("--county=%s", "SAN JOAQUIN")
+		computeAtFlag := "--compute-at=2019-11-11"
+		dateTimeFlag := fmt.Sprintf("--file-name-suffix=%s", filenameSuffix)
+		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateTimeFlag, eligibilityOptionsFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit(2))
+		Eventually(session.Err).Should(gbytes.Say("record on line 2: wrong number of fields"))
+
+		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
+
+		Ω(expectedErrorFileName).Should(BeAnExistingFile())
+		data, _ := ioutil.ReadFile(expectedErrorFileName)
+		Expect(string(data)).To(MatchRegexp("record on line 2: wrong number of fields"))
 	})
 
 	It("runs and has output for Los Angeles", func() {
