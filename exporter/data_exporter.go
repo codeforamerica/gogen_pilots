@@ -60,52 +60,50 @@ func (d *DataExporter) Export(county string) {
 }
 
 func (d *DataExporter) PrintAggregateStatistics(county string) {
-	fmt.Fprintln(d.summaryWriter)
-	fmt.Fprintln(d.summaryWriter, "&&&&&&")
-	fmt.Fprintln(d.summaryWriter, "----------- Overall summary of DOJ file --------------------")
+	fmt.Fprintf(d.summaryWriter, "\n&&&&&&\n")
+	fmt.Fprintf(d.summaryWriter, "----------- Overall summary of DOJ file --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())
 	fmt.Fprintf(d.summaryWriter, "Found %d Total individuals in DOJ file\n", d.dojInformation.TotalIndividuals())
 	fmt.Fprintf(d.summaryWriter, "Found %d Total convictions in DOJ file\n", d.dojInformation.TotalConvictions())
 	fmt.Fprintf(d.summaryWriter, "Found %d convictions in this county\n", d.dojInformation.TotalConvictionsInCounty(county))
 
-	fmt.Fprintln(d.summaryWriter)
+	fmt.Fprintf(d.summaryWriter, "\n")
 	fmt.Fprintf(d.summaryWriter, "----------- Prop64 Convictions Overall--------------------")
 	d.printSummaryByCodeSection("total", d.dojInformation.OverallProp64ConvictionsByCodeSection())
-	fmt.Fprintln(d.summaryWriter)
+	fmt.Fprintf(d.summaryWriter, "\n")
 
 	fmt.Fprintf(d.summaryWriter, "----------- Prop64 Convictions In This County --------------------")
 	d.printSummaryByCodeSection("in this county", d.dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county))
 
 	d.printSummaryByCodeSectionByEligibility(d.dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county, d.normalFlowEligibilities))
 
-	fmt.Fprintln(d.summaryWriter)
-	fmt.Fprintln(d.summaryWriter, "----------- Eligibility Reasons --------------------")
+	fmt.Fprintf(d.summaryWriter, "\n")
+	fmt.Fprintf(d.summaryWriter, "----------- Eligibility Reasons --------------------\n")
 	d.printSummaryByEligibilityByReason(d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities))
-	fmt.Fprintln(d.summaryWriter)
-	fmt.Fprintln(d.summaryWriter)
+	fmt.Fprintf(d.summaryWriter, "\n\n")
 	fmt.Fprintf(d.summaryWriter, "----------- Prop64 Related Convictions In This County --------------------")
 	d.printSummaryByCodeSection("in this county", d.dojInformation.OverallRelatedConvictionsByCodeSection())
-	fmt.Fprintln(d.summaryWriter)
+	fmt.Fprintf(d.summaryWriter, "\n")
 	d.printSummaryByCodeSectionByEligibility(d.dojInformation.RelatedConvictionsInThisCountyByCodeSectionByEligibility(county, d.normalFlowEligibilities))
-	fmt.Fprintln(d.summaryWriter)
+	fmt.Fprintf(d.summaryWriter, "\n")
 
-	fmt.Fprintln(d.summaryWriter, "----------- Impact to individuals --------------------")
+	fmt.Fprintf(d.summaryWriter, "----------- Impact to individuals --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "%d individuals currently have a felony on their record\n", d.dojInformation.CountIndividualsWithFelony())
 	fmt.Fprintf(d.summaryWriter, "%d individuals currently have convictions on their record\n", d.dojInformation.CountIndividualsWithConviction())
 	fmt.Fprintf(d.summaryWriter, "%d individuals currently have convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsWithConvictionInLast7Years())
-	fmt.Fprintln(d.summaryWriter)
+	fmt.Fprintf(d.summaryWriter, "\n")
 
-	fmt.Fprintln(d.summaryWriter, "----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------")
+	fmt.Fprintf(d.summaryWriter, "----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony(d.normalFlowEligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction(d.normalFlowEligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.normalFlowEligibilities))
-	fmt.Fprintln(d.summaryWriter)
-	fmt.Fprintln(d.summaryWriter, "----------- If ALL Prop 64 convictions are dismissed and sealed --------------------")
+	fmt.Fprintf(d.summaryWriter, "\n")
+	fmt.Fprintf(d.summaryWriter, "----------- If ALL Prop 64 convictions are dismissed and sealed --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony(d.dismissAllProp64Eligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction(d.dismissAllProp64Eligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.dismissAllProp64Eligibilities))
-	fmt.Fprintln(d.summaryWriter)
-	fmt.Fprintln(d.summaryWriter, "----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------")
+	fmt.Fprintf(d.summaryWriter, "\n")
+	fmt.Fprintf(d.summaryWriter, "----------- If all Prop 64 AND related convictions are dismissed and sealed --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony(d.dismissAllProp64AndRelatedEligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction(d.dismissAllProp64AndRelatedEligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.dismissAllProp64AndRelatedEligibilities))
@@ -166,7 +164,7 @@ func (d *DataExporter) printSummaryByEligibilityByReason(resultsByEligibilityByR
 			total += reasonMap[reason]
 			fmt.Fprintf(d.summaryWriter, "\nFound %v convictions with eligibility reason %v", reasonMap[reason], reason)
 		}
-		fmt.Fprintln(d.summaryWriter)
+		fmt.Fprintf(d.summaryWriter, "\n")
 	}
 }
 
