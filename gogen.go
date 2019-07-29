@@ -16,7 +16,7 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
-const VERSION = "0.0.3"
+const VERSION = "0.2.0"
 
 var defaultOpts struct{}
 
