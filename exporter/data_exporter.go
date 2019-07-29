@@ -93,7 +93,7 @@ func (d *DataExporter) PrintAggregateStatistics(county string) {
 	fmt.Fprintf(d.summaryWriter, "%d individuals currently have convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsWithConvictionInLast7Years())
 	fmt.Fprintf(d.summaryWriter, "\n")
 
-	fmt.Fprintf(d.summaryWriter, "----------- If eligibility is ran as is for Prop 64 and Related Charges --------------------\n")
+	fmt.Fprintf(d.summaryWriter, "----------- Eligibility is run as specified for Prop 64 and Related Charges --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had a felony will no longer have a felony on their record\n", d.dojInformation.CountIndividualsNoLongerHaveFelony(d.normalFlowEligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions will no longer have any convictions on their record\n", d.dojInformation.CountIndividualsNoLongerHaveConviction(d.normalFlowEligibilities))
 	fmt.Fprintf(d.summaryWriter, "%d individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years\n", d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.normalFlowEligibilities))
