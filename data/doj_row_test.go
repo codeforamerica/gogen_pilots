@@ -72,4 +72,27 @@ var _ = Describe("DojRow", func() {
 			})
 		})
 	})
+
+	Describe("Determines the code section", func() {
+
+		It("detects the code section when it is explicitly specified in OFFENSE_DESCR", func() {
+			rawRow[OFFENSE_DESCR] = "503 VC-TAKE CAR W/OUT OWNERS CONSENT"
+			row := NewDOJRow(rawRow, 1)
+			Expect(row.CodeSection).To(Equal("503 VC"))
+		})
+
+		It("detects the code section from COMMENT_TEXT when OFFENSE_DESCR reads 'SEE COMMENT FOR CHANGE'", func() {
+			rawRow[OFFENSE_DESCR] = "SEE COMMENT FOR CHARGE"
+			rawRow[COMMENT_TEXT] = "503 VC-TAKE CAR W/OUT OWNERS CONSENT"
+			row := NewDOJRow(rawRow, 1)
+			Expect(row.CodeSection).To(Equal("503 VC"))
+		})
+
+		It("detects the code section from COMMENT_TEXT when OFFENSE_DESCR is empty", func() {
+			rawRow[OFFENSE_DESCR] = ""
+			rawRow[COMMENT_TEXT] = "503 VC-TAKE CAR W/OUT OWNERS CONSENT"
+			row := NewDOJRow(rawRow, 1)
+			Expect(row.CodeSection).To(Equal("503 VC"))
+		})
+	})
 })
