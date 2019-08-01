@@ -79,7 +79,7 @@ func getSentencePartDuration(rawRow []string) time.Duration {
 
 func findCodeSection(rawRow []string) string {
 	switch offenseDescription := rawRow[OFFENSE_DESCR]; offenseDescription {
-	case "SEE COMMENT FOR CHARGE":
+	case "SEE COMMENT FOR CHARGE", "":
 		return strings.Split(rawRow[COMMENT_TEXT], "-")[0]
 	default:
 		return strings.Split(rawRow[OFFENSE_DESCR], "-")[0]
