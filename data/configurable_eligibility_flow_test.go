@@ -121,13 +121,13 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		Context("Dismissing and reducing by code section", func() {
 			var (
-				subject     Subject
-				conviction1 DOJRow
-				conviction2 DOJRow
-				conviction3 DOJRow
-				conviction4 DOJRow
-				conviction5 DOJRow
-				conviction6 DOJRow
+				subject                 Subject
+				conviction1             DOJRow
+				conviction2             DOJRow
+				conviction3             DOJRow
+				conviction4             DOJRow
+				conviction5             DOJRow
+				other_county_conviction DOJRow
 			)
 
 			BeforeEach(func() {
@@ -185,7 +185,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					Index:           4,
 					IsFelony:        true,
 				}
-				conviction6 = DOJRow{
+				other_county_conviction = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
 					CodeSection:     "11360 PC",
@@ -197,7 +197,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
 				}
 
-				rows := []DOJRow{conviction1, conviction2, conviction3, conviction4, conviction5, conviction6}
+				rows := []DOJRow{conviction1, conviction2, conviction3, conviction4, conviction5, other_county_conviction}
 				subject = Subject{}
 				for _, row := range rows {
 					subject.PushRow(row, flow)
@@ -223,6 +223,74 @@ var _ = Describe("configurableEligibilityFlow", func() {
 				Expect(infos[3].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[4].EligibilityDetermination).To(Equal("Eligible for Reduction"))
 				Expect(infos[4].EligibilityReason).To(Equal("Reduce all HS 11360 convictions"))
+			})
+		})
+
+		Context("Matches missing/wrong code section letters and 'attempted' code sections ", func() {
+			var (
+				subject                             Subject
+				attemptedCodeSectionConviction      DOJRow
+				missingCodeSectionLettersConviction DOJRow
+				wrongCodeSectionLettersConviction   DOJRow
+			)
+
+			BeforeEach(func() {
+				attemptedCodeSectionConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "66411357(A) HS",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        true,
+				}
+				missingCodeSectionLettersConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A)",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           1,
+					IsFelony:        true,
+				}
+				wrongCodeSectionLettersConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357(A)PC",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           2,
+					IsFelony:        true,
+				}
+
+				rows := []DOJRow{attemptedCodeSectionConviction, missingCodeSectionLettersConviction, wrongCodeSectionLettersConviction}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row, flow)
+				}
+			})
+
+			It("returns a map of eligibility infos", func() {
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				_, ok := infos[0]
+				Expect(ok).To(Equal(true))
+				Expect(len(infos)).To(Equal(3))
+			})
+
+			It("returns the correct eligibility determination for each conviction", func() {
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[0].EligibilityReason).To(Equal("Dismiss all HS 11357(a) convictions"))
+				Expect(infos[1].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[1].EligibilityReason).To(Equal("Dismiss all HS 11357(a) convictions"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[2].EligibilityReason).To(Equal("Dismiss all HS 11357(a) convictions"))
 			})
 		})
 
@@ -691,7 +759,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 
 			It("dismisses Prop 64 convictions if all convictions are older than the yearsCrimeFreeThreshold setting", func() {
-				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold +1), 0, 0)
+				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold + 1), 0, 0)
 
 				conviction1 = DOJRow{
 					DOB:             birthDate,
@@ -743,7 +811,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 
 			It("does not dismiss additional Prop 64 convictions if any conviction is newer than the yearsCrimeFreeThreshold setting", func() {
-				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold -1), 0, 0)
+				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold - 1), 0, 0)
 
 				conviction1 = DOJRow{
 					DOB:             birthDate,
@@ -818,7 +886,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			It("does not dismiss or reduce convictions for subjects with the reason of age of last conviction", func() {
 				yearsCrimeFreeThreshold = 2
 
-				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold +1), 0, 0)
+				mostRecentConvictionDate = comparisonTime.AddDate(-(yearsCrimeFreeThreshold + 1), 0, 0)
 
 				conviction1 = DOJRow{
 					DOB:             birthDate,
@@ -983,11 +1051,11 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 		Context("When additionalRelief -> subjectIsDeceased", func() {
 			var (
-				subject              Subject
-				prop64Conviction1    DOJRow
-				prop64Conviction2    DOJRow
-				prop64Conviction3    DOJRow
-				randomConviction1    DOJRow
+				subject           Subject
+				prop64Conviction1 DOJRow
+				prop64Conviction2 DOJRow
+				prop64Conviction3 DOJRow
+				randomConviction1 DOJRow
 			)
 
 			BeforeEach(func() {
