@@ -44,6 +44,9 @@ var opts struct {
 
 func (r runOpts) Execute(args []string) error {
 
+	var processingStartTime time.Time
+	processingStartTime = time.Now()
+
 	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen%s.err", r.FileNameSuffix))
 
 	if r.OutputFolder == "" || r.DOJFile == "" || r.County == "" {
@@ -103,7 +106,7 @@ func (r runOpts) Execute(args []string) error {
 
 	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter, outputWriter)
 
-	dataExporter.Export(r.County)
+	dataExporter.Export(r.County, processingStartTime)
 
 	return nil
 }
