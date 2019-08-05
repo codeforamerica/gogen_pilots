@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-
 type DOJInformation struct {
 	Rows                 [][]string
 	Subjects             map[string]*Subject
@@ -81,108 +80,31 @@ func (i *DOJInformation) TotalConvictionsInCounty(county string) int {
 }
 
 func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int {
-	allProp64Convictions := make(map[string]int)
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
-			if ok {
-				allProp64Convictions[codeSection]++
-			}
-		}
-	}
-	return allProp64Convictions
+	return i.countByCodeSectionFilteredMatchedConvictions("", emptyFilter, matchers.ExtractProp64Section)
 }
 
 func (i *DOJInformation) OverallRelatedConvictionsByCodeSection() map[string]int {
-	relatedConvictions := make(map[string]int)
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			ok, codeSection := matchers.ExtractRelatedChargeSection(conviction.CodeSection)
-			if ok {
-				relatedConvictions[codeSection]++
-			}
-		}
-	}
-	return relatedConvictions
+	return i.countByCodeSectionFilteredMatchedConvictions("", emptyFilter, matchers.ExtractRelatedChargeSection)
 }
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county string) map[string]int {
-	prop64ConvictionsInCounty := make(map[string]int)
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			if conviction.County == county {
-				ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
-				if ok {
-					prop64ConvictionsInCounty[codeSection]++
-				}
-			}
-		}
-	}
-	return prop64ConvictionsInCounty
+	return i.countByCodeSectionFilteredMatchedConvictions(county, countyFilter, matchers.ExtractProp64Section)
 }
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
-	prop64ConvictionsInCountyByCodeSectionByEligibility := make(map[string]map[string]int)
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			if conviction.County == county {
-				ok, codeSection := matchers.ExtractProp64Section(conviction.CodeSection)
-				if ok {
-					eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
-					if prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
-						prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
-					}
-					prop64ConvictionsInCountyByCodeSectionByEligibility[eligibilityDetermination][codeSection]++
-				}
-
-			}
-		}
-	}
-	return prop64ConvictionsInCountyByCodeSectionByEligibility
+	return i.countByCodeSectionAndEligibilityFilteredMatchedConvictions(county, eligibilities, countyFilter, matchers.ExtractProp64Section, countByCodeSectionAndEligibilityDetermination)
 }
+
 func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibility(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
 	if !i.checksRelatedCharges {
 		emptyMap := make(map[string]map[string]int)
 		return emptyMap
 	}
-	relatedConvictionsInThisCountyByCodeSectionByEligibility := make(map[string]map[string]int)
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			if conviction.County == county {
-				ok, codeSection := matchers.ExtractRelatedChargeSection(conviction.CodeSection)
-				if ok {
-					eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
-					if relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] == nil {
-						relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination] = make(map[string]int)
-					}
-
-					relatedConvictionsInThisCountyByCodeSectionByEligibility[eligibilityDetermination][codeSection]++
-				}
-
-			}
-		}
-	}
-	return relatedConvictionsInThisCountyByCodeSectionByEligibility
+	return i.countByCodeSectionAndEligibilityFilteredMatchedConvictions(county, eligibilities, countyFilter, matchers.ExtractRelatedChargeSection, countByCodeSectionAndEligibilityDetermination)
 }
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
-	prop64ConvictionsInCountyByEligibilityByReason := make(map[string]map[string]int)
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			if conviction.County == county {
-				if matchers.IsProp64Charge(conviction.CodeSection) {
-					eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
-					eligibilityReason := eligibilities[conviction.Index].EligibilityReason
-					if prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] == nil {
-						prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination] = make(map[string]int)
-					}
-					prop64ConvictionsInCountyByEligibilityByReason[eligibilityDetermination][eligibilityReason]++
-				}
-
-			}
-		}
-	}
-	return prop64ConvictionsInCountyByEligibilityByReason
+	return i.countByCodeSectionAndEligibilityFilteredMatchedConvictions(county, eligibilities, countyFilter, matchers.ExtractProp64Section, countByEligibilityDeterminationAndReason)
 }
 
 func (i *DOJInformation) CountIndividualsWithFelony() int {
@@ -318,6 +240,65 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 	info.aggregateSubjects(eligibilityFlow)
 
 	return &info
+}
+
+func (i *DOJInformation) countByCodeSectionFilteredMatchedConvictions(county string, filter func(county string, conviction *DOJRow) bool, matcher func(codeSection string) (bool, string)) map[string]int {
+	convictionMap := make(map[string]int)
+	for _, subject := range i.Subjects {
+		for _, conviction := range subject.Convictions {
+			if filter(county, conviction) {
+				ok, codeSection := matcher(conviction.CodeSection)
+				if ok {
+					convictionMap[codeSection]++
+				}
+
+			}
+		}
+	}
+	return convictionMap
+}
+
+func (i *DOJInformation) countByCodeSectionAndEligibilityFilteredMatchedConvictions(county string, eligibilities map[int]*EligibilityInfo, filter func(county string, conviction *DOJRow) bool, matcher func(codeSection string) (bool, string), mapper func(conviction *DOJRow, codeSection string, eligibilities map[int]*EligibilityInfo, convictionMap map[string]map[string]int) map[string]map[string]int) map[string]map[string]int {
+	convictionMap := make(map[string]map[string]int)
+	for _, subject := range i.Subjects {
+		for _, conviction := range subject.Convictions {
+			if filter(county, conviction) {
+				ok, codeSection := matcher(conviction.CodeSection)
+				if ok {
+					convictionMap = mapper(conviction, codeSection, eligibilities, convictionMap)
+				}
+
+			}
+		}
+	}
+	return convictionMap
+}
+
+func countByCodeSectionAndEligibilityDetermination(conviction *DOJRow, codeSection string, eligibilities map[int]*EligibilityInfo, convictionMap map[string]map[string]int) map[string]map[string]int {
+	eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
+	if convictionMap[eligibilityDetermination] == nil {
+		convictionMap[eligibilityDetermination] = make(map[string]int)
+	}
+	convictionMap[eligibilityDetermination][codeSection]++
+	return convictionMap
+}
+
+func countByEligibilityDeterminationAndReason(conviction *DOJRow, _ string, eligibilities map[int]*EligibilityInfo, convictionMap map[string]map[string]int) map[string]map[string]int {
+	eligibilityDetermination := eligibilities[conviction.Index].EligibilityDetermination
+	eligibilityReason := eligibilities[conviction.Index].EligibilityReason
+	if convictionMap[eligibilityDetermination] == nil {
+		convictionMap[eligibilityDetermination] = make(map[string]int)
+	}
+	convictionMap[eligibilityDetermination][eligibilityReason]++
+	return convictionMap
+}
+
+func countyFilter(county string, conviction *DOJRow) bool {
+	return conviction.County == county
+}
+
+func emptyFilter(_ string, _ *DOJRow) bool {
+	return true
 }
 
 func isHeaderRow(rowString string) bool {
