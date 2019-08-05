@@ -94,5 +94,12 @@ var _ = Describe("DojRow", func() {
 			row := NewDOJRow(rawRow, 1)
 			Expect(row.CodeSection).To(Equal("503 VC"))
 		})
+
+		It("doesn't detect code section when COMMENT_TEXT and OFFENSE_DESCR are empty", func() {
+			rawRow[OFFENSE_DESCR] = ""
+			rawRow[COMMENT_TEXT] = ""
+			row := NewDOJRow(rawRow, 1)
+			Expect(row.CodeSection).To(Equal(""))
+		})
 	})
 })
