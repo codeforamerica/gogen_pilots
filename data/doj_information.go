@@ -124,22 +124,6 @@ func (i *DOJInformation) EarliestProp64ConvictionDateInThisCounty(county string)
 	return convictionDates[0]
 }
 
-func (i *DOJInformation) EarliestProp64ConvictionDateInThisCounty(county string) time.Time {
-	var convictionDates = TimeSlice{}
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			if conviction.County == county {
-				ok, _ := matchers.ExtractProp64Section(conviction.CodeSection)
-				if ok {
-					convictionDates = append(convictionDates, conviction.DispositionDate)
-				}
-			}
-		}
-	}
-	sort.Sort(convictionDates)
-	return convictionDates[0]
-}
-
 func (i *DOJInformation) CountIndividualsWithFelony() int {
 	return i.countIndividualsFilteredByConviction(isFelonyFilter)
 }
