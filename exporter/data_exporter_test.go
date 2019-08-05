@@ -52,7 +52,7 @@ var _ = Describe("DataExporter", func() {
 		})
 
 		It("runs and has output", func() {
-			dataExporter.Export("LOS ANGELES")
+			dataExporter.Export("LOS ANGELES", time.Now())
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
@@ -106,7 +106,7 @@ var _ = Describe("DataExporter", func() {
 		})
 
 		It("runs and has condensed output", func() {
-			dataExporter.Export(COUNTY)
+			dataExporter.Export(COUNTY, time.Now())
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "condensed.csv"))
@@ -153,7 +153,7 @@ var _ = Describe("DataExporter", func() {
 		})
 
 		It("runs and has condensed output", func() {
-			dataExporter.Export("LOS ANGELES")
+			dataExporter.Export("LOS ANGELES", time.Now())
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "convictions.csv"))
@@ -205,7 +205,7 @@ var _ = Describe("DataExporter", func() {
 		})
 
 		It("runs and has output", func() {
-			dataExporter.Export(COUNTY)
+			dataExporter.Export(COUNTY, time.Now())
 			format.TruncatedDiff = false
 
 			pathToDOJOutput, err := path.Abs(path.Join(outputDir, "results.csv"))
