@@ -74,7 +74,7 @@ func (d *DataExporter) PrintAggregateStatistics(county string) {
 
 	fmt.Fprintf(d.summaryWriter, "----------- Prop64 Convictions In This County --------------------")
 	d.printSummaryByCodeSection("in this county", d.dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county))
-
+	fmt.Fprintf(d.summaryWriter, "Date of earliest Prop 64 conviction: %s", d.dojInformation.EarliestProp64ConvictionDateInThisCounty(county).Format("January 2006"))
 	d.printSummaryByCodeSectionByEligibility(d.dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county, d.normalFlowEligibilities))
 
 	fmt.Fprintf(d.summaryWriter, "\n")

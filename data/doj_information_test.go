@@ -115,6 +115,11 @@ var _ = Describe("DojInformation", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 4, "11358": 6, "11359": 7}))
 		})
 
+		It("Finds the date of the earliest Prop64 conviction in the county", func() {
+			expectedDate := time.Date(1979,6,1, 0,0,0,0, time.UTC)
+			Expect(dojInformation.EarliestProp64ConvictionDateInThisCounty(county)).To(Equal(expectedDate))
+		})
+
 		It("Prop64 convictions in this county by code section and eligibility determination", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{

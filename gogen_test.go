@@ -420,6 +420,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 4 11357 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 6 11358 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 7 11359 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Date of earliest Prop 64 conviction: June 1979"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 4 11357 convictions that are Eligible for Dismissal"))

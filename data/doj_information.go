@@ -7,6 +7,7 @@ import (
 	"gogen/matchers"
 	"gogen/utilities"
 	"os"
+	"sort"
 	"strings"
 	"time"
 )
@@ -105,6 +106,22 @@ func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibilit
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
 	return i.countByCodeSectionAndEligibilityFilteredMatchedConvictions(county, eligibilities, countyFilter, matchers.ExtractProp64Section, countByEligibilityDeterminationAndReason)
+}
+
+func (i *DOJInformation) EarliestProp64ConvictionDateInThisCounty(county string) time.Time {
+	var convictionDates = TimeSlice{}
+	for _, subject := range i.Subjects {
+		for _, conviction := range subject.Convictions {
+			if conviction.County == county {
+				ok, _ := matchers.ExtractProp64Section(conviction.CodeSection)
+				if ok {
+					convictionDates = append(convictionDates, conviction.DispositionDate)
+				}
+			}
+		}
+	}
+	sort.Sort(convictionDates)
+	return convictionDates[0]
 }
 
 func (i *DOJInformation) CountIndividualsWithFelony() int {
@@ -310,4 +327,16 @@ func includesHeaders(reader *bufio.Reader) bool {
 	firstRow := string(firstRowBytes)
 
 	return isHeaderRow(firstRow)
+}
+
+type TimeSlice []time.Time
+
+func (s TimeSlice) Len() int {
+	return len(s)
+}
+func (s TimeSlice) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s TimeSlice) Less(i, j int) bool {
+	return s[i].Before(s[j])
 }
