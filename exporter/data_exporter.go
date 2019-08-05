@@ -1,6 +1,7 @@
 package exporter
 
 import (
+	"encoding/json"
 	"fmt"
 	"gogen/data"
 	"io"
@@ -17,6 +18,25 @@ type DataExporter struct {
 	outputCondensedDOJWriter                DOJWriter
 	outputProp64ConvictionsDOJWriter        DOJWriter
 	summaryWriter                           io.Writer
+}
+
+type Summary struct {
+	County                                      string         `json:"county"`
+	OldestConviction                            time.Time      `json:"oldestConviction"`
+	LineCount                                   int            `json:"lineCount"`
+	ProcessingTime                              float64        `json:"processingTime"`
+	ReliefWithCurrentEligibilityChoices         map[string]int `json:"reliefWithCurrentEligibilityChoices"`
+	ReliefWithDismissAllProp64                  map[string]int `json:"reliefWithDismissAllProp64"`
+	Prop64ConvictionsCountInCountyByCodeSection map[string]int `json:"prop64ConvictionsCountInCountyByCodeSection"`
+
+	// TODO
+	SubjectsWithProp64ConvictionCountInCounty  int            `json:"subjectsWithProp64ConvictionCountInCounty"`
+	Prop64FelonyConvictionsCountInCounty       int            `json:"prop64FelonyConvictionsCountInCounty"`
+	Prop64MisdemeanorConvictionsCountInCounty  int            `json:"prop64MisdemeanorConvictionsCountInCounty"`
+	SubjectsWithSomeReliefCount                int            `json:"subjectsWithSomeReliefCount"`
+	ConvictionDismissalCountByCodeSection      map[string]int `json:"convictionDismissalCountByCodeSection"`
+	ConvictionReductionCountByCodeSection      map[string]int `json:"convictionReductionCountByCodeSection"`
+	ConvictionDismissalCountByAdditionalRelief map[string]int `json:"convictionDismissalCountByAdditionalRelief"`
 }
 
 func NewDataExporter(
@@ -56,14 +76,14 @@ func (d *DataExporter) Export(county string, startTime time.Time) {
 	d.outputDOJWriter.Flush()
 	d.outputCondensedDOJWriter.Flush()
 	d.outputProp64ConvictionsDOJWriter.Flush()
-
 	d.PrintAggregateStatistics(county, startTime)
+	d.exportSummary(county, startTime)
 }
 
 func (d *DataExporter) PrintAggregateStatistics(county string, startTime time.Time) {
 	fmt.Fprintf(d.summaryWriter, "\n&&&&&&\n")
 	fmt.Fprintf(d.summaryWriter, "----------- Overall summary of DOJ file --------------------\n")
-	fmt.Fprintf(d.summaryWriter, "Found %d Total rows in DOJ file\n",  d.dojInformation.TotalRows())
+	fmt.Fprintf(d.summaryWriter, "Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())
 	fmt.Fprintf(d.summaryWriter, "Based on your office’s eligibility choices, this application processed the data in %v seconds\n", time.Since(startTime).Seconds())
 	fmt.Fprintf(d.summaryWriter, "Found %d Total individuals in DOJ file\n", d.dojInformation.TotalIndividuals())
 	fmt.Fprintf(d.summaryWriter, "Found %d Total convictions in DOJ file\n", d.dojInformation.TotalConvictions())
@@ -175,6 +195,37 @@ func (d *DataExporter) printMap(formatString string, values map[string]int) {
 
 	for _, key := range keys {
 		fmt.Fprintf(d.summaryWriter, formatString, values[key], key)
+	}
+}
+
+func (d *DataExporter) exportSummary(county string, startTime time.Time) {
+	summary := d.NewSummary(county, startTime)
+
+	s, err := json.Marshal(summary)
+	if err != nil {
+		panic("Cannot marshal") // TODO replace panic
+	}
+	fmt.Fprintf(d.summaryWriter, string(s))
+
+}
+
+func (d *DataExporter) NewSummary(county string, startTime time.Time) Summary {
+	return Summary{
+		County:           county,
+		LineCount:        d.dojInformation.TotalRows(),
+		OldestConviction: d.dojInformation.EarliestProp64ConvictionDateInThisCounty(county),
+		ProcessingTime:   time.Since(startTime).Seconds(),
+		ReliefWithCurrentEligibilityChoices: map[string]int{
+			"CountSubjectsNoFelony":               d.dojInformation.CountIndividualsNoLongerHaveFelony(d.normalFlowEligibilities),
+			"CountSubjectsNoConvictionLast7Years": d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.normalFlowEligibilities),
+			"CountSubjectsNoConviction":           d.dojInformation.CountIndividualsNoLongerHaveConviction(d.normalFlowEligibilities),
+		},
+		ReliefWithDismissAllProp64: map[string]int{
+			"CountSubjectsNoFelony":               d.dojInformation.CountIndividualsNoLongerHaveFelony(d.dismissAllProp64Eligibilities),
+			"CountSubjectsNoConvictionLast7Years": d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.dismissAllProp64Eligibilities),
+			"CountSubjectsNoConviction":           d.dojInformation.CountIndividualsNoLongerHaveConviction(d.dismissAllProp64Eligibilities),
+		},
+		Prop64ConvictionsCountInCountyByCodeSection: d.dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county),
 	}
 }
 
