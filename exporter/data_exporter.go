@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gogen/data"
 	"io"
+	"io/ioutil"
 	"sort"
 	"time"
 )
@@ -18,6 +19,7 @@ type DataExporter struct {
 	outputCondensedDOJWriter                DOJWriter
 	outputProp64ConvictionsDOJWriter        DOJWriter
 	summaryWriter                           io.Writer
+	outputJsonFilePath						string
 }
 
 type Summary struct {
@@ -48,6 +50,7 @@ func NewDataExporter(
 	outputCondensedDOJWriter DOJWriter,
 	outputProp64ConvictionsDOJWriter DOJWriter,
 	summaryWriter io.Writer,
+	outputJsonFilePath string,
 ) DataExporter {
 
 	return DataExporter{
@@ -59,6 +62,7 @@ func NewDataExporter(
 		outputCondensedDOJWriter:                outputCondensedDOJWriter,
 		outputProp64ConvictionsDOJWriter:        outputProp64ConvictionsDOJWriter,
 		summaryWriter:                           summaryWriter,
+		outputJsonFilePath: 					 outputJsonFilePath,
 	}
 }
 
@@ -203,10 +207,12 @@ func (d *DataExporter) exportSummary(county string, startTime time.Time) {
 
 	s, err := json.Marshal(summary)
 	if err != nil {
-		panic("Cannot marshal") // TODO replace panic
+		panic("Cannot marshal JSON") // TODO replace panic
 	}
-	fmt.Fprintf(d.summaryWriter, string(s))
-
+	err = ioutil.WriteFile(d.outputJsonFilePath, s, 0644)
+	if err != nil {
+		panic("Cannot write JSON") // TODO replace panic
+	}
 }
 
 func (d *DataExporter) NewSummary(county string, startTime time.Time) Summary {

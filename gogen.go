@@ -98,13 +98,14 @@ func (r runOpts) Execute(args []string) error {
 	condensedFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results_condensed%s.csv", r.FileNameSuffix)
 	prop64ConvictionsFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results_convictions%s.csv", r.FileNameSuffix)
 	outputFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.out", r.FileNameSuffix)
+	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.json", r.FileNameSuffix)
 
 	dojWriter := exporter.NewDOJWriter(dojFilePath)
 	condensedDojWriter := exporter.NewCondensedDOJWriter(condensedFilePath)
 	prop64ConvictionsDojWriter := exporter.NewDOJWriter(prop64ConvictionsFilePath)
 	outputWriter := utilities.GetOutputWriter(outputFilePath)
 
-	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter, outputWriter)
+	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter, outputWriter, outputJsonFilePath)
 
 	dataExporter.Export(r.County, processingStartTime)
 

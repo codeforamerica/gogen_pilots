@@ -2,10 +2,12 @@ package exporter_test
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
+	"github.com/onsi/gomega/gstruct"
 	"gogen/data"
 	. "gogen/exporter"
 	. "gogen/test_fixtures"
@@ -48,7 +50,7 @@ var _ = Describe("DataExporter", func() {
 
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
 		})
 
 		It("runs and has output", func() {
@@ -102,7 +104,7 @@ var _ = Describe("DataExporter", func() {
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
 		})
 
 		It("runs and has condensed output", func() {
@@ -149,7 +151,7 @@ var _ = Describe("DataExporter", func() {
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
 		})
 
 		It("runs and has condensed output", func() {
@@ -201,7 +203,7 @@ var _ = Describe("DataExporter", func() {
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter)
+				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
 		})
 
 		It("runs and has output", func() {
@@ -221,6 +223,31 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
+
+			bytes, _ := ioutil.ReadFile(path.Join(outputDir, "gogen.json"))
+			var summary Summary
+			json.Unmarshal(bytes, &summary)
+			Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+				"County": Equal("SACRAMENTO"),
+				"LineCount": Equal(36),
+				"OldestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
+					"CountSubjectsNoFelony": Equal(4),
+					"CountSubjectsNoConviction": Equal(3),
+					"CountSubjectsNoConvictionLast7Years": Equal(1),
+				}),
+				"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
+					"CountSubjectsNoFelony": Equal(4),
+					"CountSubjectsNoConviction": Equal(3),
+					"CountSubjectsNoConvictionLast7Years": Equal(1),
+				}),
+				"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+					"11357": Equal(4),
+					"11358": Equal(6),
+					"11359": Equal(7),
+				}),
+			}))
+
 		})
 	})
 })

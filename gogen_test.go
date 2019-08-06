@@ -1,11 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/onsi/gomega/gstruct"
+	"gogen/exporter"
 	"io/ioutil"
 	"os/exec"
 	path "path/filepath"
 	"regexp"
+	"time"
 
 	. "gogen/test_fixtures"
 
@@ -14,6 +18,13 @@ import (
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 )
+
+func GetOutputSummary(filePath string) exporter.Summary {
+	bytes, _ := ioutil.ReadFile(filePath)
+	var summary exporter.Summary
+	json.Unmarshal(bytes, &summary)
+	return summary
+}
 
 var _ = Describe("gogen", func() {
 	var (
@@ -48,10 +59,8 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
-		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 11 Total individuals in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		Expect(summary.LineCount).To(Equal(38))
 	})
 
 	It("can handle an input file without headers", func() {
@@ -79,12 +88,8 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit(0))
-		Expect(session.Err).ToNot(gbytes.Say("required"))
-
-		Eventually(session).Should(gbytes.Say("Found 38 Total rows in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 11 Total individuals in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		Expect(summary.LineCount).To(Equal(38))
 	})
 
 	It("can accept a compute-at option for determining eligibility", func() {
@@ -113,18 +118,8 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
-		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
-
-		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason 21 years or younger"))
-		Eventually(session).Should(gbytes.Say("Found 2 convictions with eligibility reason 57 years or older"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Conviction occurred 10 or more years ago"))
-		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason Dismiss all HS 11357(c) convictions")))
-		Eventually(session).Should(gbytes.Say("Found 5 convictions with eligibility reason Dismiss all HS 11358 convictions"))
-		Eventually(session).Should(gbytes.Say("Found 3 convictions with eligibility reason Misdemeanor or Infraction"))
-
-		Eventually(session).Should(gbytes.Say("Eligible for Reduction"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Reduce all HS 11359 convictions"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		Expect(summary.LineCount).To(Equal(36))
 	})
 
 	It("can accept a suffix for the output file names", func() {
@@ -159,11 +154,13 @@ var _ = Describe("gogen", func() {
 		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_%s.csv", outputDir, dateSuffix)
 		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_%s.csv", outputDir, dateSuffix)
 		expectedOutputFileName := fmt.Sprintf("%v/gogen_%s.out", outputDir, dateSuffix)
+		expectedJsonOutputFileName := fmt.Sprintf("%v/gogen_%s.json", outputDir, dateSuffix)
 
 		Ω(expectedDojResultsFileName).Should(BeAnExistingFile())
 		Ω(expectedCondensedFileName).Should(BeAnExistingFile())
 		Ω(expectedConvictionsFileName).Should(BeAnExistingFile())
 		Ω(expectedOutputFileName).Should(BeAnExistingFile())
+		Ω(expectedJsonOutputFileName).Should(BeAnExistingFile())
 	})
 
 	It("validates required options", func() {
@@ -293,7 +290,27 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit())
-		Expect(session.Err).ToNot(gbytes.Say("required"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+			"County":           Equal("LOS ANGELES"),
+			"LineCount":        Equal(32),
+			"OldestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
+				"CountSubjectsNoFelony":               Equal(1),
+				"CountSubjectsNoConviction":           Equal(1),
+				"CountSubjectsNoConvictionLast7Years": Equal(0),
+			}),
+			"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
+				"CountSubjectsNoFelony":               Equal(2),
+				"CountSubjectsNoConviction":           Equal(2),
+				"CountSubjectsNoConvictionLast7Years": Equal(3),
+			}),
+			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+				"11357": Equal(3),
+				"11358": Equal(8),
+				"11359": Equal(4),
+			}),
+		}))
 
 		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
 		Eventually(session).Should(gbytes.Say("Found 32 Total rows in DOJ file"))
@@ -401,7 +418,28 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit(0))
-		Expect(session.Err).ToNot(gbytes.Say("required"))
+
+		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+			"County":           Equal("SACRAMENTO"),
+			"LineCount":        Equal(36),
+			"OldestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
+				"CountSubjectsNoFelony":               Equal(4),
+				"CountSubjectsNoConviction":           Equal(3),
+				"CountSubjectsNoConvictionLast7Years": Equal(1),
+			}),
+			"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
+				"CountSubjectsNoFelony":               Equal(4),
+				"CountSubjectsNoConviction":           Equal(3),
+				"CountSubjectsNoConvictionLast7Years": Equal(1),
+			}),
+			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+				"11357": Equal(4),
+				"11358": Equal(6),
+				"11359": Equal(7),
+			}),
+		}))
 
 		Eventually(session).Should(gbytes.Say("&&&&&&"))
 		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
