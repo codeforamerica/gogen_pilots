@@ -441,7 +441,6 @@ var _ = Describe("gogen", func() {
 			}),
 		}))
 
-		Eventually(session).Should(gbytes.Say("&&&&&&"))
 		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
 		Eventually(session).Should(gbytes.Say("Found 36 Total rows in DOJ file"))
 		Eventually(session).Should(gbytes.Say("Found 11 Total individuals in DOJ file"))

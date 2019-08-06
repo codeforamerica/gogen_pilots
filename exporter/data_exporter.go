@@ -67,8 +67,6 @@ func NewDataExporter(
 }
 
 func (d *DataExporter) Export(county string, startTime time.Time) {
-	fmt.Printf("Processing Subjects\n")
-
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
 		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
@@ -85,7 +83,6 @@ func (d *DataExporter) Export(county string, startTime time.Time) {
 }
 
 func (d *DataExporter) PrintAggregateStatistics(county string, startTime time.Time) {
-	fmt.Fprintf(d.summaryWriter, "\n&&&&&&\n")
 	fmt.Fprintf(d.summaryWriter, "----------- Overall summary of DOJ file --------------------\n")
 	fmt.Fprintf(d.summaryWriter, "Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())
 	fmt.Fprintf(d.summaryWriter, "Based on your office’s eligibility choices, this application processed the data in %v seconds\n", time.Since(startTime).Seconds())
