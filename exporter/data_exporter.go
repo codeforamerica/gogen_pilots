@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gogen/data"
+	"gogen/utilities"
 	"io"
 	"io/ioutil"
 	"sort"
@@ -204,11 +205,11 @@ func (d *DataExporter) exportSummary(county string, startTime time.Time) {
 
 	s, err := json.Marshal(summary)
 	if err != nil {
-		panic("Cannot marshal JSON") // TODO replace panic
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 	err = ioutil.WriteFile(d.outputJsonFilePath, s, 0644)
 	if err != nil {
-		panic("Cannot write JSON") // TODO replace panic
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 }
 
