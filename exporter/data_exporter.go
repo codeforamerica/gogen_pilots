@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -230,6 +231,9 @@ func (d *DataExporter) NewSummary(county string, startTime time.Time) Summary {
 			"CountSubjectsNoConviction":           d.dojInformation.CountIndividualsNoLongerHaveConviction(d.dismissAllProp64Eligibilities),
 		},
 		Prop64ConvictionsCountInCountyByCodeSection: d.dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county),
+		ConvictionDismissalCountByCodeSection: d.getDismissalsByCodeSection(county),
+		ConvictionReductionCountByCodeSection: d.getReductionsByCodeSection(county),
+		ConvictionDismissalCountByAdditionalRelief: d.getDismissalsByAdditionalRelief(county),
 	}
 }
 
@@ -248,4 +252,42 @@ func sumValues(mapOfInts map[string]int) int {
 		total += value
 	}
 	return total
+}
+
+func (d *DataExporter) getDismissalsByCodeSection(county string) map[string]int {
+	var codeSection string
+	result := make(map[string]int)
+	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"] {
+		_, err := fmt.Sscanf(key, "Dismiss all HS %s convictions", &codeSection)
+		if err == nil {
+			if strings.HasSuffix(key, "(when no sub-section is specified)") {
+				result["11357(no sub-section)"] = value
+			} else {
+				result[codeSection] = value
+			}
+		}
+	}
+	return result
+}
+
+func (d *DataExporter) getReductionsByCodeSection(county string) map[string]int{
+	var codeSection string
+	result := make(map[string]int)
+	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Reduction"] {
+		_, err := fmt.Sscanf(key, "Reduce all HS %s convictions", &codeSection)
+		if err == nil {
+			result[codeSection] = value
+		}
+	}
+	return result
+}
+
+func (d *DataExporter) getDismissalsByAdditionalRelief(county string) map[string]int {
+	result := make(map[string]int)
+	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"] {
+		if !strings.HasPrefix(key, "Dismiss all HS") {
+			result[key] = value
+		}
+	}
+	return result
 }
