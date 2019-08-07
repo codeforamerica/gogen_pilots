@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/jessevdk/go-flags"
@@ -22,7 +23,7 @@ var defaultOpts struct{}
 
 type runOpts struct {
 	OutputFolder       string `long:"outputs" description:"The folder in which to place result files"`
-	DOJFile            string `long:"input-doj" description:"The file containing criminal histories from CA DOJ"`
+	DOJFiles           string `long:"input-doj" description:"The files containing criminal histories from CA DOJ"`
 	County             string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 	EligibilityOptions string `long:"eligibility-options" description:"File containing options for which eligibility logic to apply"`
@@ -35,6 +36,10 @@ type exportTestCSVOpts struct {
 }
 
 type versionOpts struct{}
+
+type RunAggregateStats struct {
+	TotalRows int
+}
 
 var opts struct {
 	Version   versionOpts       `command:"version" description:"Print the version"`
@@ -49,16 +54,18 @@ func (r runOpts) Execute(args []string) error {
 
 	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen%s.err", r.FileNameSuffix))
 
-	if r.OutputFolder == "" || r.DOJFile == "" || r.County == "" {
-		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_OPTION_ERROR)
+	if r.OutputFolder == "" || r.DOJFiles == "" || r.County == "" {
+		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_RUN_OPTION_ERROR)
 	}
+
+	inputFiles := strings.Split(r.DOJFiles, ",")
 
 	computeAtDate := time.Now()
 
 	if r.ComputeAt != "" {
 		computeAtOption, err := time.Parse("2006-01-02", r.ComputeAt)
 		if err != nil {
-			utilities.ExitWithError(errors.New("invalid --compute-at date: Must be a valid date in the format YYYY-MM-DD"), utilities.INVALID_OPTION_ERROR)
+			utilities.ExitWithError(errors.New("invalid --compute-at date: Must be a valid date in the format YYYY-MM-DD"), utilities.INVALID_RUN_OPTION_ERROR)
 		} else {
 			computeAtDate = computeAtOption
 		}
@@ -70,43 +77,70 @@ func (r runOpts) Execute(args []string) error {
 		var options data.EligibilityOptions
 		optionsFile, err := os.Open(r.EligibilityOptions)
 		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_OPTION_ERROR)
+			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
 		}
 		defer optionsFile.Close()
 
 		optionsBytes, err := ioutil.ReadAll(optionsFile)
 		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_OPTION_ERROR)
+			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
 		}
 
 		err = json.Unmarshal(optionsBytes, &options)
 		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_OPTION_ERROR)
+			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
 		}
-		countyEligibilityFlow = data.NewConfigurableEligibilityFlow(options, r.County)
+		countyEligibilityFlow, err = data.NewConfigurableEligibilityFlow(options, r.County)
+		if err != nil {
+			utilities.ExitWithError(err, utilities.INVALID_ELIGIBILITY_OPTION_ERROR)
+		}
 	} else {
 		countyEligibilityFlow = data.EligibilityFlows[r.County]
 	}
 
-	dojInformation := data.NewDOJInformation(r.DOJFile, computeAtDate, countyEligibilityFlow)
-	countyEligibilities := dojInformation.DetermineEligibility(r.County, countyEligibilityFlow)
+	var runErrors []error
 
-	dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
-	dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+	for _, inputFile := range inputFiles {
+		dojInformation, parseFileErr := data.NewDOJInformation(inputFile, computeAtDate, countyEligibilityFlow)
+		if parseFileErr != nil {
+			runErrors = append(runErrors, parseFileErr)
+			continue
+		}
+		countyEligibilities := dojInformation.DetermineEligibility(r.County, countyEligibilityFlow)
 
-	dojFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results%s.csv", r.FileNameSuffix)
-	condensedFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results_condensed%s.csv", r.FileNameSuffix)
-	prop64ConvictionsFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results_convictions%s.csv", r.FileNameSuffix)
-	outputFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.out", r.FileNameSuffix)
+		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
+		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-	dojWriter := exporter.NewDOJWriter(dojFilePath)
-	condensedDojWriter := exporter.NewCondensedDOJWriter(condensedFilePath)
-	prop64ConvictionsDojWriter := exporter.NewDOJWriter(prop64ConvictionsFilePath)
-	outputWriter := utilities.GetOutputWriter(outputFilePath)
+		dojFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results%s.csv", r.FileNameSuffix)
+		condensedFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results_condensed%s.csv", r.FileNameSuffix)
+		prop64ConvictionsFilePath := utilities.GenerateFileName(r.OutputFolder, "doj_results_convictions%s.csv", r.FileNameSuffix)
+		outputFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.out", r.FileNameSuffix)
 
-	dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter, outputWriter)
+		dojWriter, writerErr := exporter.NewDOJWriter(dojFilePath)
+		if writerErr != nil {
+			runErrors = append(runErrors, parseFileErr)
+			continue
+		}
+		condensedDojWriter, condensedWriterErr := exporter.NewCondensedDOJWriter(condensedFilePath)
+		if condensedWriterErr != nil {
+			runErrors = append(runErrors, parseFileErr)
+			continue
+		}
+		prop64ConvictionsDojWriter, convictionWriterErr := exporter.NewDOJWriter(prop64ConvictionsFilePath)
+		if convictionWriterErr != nil {
+			runErrors = append(runErrors, parseFileErr)
+			continue
+		}
+		outputWriter := utilities.GetOutputWriter(outputFilePath)
 
-	dataExporter.Export(r.County, processingStartTime)
+		dataExporter := exporter.NewDataExporter(dojInformation, countyEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, condensedDojWriter, prop64ConvictionsDojWriter, outputWriter)
+
+		dataExporter.Export(r.County, processingStartTime)
+	}
+
+	if len(runErrors) > 0 {
+		utilities.ExitWithErrors(runErrors, utilities.FILE_PROCESSING_ERROR)
+	}
 
 	return nil
 }

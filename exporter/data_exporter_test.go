@@ -36,14 +36,14 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
 			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 
@@ -88,7 +88,7 @@ var _ = Describe("DataExporter", func() {
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -96,9 +96,9 @@ var _ = Describe("DataExporter", func() {
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
 
-			dojWriter := NewDOJWriter(dojResultsPath)
-			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(dojResultsPath)
+			dojCondensedWriter, _ := NewCondensedDOJWriter(dojCondensedResultsPath)
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
@@ -138,14 +138,14 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
 			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
@@ -190,14 +190,14 @@ var _ = Describe("DataExporter", func() {
 			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 			dataExporter = NewDataExporter(dojInformation,
@@ -235,7 +235,7 @@ func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
 }
 
 func createFlow(dismissCodeSections []string, reduceCodeSections []string, county string) data.EligibilityFlow {
-	return data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
+	flow, _ := data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
 		BaselineEligibility: data.BaselineEligibility{
 			Dismiss: dismissCodeSections,
 			Reduce: reduceCodeSections,
@@ -248,4 +248,5 @@ func createFlow(dismissCodeSections []string, reduceCodeSections []string, count
 			SubjectIsDeceased: true,
 		},
 	}, county)
+	return flow
 }

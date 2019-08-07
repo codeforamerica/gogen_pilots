@@ -13,7 +13,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 	BeforeEach(func() {
 
-		flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+		flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 			BaselineEligibility: BaselineEligibility{
 				Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11358", "11359"},
 				Reduce:  []string{"11357(d)", "11360"},
@@ -357,7 +357,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 
 			It("returns the correct eligibility determination for each conviction", func() {
-				flow := NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ := NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(no-sub-section)"},
 						Reduce:  []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)", "11358", "11359", "11360"},
@@ -388,7 +388,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			)
 
 			BeforeEach(func() {
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{},
 						Reduce:  []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)", "11357(no-sub-section)", "11358", "11359", "11360",},
@@ -538,7 +538,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 
 			It("dismisses convictions under the age of 21 if subjectUnder21AtConviction option is set", func() {
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -558,7 +558,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			})
 
 			It("does not dismiss convictions under the age of 21 if subjectUnder21AtConviction option is not set", func() {
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -589,7 +589,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 			BeforeEach(func() {
 				yearsSinceConvictionThreshold = 13
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -687,7 +687,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			)
 
 			BeforeEach(func() {
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -747,7 +747,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 			BeforeEach(func() {
 				yearsCrimeFreeThreshold = 6
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -875,7 +875,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 			)
 
 			BeforeEach(func() {
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)",},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -990,7 +990,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					subject.PushRow(row, flow)
 				}
 
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)"},
 					},
@@ -1028,7 +1028,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 					subject.PushRow(row, flow)
 				}
 
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)"},
 						Reduce:  []string{"11358", "11359", "11360",},
@@ -1114,7 +1114,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 				subject.IsDeceased = true
 
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)"},
 					},
@@ -1154,7 +1154,7 @@ var _ = Describe("configurableEligibilityFlow", func() {
 
 				subject.IsDeceased = true
 
-				flow = NewConfigurableEligibilityFlow(EligibilityOptions{
+				flow, _ = NewConfigurableEligibilityFlow(EligibilityOptions{
 					BaselineEligibility: BaselineEligibility{
 						Dismiss: []string{"11357(a)", "11357(b)", "11357(c)", "11357(d)"},
 						Reduce:  []string{"11358", "11359", "11360",},

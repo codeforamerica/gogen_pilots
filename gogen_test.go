@@ -225,7 +225,7 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit(1))
+		Eventually(session).Should(gexec.Exit(2))
 		Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
 
 		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
@@ -471,5 +471,75 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("4 individuals who had a felony will no longer have a felony on their record"))
 		Eventually(session).Should(gbytes.Say("3 individuals who had convictions will no longer have any convictions on their record"))
 		Eventually(session).Should(gbytes.Say("1 individuals who had convictions in the last 7 years will no longer have any convictions on their record in the last 7 years"))
+	})
+
+	//It("can aggregate statistics for multiple input files", func() {
+	//	outputDir, err = ioutil.TempDir("/tmp", "gogen")
+	//	Expect(err).ToNot(HaveOccurred())
+	//
+	//	pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
+	//	inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
+	//
+	//	pathToGogen, err := gexec.Build("gogen")
+	//	Expect(err).ToNot(HaveOccurred())
+	//
+	//	pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
+	//
+	//	runCommand := "run"
+	//	outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+	//	dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV + "," + inputCSV)
+	//
+	//
+	//	countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
+	//	computeAtFlag := "--compute-at=2019-11-11"
+	//	eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
+	//
+	//	command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, eligibilityOptionsFlag)
+	//	session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+	//	Expect(err).ToNot(HaveOccurred())
+	//
+	//	Eventually(session).Should(gexec.Exit(0))
+	//	Expect(session.Err).ToNot(gbytes.Say("required"))
+	//	Eventually(session).Should(gbytes.Say("Found 72 Total rows in all files"))
+	//})
+
+	It("can return errors for multiple input files", func() {
+		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
+		pathToValidDOJ, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
+		pathToBadDOJ, err := path.Abs(path.Join("test_fixtures", "bad.csv"))
+		pathToMissingDOJ, err := path.Abs(path.Join("test_fixtures", "missing.csv"))
+
+		pathToGogen, err := gexec.Build("gogen")
+		Expect(err).ToNot(HaveOccurred())
+		filenameSuffix := "a_suffix"
+
+		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", pathToValidDOJ + "," + pathToBadDOJ + "," + pathToMissingDOJ)
+
+		countyFlag := fmt.Sprintf("--county=%s", "SACRAMENTO")
+		computeAtFlag := "--compute-at=2019-11-11"
+		dateTimeFlag := fmt.Sprintf("--file-name-suffix=%s", filenameSuffix)
+		eligibilityOptionsFlag := fmt.Sprintf("--eligibility-options=%s", pathToEligibilityOptions)
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, countyFlag, computeAtFlag, dateTimeFlag, eligibilityOptionsFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit(2))
+		Eventually(session.Err).Should(gbytes.Say("record on line 2: wrong number of fields"))
+		Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
+
+		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
+
+		Ω(expectedErrorFileName).Should(BeAnExistingFile())
+		data, _ := ioutil.ReadFile(expectedErrorFileName)
+		Expect(string(data)).To(MatchRegexp("open .*missing.csv: no such file or directory"))
+		Expect(string(data)).To(MatchRegexp("record on line 2: wrong number of fields"))
 	})
 })
