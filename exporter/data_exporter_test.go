@@ -48,7 +48,6 @@ var _ = Describe("DataExporter", func() {
 			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
-
 			dataExporter = NewDataExporter(dojInformation,
 				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
 		})
@@ -88,7 +87,6 @@ var _ = Describe("DataExporter", func() {
 			dismissCodeSections := []string{"11357(a)", "11357(c)", "11357(d)", "11357(no-sub-section)", "11358"}
 			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
-
 
 			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
@@ -227,25 +225,45 @@ var _ = Describe("DataExporter", func() {
 			bytes, _ := ioutil.ReadFile(path.Join(outputDir, "gogen.json"))
 			var summary Summary
 			json.Unmarshal(bytes, &summary)
-			Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
-				"County": Equal("SACRAMENTO"),
-				"LineCount": Equal(36),
-				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+			Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
+				"County":                  Equal("SACRAMENTO"),
+				"LineCount":               Equal(36),
+				"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ProcessingTimeInSeconds": BeNumerically(">", 0),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
-					"CountSubjectsNoFelony": Equal(4),
-					"CountSubjectsNoConviction": Equal(3),
+					"CountSubjectsNoFelony":               Equal(4),
+					"CountSubjectsNoConviction":           Equal(3),
 					"CountSubjectsNoConvictionLast7Years": Equal(1),
 				}),
 				"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
-					"CountSubjectsNoFelony": Equal(4),
-					"CountSubjectsNoConviction": Equal(3),
+					"CountSubjectsNoFelony":               Equal(4),
+					"CountSubjectsNoConviction":           Equal(3),
 					"CountSubjectsNoConvictionLast7Years": Equal(1),
 				}),
 				"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 					"11357": Equal(4),
 					"11358": Equal(6),
 					"11359": Equal(7),
+				}),
+				"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
+				"Prop64FelonyConvictionsCountInCounty":      Equal(0),
+				"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
+				"SubjectsWithSomeReliefCount":               Equal(0),
+				"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+					"11357(c)":              Equal(1),
+					"11357(no sub-section)": Equal(1),
+					"11358":                 Equal(5),
+				}),
+				"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+					"11359": Equal(1),
+				}),
+				"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
+					"21 years or younger":                      Equal(1),
+					"57 years or older":                        Equal(2),
+					"Conviction occurred 10 or more years ago": Equal(1),
+					"Individual is deceased":                   Equal(1),
+					"Misdemeanor or Infraction":                Equal(3),
+					"Only has 11357-60 charges":                Equal(1),
 				}),
 			}))
 
@@ -266,14 +284,14 @@ func createFlow(dismissCodeSections []string, reduceCodeSections []string, count
 	return data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
 		BaselineEligibility: data.BaselineEligibility{
 			Dismiss: dismissCodeSections,
-			Reduce: reduceCodeSections,
+			Reduce:  reduceCodeSections,
 		},
 		AdditionalRelief: data.AdditionalRelief{
 			SubjectUnder21AtConviction:    true,
 			SubjectAgeThreshold:           57,
 			YearsSinceConvictionThreshold: 10,
 			SubjectHasOnlyProp64Charges:   true,
-			SubjectIsDeceased: true,
+			SubjectIsDeceased:             true,
 		},
 	}, county)
 }
