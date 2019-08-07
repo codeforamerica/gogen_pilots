@@ -294,7 +294,7 @@ var _ = Describe("gogen", func() {
 		Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
 			"County":           Equal("LOS ANGELES"),
 			"LineCount":        Equal(32),
-			"OldestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+			"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
 				"CountSubjectsNoFelony":               Equal(1),
 				"CountSubjectsNoConviction":           Equal(1),
@@ -423,7 +423,7 @@ var _ = Describe("gogen", func() {
 		Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
 			"County":           Equal("SACRAMENTO"),
 			"LineCount":        Equal(36),
-			"OldestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+			"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
 				"CountSubjectsNoFelony":               Equal(4),
 				"CountSubjectsNoConviction":           Equal(3),
