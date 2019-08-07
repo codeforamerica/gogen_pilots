@@ -8,3 +8,4 @@ generated_test_data.csv
 ~*.xlsx
 gogen*.out
 gogen*.err
+gogen*.json
