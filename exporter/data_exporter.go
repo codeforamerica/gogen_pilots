@@ -26,7 +26,7 @@ type Summary struct {
 	County                                      string         `json:"county"`
 	EarliestConviction                          time.Time      `json:"earliestConviction"`
 	LineCount                                   int            `json:"lineCount"`
-	ProcessingTime                              float64        `json:"processingTime"`
+	ProcessingTimeInSeconds                     float64        `json:"processingTimeInSeconds"`
 	ReliefWithCurrentEligibilityChoices         map[string]int `json:"reliefWithCurrentEligibilityChoices"`
 	ReliefWithDismissAllProp64                  map[string]int `json:"reliefWithDismissAllProp64"`
 	Prop64ConvictionsCountInCountyByCodeSection map[string]int `json:"prop64ConvictionsCountInCountyByCodeSection"`
@@ -214,10 +214,10 @@ func (d *DataExporter) exportSummary(county string, startTime time.Time) {
 
 func (d *DataExporter) NewSummary(county string, startTime time.Time) Summary {
 	return Summary{
-		County:           county,
-		LineCount:        d.dojInformation.TotalRows(),
-		EarliestConviction: d.dojInformation.EarliestProp64ConvictionDateInThisCounty(county),
-		ProcessingTime:   time.Since(startTime).Seconds(),
+		County:                  county,
+		LineCount:               d.dojInformation.TotalRows(),
+		EarliestConviction:      d.dojInformation.EarliestProp64ConvictionDateInThisCounty(county),
+		ProcessingTimeInSeconds: time.Since(startTime).Seconds(),
 		ReliefWithCurrentEligibilityChoices: map[string]int{
 			"CountSubjectsNoFelony":               d.dojInformation.CountIndividualsNoLongerHaveFelony(d.normalFlowEligibilities),
 			"CountSubjectsNoConvictionLast7Years": d.dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(d.normalFlowEligibilities),

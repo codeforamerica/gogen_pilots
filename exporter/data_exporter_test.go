@@ -231,6 +231,7 @@ var _ = Describe("DataExporter", func() {
 				"County": Equal("SACRAMENTO"),
 				"LineCount": Equal(36),
 				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+				"ProcessingTimeInSeconds": BeNumerically(">", 0),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
 					"CountSubjectsNoFelony": Equal(4),
 					"CountSubjectsNoConviction": Equal(3),
