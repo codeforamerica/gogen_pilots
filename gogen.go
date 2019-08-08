@@ -46,7 +46,6 @@ var opts struct {
 func (r runOpts) Execute(args []string) error {
 
 	var processingStartTime time.Time
-	processingStartTime = time.Now()
 
 	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen%s.err", r.FileNameSuffix))
 
@@ -99,6 +98,7 @@ func (r runOpts) Execute(args []string) error {
 	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.json", r.FileNameSuffix)
 
 	for fileIndex, inputFile := range inputFiles {
+		processingStartTime = time.Now()
 		fileIndex = fileIndex + 1
 		fileOutputFolder := utilities.GenerateIndexedOutputFolder(r.OutputFolder, fileIndex, r.FileNameSuffix)
 		err := os.MkdirAll(fileOutputFolder, os.ModePerm)
@@ -165,11 +165,11 @@ func ExportSummary(summary exporter.Summary, startTime time.Time, filePath strin
 
 	s, err := json.Marshal(summary)
 	if err != nil {
-		panic("Cannot marshal JSON") // TODO replace panic
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 	err = ioutil.WriteFile(filePath, s, 0644)
 	if err != nil {
-		panic("Cannot write JSON") // TODO replace panic
+		utilities.ExitWithError(err, utilities.OTHER_ERROR)
 	}
 }
 
