@@ -64,7 +64,7 @@ func NewDataExporter(
 	}
 }
 
-func (d *DataExporter) Export(county string, startTime time.Time) Summary {
+func (d *DataExporter) Export(county string) Summary {
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
 		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
@@ -76,14 +76,13 @@ func (d *DataExporter) Export(county string, startTime time.Time) Summary {
 	d.outputDOJWriter.Flush()
 	d.outputCondensedDOJWriter.Flush()
 	d.outputProp64ConvictionsDOJWriter.Flush()
-	d.PrintAggregateStatistics(county, startTime)
+	d.PrintAggregateStatistics(county)
 	return d.NewSummary(county)
 }
 
-func (d *DataExporter) PrintAggregateStatistics(county string, startTime time.Time) {
+func (d *DataExporter) PrintAggregateStatistics(county string) {
 	fmt.Fprintf(d.aggregateStatsWriter, "----------- Overall summary of DOJ file --------------------\n")
 	fmt.Fprintf(d.aggregateStatsWriter, "Found %d Total rows in DOJ file\n", d.dojInformation.TotalRows())
-	fmt.Fprintf(d.aggregateStatsWriter, "Based on your office’s eligibility choices, this application processed the data in %v seconds\n", time.Since(startTime).Seconds())
 	fmt.Fprintf(d.aggregateStatsWriter, "Found %d Total individuals in DOJ file\n", d.dojInformation.TotalIndividuals())
 	fmt.Fprintf(d.aggregateStatsWriter, "Found %d Total convictions in DOJ file\n", d.dojInformation.TotalConvictions())
 	fmt.Fprintf(d.aggregateStatsWriter, "Found %d convictions in this county\n", d.dojInformation.TotalConvictionsInCounty(county))
