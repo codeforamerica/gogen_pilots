@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var _ = Describe("configurableEligibilityFlow", func() {
+var _ = Describe("ConfigurableEligibilityFlow", func() {
 	const COUNTY = "ARBITRARY"
 
 	var flow EligibilityFlow

@@ -64,7 +64,7 @@ func NewDataExporter(
 	}
 }
 
-func (d *DataExporter) Export(county string) Summary {
+func (d *DataExporter) Export(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) Summary {
 	for i, row := range d.dojInformation.Rows {
 		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
 		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
@@ -77,7 +77,7 @@ func (d *DataExporter) Export(county string) Summary {
 	d.outputCondensedDOJWriter.Flush()
 	d.outputProp64ConvictionsDOJWriter.Flush()
 	d.PrintAggregateStatistics(county)
-	return d.NewSummary(county)
+	return d.NewSummary(county, configurableEligibilityFlow)
 }
 
 func (d *DataExporter) PrintAggregateStatistics(county string) {
@@ -213,7 +213,7 @@ func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Sum
 	}
 }
 
-func (d *DataExporter) NewSummary(county string) Summary {
+func (d *DataExporter) NewSummary(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) Summary {
 	return Summary{
 		County:             county,
 		LineCount:          d.dojInformation.TotalRows(),
@@ -229,9 +229,9 @@ func (d *DataExporter) NewSummary(county string) Summary {
 			"CountSubjectsNoConviction":           d.dojInformation.CountIndividualsNoLongerHaveConviction(d.dismissAllProp64Eligibilities),
 		},
 		Prop64ConvictionsCountInCountyByCodeSection: d.dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county),
-		ConvictionDismissalCountByCodeSection:       d.getDismissalsByCodeSection(county),
-		ConvictionReductionCountByCodeSection:       d.getReductionsByCodeSection(county),
-		ConvictionDismissalCountByAdditionalRelief:  d.getDismissalsByAdditionalRelief(county),
+		ConvictionDismissalCountByCodeSection:       d.getDismissalsByCodeSection(county, configurableEligibilityFlow),
+		ConvictionReductionCountByCodeSection:       d.getReductionsByCodeSection(county, configurableEligibilityFlow),
+		ConvictionDismissalCountByAdditionalRelief:  d.getDismissalsByAdditionalRelief(county, configurableEligibilityFlow),
 	}
 }
 
@@ -259,7 +259,7 @@ func sumValues(mapOfInts map[string]int) int {
 	return total
 }
 
-func (d *DataExporter) getDismissalsByCodeSection(county string) map[string]int {
+func (d *DataExporter) getDismissalsByCodeSection(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) map[string]int {
 	var codeSection string
 	result := make(map[string]int)
 	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"] {
@@ -275,7 +275,7 @@ func (d *DataExporter) getDismissalsByCodeSection(county string) map[string]int 
 	return result
 }
 
-func (d *DataExporter) getReductionsByCodeSection(county string) map[string]int {
+func (d *DataExporter) getReductionsByCodeSection(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) map[string]int {
 	var codeSection string
 	result := make(map[string]int)
 	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Reduction"] {
@@ -287,7 +287,7 @@ func (d *DataExporter) getReductionsByCodeSection(county string) map[string]int 
 	return result
 }
 
-func (d *DataExporter) getDismissalsByAdditionalRelief(county string) map[string]int {
+func (d *DataExporter) getDismissalsByAdditionalRelief(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) map[string]int {
 	result := make(map[string]int)
 	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"] {
 		if !strings.HasPrefix(key, "Dismiss all HS") {

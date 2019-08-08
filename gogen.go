@@ -49,7 +49,7 @@ func (r runOpts) Execute(args []string) error {
 
 	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen%s.err", r.FileNameSuffix))
 
-	if r.OutputFolder == "" || r.DOJFiles == "" || r.County == "" {
+	if r.OutputFolder == "" || r.DOJFiles == "" || r.County == "" || r.EligibilityOptions == "" {
 		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_RUN_OPTION_ERROR)
 	}
 
@@ -66,31 +66,27 @@ func (r runOpts) Execute(args []string) error {
 		}
 	}
 
-	var countyEligibilityFlow data.EligibilityFlow
+	var configurableEligibilityFlow data.ConfigurableEligibilityFlow
 
-	if r.EligibilityOptions != "" {
-		var options data.EligibilityOptions
-		optionsFile, err := os.Open(r.EligibilityOptions)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
-		}
-		defer optionsFile.Close()
+	var options data.EligibilityOptions
+	optionsFile, err := os.Open(r.EligibilityOptions)
+	if err != nil {
+		utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
+	}
+	defer optionsFile.Close()
 
-		optionsBytes, err := ioutil.ReadAll(optionsFile)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
-		}
+	optionsBytes, err := ioutil.ReadAll(optionsFile)
+	if err != nil {
+		utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
+	}
 
-		err = json.Unmarshal(optionsBytes, &options)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
-		}
-		countyEligibilityFlow, err = data.NewConfigurableEligibilityFlow(options, r.County)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_ELIGIBILITY_OPTION_ERROR)
-		}
-	} else {
-		countyEligibilityFlow = data.EligibilityFlows[r.County]
+	err = json.Unmarshal(optionsBytes, &options)
+	if err != nil {
+		utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
+	}
+	configurableEligibilityFlow, err = data.NewConfigurableEligibilityFlow(options, r.County)
+	if err != nil {
+		utilities.ExitWithError(err, utilities.INVALID_ELIGIBILITY_OPTION_ERROR)
 	}
 
 	var runErrors []error
@@ -106,12 +102,12 @@ func (r runOpts) Execute(args []string) error {
 			runErrors = append(runErrors, err)
 			continue
 		}
-		dojInformation, err := data.NewDOJInformation(inputFile, computeAtDate, countyEligibilityFlow)
+		dojInformation, err := data.NewDOJInformation(inputFile, computeAtDate, configurableEligibilityFlow)
 		if err != nil {
 			runErrors = append(runErrors, err)
 			continue
 		}
-		countyEligibilities := dojInformation.DetermineEligibility(r.County, countyEligibilityFlow)
+		countyEligibilities := dojInformation.DetermineEligibility(r.County, configurableEligibilityFlow)
 
 		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
 		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -148,7 +144,7 @@ func (r runOpts) Execute(args []string) error {
 			prop64ConvictionsDojWriter,
 			aggregateFileStatsWriter)
 
-		fileSummary := dataExporter.Export(r.County)
+		fileSummary := dataExporter.Export(r.County, configurableEligibilityFlow)
 		runSummary = dataExporter.AccumulateSummaryData(runSummary, fileSummary)
 	}
 
