@@ -260,29 +260,29 @@ func sumValues(mapOfInts map[string]int) int {
 }
 
 func (d *DataExporter) getDismissalsByCodeSection(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) map[string]int {
-	var codeSection string
 	result := make(map[string]int)
-	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"] {
-		_, err := fmt.Sscanf(key, "Dismiss all HS %s convictions", &codeSection)
-		if err == nil {
-			if strings.HasSuffix(key, "(when no sub-section is specified)") {
-				result["11357(no sub-section)"] = value
-			} else {
-				result[codeSection] = value
-			}
+	var eligibilityReasonKey string
+	for _, codeSection := range configurableEligibilityFlow.DismissSections {
+		if codeSection == "11357(no-sub-section)" {
+			eligibilityReasonKey = "Dismiss all HS 11357 convictions (when no sub-section is specified)"
+		} else {
+			eligibilityReasonKey = fmt.Sprintf("Dismiss all HS %s convictions", codeSection)
 		}
+		result[codeSection] = d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"][eligibilityReasonKey]
 	}
 	return result
 }
 
 func (d *DataExporter) getReductionsByCodeSection(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) map[string]int {
-	var codeSection string
 	result := make(map[string]int)
-	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Reduction"] {
-		_, err := fmt.Sscanf(key, "Reduce all HS %s convictions", &codeSection)
-		if err == nil {
-			result[codeSection] = value
+	var eligibilityReasonKey string
+	for _, codeSection := range configurableEligibilityFlow.ReduceSections {
+		if codeSection == "11357(no-sub-section)" {
+			eligibilityReasonKey = "Reduce all HS 11357 convictions (when no sub-section is specified)"
+		} else {
+			eligibilityReasonKey = fmt.Sprintf("Reduce all HS %s convictions", codeSection)
 		}
+		result[codeSection] = d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Reduction"][eligibilityReasonKey]
 	}
 	return result
 }
