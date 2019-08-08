@@ -9,8 +9,8 @@ import (
 
 type ConfigurableEligibilityFlow struct {
 	county                               string
-	dismissSections                      []string
-	reduceSections                       []string
+	DismissSections                      []string
+	ReduceSections                       []string
 	dismissConvictionsUnderAgeOf21       bool
 	dismissIfSubjectHasOnlyProp64Charges bool
 	dismissIfSubjectIsDeceased           bool
@@ -41,8 +41,8 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) (
 
 	return ConfigurableEligibilityFlow{
 		county:                               county,
-		dismissSections:                      options.BaselineEligibility.Dismiss,
-		reduceSections:                       options.BaselineEligibility.Reduce,
+		DismissSections:                      options.BaselineEligibility.Dismiss,
+		ReduceSections:                       options.BaselineEligibility.Reduce,
 		dismissConvictionsUnderAgeOf21:       options.AdditionalRelief.SubjectUnder21AtConviction,
 		dismissIfSubjectIsDeceased:           options.AdditionalRelief.SubjectIsDeceased,
 		dismissIfSubjectHasOnlyProp64Charges: options.AdditionalRelief.SubjectHasOnlyProp64Charges,
@@ -115,7 +115,7 @@ func (ef ConfigurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 }
 
 func (ef ConfigurableEligibilityFlow) isDismissedCodeSection(candidateCodeSection string) (bool, string) {
-	for _, codeSection := range ef.dismissSections {
+	for _, codeSection := range ef.DismissSections {
 		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection) {
 			return true, codeSection
 		}
@@ -124,7 +124,7 @@ func (ef ConfigurableEligibilityFlow) isDismissedCodeSection(candidateCodeSectio
 }
 
 func (ef ConfigurableEligibilityFlow) isReducedCodeSection(candidateCodeSection string) (bool, string) {
-	for _, codeSection := range ef.reduceSections {
+	for _, codeSection := range ef.ReduceSections {
 		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection) {
 			return true, codeSection
 		}

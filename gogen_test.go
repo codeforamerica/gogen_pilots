@@ -321,12 +321,16 @@ var _ = Describe("gogen", func() {
 			"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
 			"SubjectsWithSomeReliefCount":               Equal(0),
 			"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+				"11357(a)":              Equal(0),
 				"11357(c)":              Equal(1),
-				"11357(no sub-section)": Equal(1),
+				"11357(d)":              Equal(0),
+				"11357(no-sub-section)": Equal(1),
 				"11358":                 Equal(5),
 			}),
 			"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+				"11357(b)": Equal(0),
 				"11359": Equal(1),
+				"11360": Equal(0),
 			}),
 			"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 				"21 years or younger":                      Equal(1),
@@ -506,12 +510,16 @@ var _ = Describe("gogen", func() {
 				"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
 				"SubjectsWithSomeReliefCount":               Equal(0),
 				"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+					"11357(a)":              Equal(0),
 					"11357(c)":              Equal(2),
-					"11357(no sub-section)": Equal(2),
+					"11357(d)":              Equal(0),
+					"11357(no-sub-section)": Equal(2),
 					"11358":                 Equal(10),
 				}),
 				"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+					"11357(b)": Equal(0),
 					"11359": Equal(2),
+					"11360": Equal(0),
 				}),
 				"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 					"21 years or younger":                      Equal(2),
