@@ -65,7 +65,7 @@ var _ = Describe("DojInformation", func() {
 
 		comparisonTime = time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 		testFlow := testEligibilityFlow{}
-		configurableFlow := NewConfigurableEligibilityFlow(EligibilityOptions{
+		configurableFlow, _ := NewConfigurableEligibilityFlow(EligibilityOptions{
 			BaselineEligibility: BaselineEligibility{
 				Dismiss: []string{"11357(a)", "11357(c)", "11357(d)", "11357(no-sub-section)", "11358"},
 				Reduce:  []string{"11357(b)", "11359", "11360"},
@@ -77,7 +77,7 @@ var _ = Describe("DojInformation", func() {
 				SubjectIsDeceased: true,
 			},
 		}, county)
-		dojInformation = NewDOJInformation(pathToDOJ, comparisonTime, configurableFlow)
+		dojInformation, _ = NewDOJInformation(pathToDOJ, comparisonTime, configurableFlow)
 
 		testEligibilities = dojInformation.DetermineEligibility(county, testFlow)
 		dojEligibilities = dojInformation.DetermineEligibility(county, configurableFlow)

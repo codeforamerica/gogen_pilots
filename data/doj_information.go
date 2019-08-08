@@ -148,22 +148,26 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years(elig
 	return i.countIndividualsFilteredByFullRelief(eligibilities, occurredInLast7YearsFilter, dismissedFilter)
 }
 
-func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibilityFlow EligibilityFlow) *DOJInformation {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibilityFlow EligibilityFlow) (*DOJInformation, error) {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
-		utilities.ExitWithError(err, utilities.OTHER_ERROR)
+		return nil, err
 	}
 
 	bufferedReader := bufio.NewReader(dojFile)
 	sourceCSV := csv.NewReader(bufferedReader)
 
-	if includesHeaders(bufferedReader) {
+	hasHeaders, err := includesHeaders(bufferedReader)
+	if err != nil {
+		return nil, err
+	}
+	if hasHeaders {
 		bufferedReader.ReadLine() // read and discard header row
 	}
 
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
-		utilities.ExitWithError(err, utilities.CSV_PARSING_ERROR)
+		return nil, err
 	}
 	info := DOJInformation{
 		Rows:                 rows,
@@ -174,7 +178,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 
 	info.aggregateSubjects(eligibilityFlow)
 
-	return &info
+	return &info, nil
 }
 
 func (i *DOJInformation) countByCodeSectionFilteredMatchedConvictions(
@@ -317,16 +321,16 @@ func isHeaderRow(rowString string) bool {
 	return strings.HasPrefix(rowString, "RECORD_ID")
 }
 
-func includesHeaders(reader *bufio.Reader) bool {
+func includesHeaders(reader *bufio.Reader) (bool, error) {
 	firstRowBytes, err := reader.Peek(128)
 
 	if err != nil {
-		utilities.ExitWithError(err, utilities.OTHER_ERROR)
+		return false, err
 	}
 
 	firstRow := string(firstRowBytes)
 
-	return isHeaderRow(firstRow)
+	return isHeaderRow(firstRow), nil
 }
 
 type TimeSlice []time.Time

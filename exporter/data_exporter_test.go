@@ -2,7 +2,6 @@ package exporter_test
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -38,19 +37,26 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
 			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
 
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
+			dataExporter = NewDataExporter(
+				dojInformation,
+				dojEligibilities,
+				dismissAllProp64Eligibilities,
+				dismissAllProp64AndRelatedEligibilities,
+				dojWriter,
+				dojCondensedWriter,
+				dojProp64ConvictionsWriter,
+				outputWriter)
 		})
 
 		It("runs and has output", func() {
@@ -90,7 +96,7 @@ var _ = Describe("DataExporter", func() {
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
@@ -98,13 +104,19 @@ var _ = Describe("DataExporter", func() {
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
 
-			dojWriter := NewDOJWriter(dojResultsPath)
-			dojCondensedWriter := NewCondensedDOJWriter(dojCondensedResultsPath)
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(dojResultsPath)
+			dojCondensedWriter, _ := NewCondensedDOJWriter(dojCondensedResultsPath)
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
+			dataExporter = NewDataExporter(
+				dojInformation,
+				dojEligibilities,
+				dismissAllProp64Eligibilities,
+				dismissAllProp64AndRelatedEligibilities,
+				dojWriter, dojCondensedWriter,
+				dojProp64ConvictionsWriter,
+				outputWriter)
 		})
 
 		It("runs and has condensed output", func() {
@@ -140,18 +152,25 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
 			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
+			dataExporter = NewDataExporter(
+				dojInformation,
+				dojEligibilities,
+				dismissAllProp64Eligibilities,
+				dismissAllProp64AndRelatedEligibilities,
+				dojWriter,
+				dojCondensedWriter,
+				dojProp64ConvictionsWriter,
+				outputWriter)
 		})
 
 		It("runs and has condensed output", func() {
@@ -192,18 +211,25 @@ var _ = Describe("DataExporter", func() {
 			reduceCodeSections := []string{"11357(b)", "11359", "11360"}
 			flow := createFlow(dismissCodeSections, reduceCodeSections, COUNTY)
 
-			dojInformation := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
+			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
 			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
 			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
 			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
-			dojWriter := NewDOJWriter(path.Join(outputDir, "results.csv"))
-			dojCondensedWriter := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
-			dojProp64ConvictionsWriter := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
+			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
+			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
+			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen.out")
 
-			dataExporter = NewDataExporter(dojInformation,
-				dojEligibilities, dismissAllProp64Eligibilities, dismissAllProp64AndRelatedEligibilities, dojWriter, dojCondensedWriter, dojProp64ConvictionsWriter, outputWriter, path.Join(outputDir, "gogen.json"))
+			dataExporter = NewDataExporter(
+				dojInformation,
+				dojEligibilities,
+				dismissAllProp64Eligibilities,
+				dismissAllProp64AndRelatedEligibilities,
+				dojWriter,
+				dojCondensedWriter,
+				dojProp64ConvictionsWriter,
+				outputWriter)
 		})
 
 		It("runs and has output", func() {
@@ -223,32 +249,104 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			expectCSVsToBeEqual(expectedDOJResultsCSV, outputDOJCSV)
+		})
+	})
 
-			bytes, _ := ioutil.ReadFile(path.Join(outputDir, "gogen.json"))
-			var summary Summary
-			json.Unmarshal(bytes, &summary)
-			Expect(summary).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
-				"County": Equal("SACRAMENTO"),
-				"LineCount": Equal(36),
+	Describe("AccumulateSummaryData", func() {
+		It("adds new stats to stats already accumulated", func() {
+			existingStats := Summary{
+				County: "SANTA CARLA",
+				LineCount: 21,
+				EarliestConviction: time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC),
+				ReliefWithCurrentEligibilityChoices: map[string]int{
+					"CountSubjectsNoFelony":               2,
+					"CountSubjectsNoConvictionLast7Years": 3,
+					"CountSubjectsNoConviction":           1,
+				},
+				ReliefWithDismissAllProp64: map[string]int{
+					"CountSubjectsNoFelony":               5,
+					"CountSubjectsNoConvictionLast7Years": 7,
+					"CountSubjectsNoConviction":           4,
+				},
+				Prop64ConvictionsCountInCountyByCodeSection: map[string]int{
+					"11357": 4,
+					"11358": 6,
+					"11359": 7,
+				},
+			}
+
+			newStats := Summary{
+				County: "SANTA CARLA",
+				LineCount: 25,
+				EarliestConviction: time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
+				ReliefWithCurrentEligibilityChoices: map[string]int{
+					"CountSubjectsNoFelony":               1,
+					"CountSubjectsNoConvictionLast7Years": 5,
+					"CountSubjectsNoConviction":           2,
+				},
+				ReliefWithDismissAllProp64: map[string]int{
+					"CountSubjectsNoFelony":               4,
+					"CountSubjectsNoConvictionLast7Years": 6,
+					"CountSubjectsNoConviction":           3,
+				},
+				Prop64ConvictionsCountInCountyByCodeSection: map[string]int{
+					"11357": 5,
+					"11358": 7,
+					"11359": 8,
+				},
+			}
+
+			cumulativeStats := dataExporter.AccumulateSummaryData(existingStats, newStats)
+
+			Expect(cumulativeStats).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
+				"County": Equal("SANTA CARLA"),
+				"LineCount": Equal(46),
 				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
-				"ProcessingTimeInSeconds": BeNumerically(">", 0),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
-					"CountSubjectsNoFelony": Equal(4),
+					"CountSubjectsNoFelony": Equal(3),
+					"CountSubjectsNoConvictionLast7Years": Equal(8),
 					"CountSubjectsNoConviction": Equal(3),
-					"CountSubjectsNoConvictionLast7Years": Equal(1),
 				}),
 				"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
-					"CountSubjectsNoFelony": Equal(4),
-					"CountSubjectsNoConviction": Equal(3),
-					"CountSubjectsNoConvictionLast7Years": Equal(1),
+					"CountSubjectsNoFelony": Equal(9),
+					"CountSubjectsNoConvictionLast7Years": Equal(13),
+					"CountSubjectsNoConviction": Equal(7),
 				}),
 				"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-					"11357": Equal(4),
-					"11358": Equal(6),
-					"11359": Equal(7),
+					"11357": Equal(9),
+					"11358": Equal(13),
+					"11359": Equal(15),
 				}),
 			}))
+		})
 
+		It("does not use an empty date as the earliest date", func() {
+			existingStats := Summary{}
+
+			newStats := Summary{
+				County: "SANTA CARLA",
+				LineCount: 25,
+				EarliestConviction: time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
+				ReliefWithCurrentEligibilityChoices: map[string]int{
+					"CountSubjectsNoFelony":               1,
+					"CountSubjectsNoConvictionLast7Years": 5,
+					"CountSubjectsNoConviction":           2,
+				},
+				ReliefWithDismissAllProp64: map[string]int{
+					"CountSubjectsNoFelony":               4,
+					"CountSubjectsNoConvictionLast7Years": 6,
+					"CountSubjectsNoConviction":           3,
+				},
+				Prop64ConvictionsCountInCountyByCodeSection: map[string]int{
+					"11357": 5,
+					"11358": 7,
+					"11359": 8,
+				},
+			}
+
+			cumulativeStats := dataExporter.AccumulateSummaryData(existingStats, newStats)
+
+			Expect(cumulativeStats.EarliestConviction).To(Equal(time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC)))
 		})
 	})
 })
@@ -263,7 +361,7 @@ func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
 }
 
 func createFlow(dismissCodeSections []string, reduceCodeSections []string, county string) data.EligibilityFlow {
-	return data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
+	flow, _ := data.NewConfigurableEligibilityFlow(data.EligibilityOptions{
 		BaselineEligibility: data.BaselineEligibility{
 			Dismiss: dismissCodeSections,
 			Reduce: reduceCodeSections,
@@ -276,4 +374,5 @@ func createFlow(dismissCodeSections []string, reduceCodeSections []string, count
 			SubjectIsDeceased: true,
 		},
 	}, county)
+	return flow
 }

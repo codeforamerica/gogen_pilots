@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	OTHER_ERROR = 1
-	CSV_PARSING_ERROR = 2
-	INVALID_OPTION_ERROR = 3
+	OTHER_ERROR                      = 1
+	FILE_PROCESSING_ERROR            = 2
+	INVALID_RUN_OPTION_ERROR         = 3
+	INVALID_ELIGIBILITY_OPTION_ERROR = 4
 )
 
 var errorFileName string
@@ -53,11 +54,39 @@ func ExitWithError(originalError error, exitCode int) {
 	os.Exit(exitCode)
 }
 
+func ExitWithErrors(originalErrors []error, exitCode int) {
+	errorFile, err := os.Create(errorFileName)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
+
+	errorWriter := io.MultiWriter(os.Stderr, errorFile)
+	for _, errorMessage := range originalErrors {
+		fmt.Fprintln(errorWriter, errorMessage)
+	}
+	os.Exit(exitCode)
+}
+
 func GenerateFileName(outputFolder string, template string, suffix string) string {
 	if suffix != "" {
 		suffix = "_" + suffix
 	}
 	return filepath.Join(outputFolder, fmt.Sprintf(template, suffix))
+}
+
+func GenerateIndexedFileName(outputFolder string, template string, fileIndex int, suffix string) string {
+	if suffix != "" {
+		suffix = "_" + suffix
+	}
+	return filepath.Join(outputFolder, fmt.Sprintf(template, fileIndex, suffix))
+}
+
+func GenerateIndexedOutputFolder(outputFolder string, fileIndex int, suffix string) string {
+	if suffix != "" {
+		suffix = "_" + suffix
+	}
+
+	return filepath.Join(outputFolder, fmt.Sprintf("DOJ_Input_File_%d_Results%s", fileIndex, suffix))
 }
 
 func GetOutputWriter(filePath string) io.Writer {
