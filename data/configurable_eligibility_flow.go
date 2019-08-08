@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type configurableEligibilityFlow struct {
+type ConfigurableEligibilityFlow struct {
 	county                               string
 	dismissSections                      []string
 	reduceSections                       []string
@@ -19,27 +19,27 @@ type configurableEligibilityFlow struct {
 	yearsCrimeFreeThreshold              int
 }
 
-func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) (configurableEligibilityFlow, error) {
+func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) (ConfigurableEligibilityFlow, error) {
 
 	if options.AdditionalRelief.SubjectAgeThreshold != 0 {
 		if options.AdditionalRelief.SubjectAgeThreshold > 65 || options.AdditionalRelief.SubjectAgeThreshold < 40 {
-			return configurableEligibilityFlow{}, errors.New("SubjectAgeThreshold should be between 40 and 65, or 0")
+			return ConfigurableEligibilityFlow{}, errors.New("SubjectAgeThreshold should be between 40 and 65, or 0")
 		}
 	}
 
 	if options.AdditionalRelief.YearsSinceConvictionThreshold != 0 {
 		if options.AdditionalRelief.YearsSinceConvictionThreshold > 15 || options.AdditionalRelief.YearsSinceConvictionThreshold < 1 {
-			return configurableEligibilityFlow{}, errors.New("YearsSinceConvictionThreshold should be between 1 and 15, or 0")
+			return ConfigurableEligibilityFlow{}, errors.New("YearsSinceConvictionThreshold should be between 1 and 15, or 0")
 		}
 	}
 
 	if options.AdditionalRelief.YearsCrimeFreeThreshold != 0 {
 		if options.AdditionalRelief.YearsCrimeFreeThreshold > 15 || options.AdditionalRelief.YearsCrimeFreeThreshold < 1 {
-			return configurableEligibilityFlow{}, errors.New("YearsCrimeFreeThreshold should be between 1 and 15, or 0")
+			return ConfigurableEligibilityFlow{}, errors.New("YearsCrimeFreeThreshold should be between 1 and 15, or 0")
 		}
 	}
 
-	return configurableEligibilityFlow{
+	return ConfigurableEligibilityFlow{
 		county:                               county,
 		dismissSections:                      options.BaselineEligibility.Dismiss,
 		reduceSections:                       options.BaselineEligibility.Reduce,
@@ -53,7 +53,7 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) (
 	nil
 }
 
-func (ef configurableEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
+func (ef ConfigurableEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
@@ -65,15 +65,15 @@ func (ef configurableEligibilityFlow) ProcessSubject(subject *Subject, compariso
 	return infos
 }
 
-func (ef configurableEligibilityFlow) ChecksRelatedCharges() bool {
+func (ef ConfigurableEligibilityFlow) ChecksRelatedCharges() bool {
 	return false
 }
 
-func (ef configurableEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
+func (ef ConfigurableEligibilityFlow) checkRelevancy(codeSection string, county string) bool {
 	return county == ef.county && matchers.IsProp64Charge(codeSection)
 }
 
-func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef ConfigurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if !row.IsFelony {
 		info.SetEligibleForDismissal("Misdemeanor or Infraction")
 		return
@@ -114,7 +114,7 @@ func (ef configurableEligibilityFlow) EvaluateEligibility(info *EligibilityInfo,
 	}
 }
 
-func (ef configurableEligibilityFlow) isDismissedCodeSection(candidateCodeSection string) (bool, string) {
+func (ef ConfigurableEligibilityFlow) isDismissedCodeSection(candidateCodeSection string) (bool, string) {
 	for _, codeSection := range ef.dismissSections {
 		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection) {
 			return true, codeSection
@@ -123,7 +123,7 @@ func (ef configurableEligibilityFlow) isDismissedCodeSection(candidateCodeSectio
 	return false, ""
 }
 
-func (ef configurableEligibilityFlow) isReducedCodeSection(candidateCodeSection string) (bool, string) {
+func (ef ConfigurableEligibilityFlow) isReducedCodeSection(candidateCodeSection string) (bool, string) {
 	for _, codeSection := range ef.reduceSections {
 		if matchers.Prop64MatchersByCodeSection[codeSection].MatchString(candidateCodeSection) {
 			return true, codeSection
