@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"gogen/matchers"
-	"gogen/utilities"
 	"time"
 )
 
@@ -20,23 +19,23 @@ type configurableEligibilityFlow struct {
 	yearsCrimeFreeThreshold              int
 }
 
-func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) configurableEligibilityFlow {
+func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) (configurableEligibilityFlow, error) {
 
 	if options.AdditionalRelief.SubjectAgeThreshold != 0 {
 		if options.AdditionalRelief.SubjectAgeThreshold > 65 || options.AdditionalRelief.SubjectAgeThreshold < 40 {
-			utilities.ExitWithError(errors.New("SubjectAgeThreshold should be between 40 and 65, or 0"), utilities.INVALID_OPTION_ERROR)
+			return configurableEligibilityFlow{}, errors.New("SubjectAgeThreshold should be between 40 and 65, or 0")
 		}
 	}
 
 	if options.AdditionalRelief.YearsSinceConvictionThreshold != 0 {
 		if options.AdditionalRelief.YearsSinceConvictionThreshold > 15 || options.AdditionalRelief.YearsSinceConvictionThreshold < 1 {
-			utilities.ExitWithError(errors.New("YearsSinceConvictionThreshold should be between 1 and 15, or 0"), utilities.INVALID_OPTION_ERROR)
+			return configurableEligibilityFlow{}, errors.New("YearsSinceConvictionThreshold should be between 1 and 15, or 0")
 		}
 	}
 
 	if options.AdditionalRelief.YearsCrimeFreeThreshold != 0 {
 		if options.AdditionalRelief.YearsCrimeFreeThreshold > 15 || options.AdditionalRelief.YearsCrimeFreeThreshold < 1 {
-			utilities.ExitWithError(errors.New("YearsCrimeFreeThreshold should be between 1 and 15, or 0"), utilities.INVALID_OPTION_ERROR)
+			return configurableEligibilityFlow{}, errors.New("YearsCrimeFreeThreshold should be between 1 and 15, or 0")
 		}
 	}
 
@@ -50,7 +49,8 @@ func NewConfigurableEligibilityFlow(options EligibilityOptions, county string) c
 		subjectAgeThreshold:                  options.AdditionalRelief.SubjectAgeThreshold,
 		yearsSinceConvictionThreshold:        options.AdditionalRelief.YearsSinceConvictionThreshold,
 		yearsCrimeFreeThreshold:              options.AdditionalRelief.YearsCrimeFreeThreshold,
-	}
+	},
+	nil
 }
 
 func (ef configurableEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {

@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"fmt"
 	"gogen/data"
-	"gogen/utilities"
 	"os"
 	"time"
 )
@@ -160,10 +159,10 @@ type csvWriter struct {
 	filename         string
 }
 
-func NewWriter(outputFilePath string, headers []string) DOJWriter {
+func NewWriter(outputFilePath string, headers []string) (DOJWriter, error) {
 	outputFile, err := os.Create(outputFilePath)
 	if err != nil {
-		utilities.ExitWithError(err, utilities.OTHER_ERROR)
+		return nil, err
 	}
 
 	w := new(csvWriter)
@@ -172,18 +171,18 @@ func NewWriter(outputFilePath string, headers []string) DOJWriter {
 
 	err = w.outputFileWriter.Write(headers)
 	if err != nil {
-		utilities.ExitWithError(err, utilities.OTHER_ERROR)
+		return nil, err
 	}
 
-	return w
+	return w, nil
 }
 
-func NewDOJWriter(outputFilePath string) DOJWriter {
+func NewDOJWriter(outputFilePath string) (DOJWriter, error) {
 	headers := append(DojFullHeaders, EligiblityHeaders...)
 	return NewWriter(outputFilePath, headers)
 }
 
-func NewCondensedDOJWriter(outputFilePath string) DOJWriter {
+func NewCondensedDOJWriter(outputFilePath string) (DOJWriter, error) {
 	headers := append(DojCondensedHeaders, EligiblityHeaders...)
 	return NewWriter(outputFilePath, headers)
 }
