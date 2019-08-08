@@ -148,7 +148,7 @@ func (r runOpts) Execute(args []string) error {
 			prop64ConvictionsDojWriter,
 			aggregateFileStatsWriter)
 
-		fileSummary := dataExporter.Export(r.County, processingStartTime)
+		fileSummary := dataExporter.Export(r.County)
 		runSummary = dataExporter.AccumulateSummaryData(runSummary, fileSummary)
 	}
 
