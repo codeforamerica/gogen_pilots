@@ -33,7 +33,7 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	testWriter := NewWriter(filepath.Join(opts.OutputFolder, "generated_test_data.csv"), DojFullHeaders)
+	testWriter, _ := NewWriter(filepath.Join(opts.OutputFolder, "generated_test_data.csv"), DojFullHeaders)
 
 	totalRows := 0
 
