@@ -119,7 +119,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
-		Expect(summary.LineCount).To(Equal(36))
+		Expect(summary.LineCount).To(Equal(37))
 	})
 
 	It("can accept a suffix for the output file names", func() {
@@ -298,7 +298,7 @@ var _ = Describe("gogen", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("SACRAMENTO"),
-			"LineCount":               Equal(36),
+			"LineCount":               Equal(37),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
@@ -319,7 +319,7 @@ var _ = Describe("gogen", func() {
 			"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
 			"Prop64FelonyConvictionsCountInCounty":      Equal(0),
 			"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
-			"SubjectsWithSomeReliefCount":               Equal(0),
+			"SubjectsWithSomeReliefCount":               Equal(11),
 			"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 				"11357(a)":              Equal(0),
 				"11357(c)":              Equal(1),
@@ -329,8 +329,8 @@ var _ = Describe("gogen", func() {
 			}),
 			"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 				"11357(b)": Equal(0),
-				"11359": Equal(1),
-				"11360": Equal(0),
+				"11359":    Equal(1),
+				"11360":    Equal(0),
 			}),
 			"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 				"21 years or younger":                      Equal(1),
@@ -343,10 +343,10 @@ var _ = Describe("gogen", func() {
 		}))
 
 		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
-		Eventually(session).Should(gbytes.Say("Found 36 Total rows in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 11 Total individuals in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Found 37 Total rows in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 12 Total individuals in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 29 Total convictions in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 26 convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Convictions Overall--------------------"))
 		Eventually(session).Should(gbytes.Say("Found 20 convictions total"))
@@ -391,8 +391,8 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 0 convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("----------- Impact to individuals --------------------"))
-		Eventually(session).Should(gbytes.Say("11 individuals currently have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("11 individuals currently have convictions on their record"))
+		Eventually(session).Should(gbytes.Say("12 individuals currently have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("12 individuals currently have convictions on their record"))
 		Eventually(session).Should(gbytes.Say("3 individuals currently have convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility is run as specified for Prop 64 and Related Charges --------------------"))
@@ -486,9 +486,9 @@ var _ = Describe("gogen", func() {
 
 			summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
 			Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
-				"County":             Equal("SACRAMENTO"),
-				"LineCount":          Equal(72),
-				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+				"County":                  Equal("SACRAMENTO"),
+				"LineCount":               Equal(74),
+				"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ProcessingTimeInSeconds": BeNumerically(">", 0),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
 					"CountSubjectsNoFelony":               Equal(8),
@@ -508,7 +508,7 @@ var _ = Describe("gogen", func() {
 				"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
 				"Prop64FelonyConvictionsCountInCounty":      Equal(0),
 				"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
-				"SubjectsWithSomeReliefCount":               Equal(0),
+				"SubjectsWithSomeReliefCount":               Equal(22),
 				"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 					"11357(a)":              Equal(0),
 					"11357(c)":              Equal(2),
@@ -518,8 +518,8 @@ var _ = Describe("gogen", func() {
 				}),
 				"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 					"11357(b)": Equal(0),
-					"11359": Equal(2),
-					"11360": Equal(0),
+					"11359":    Equal(2),
+					"11360":    Equal(0),
 				}),
 				"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 					"21 years or younger":                      Equal(2),
