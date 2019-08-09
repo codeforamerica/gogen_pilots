@@ -204,9 +204,9 @@ func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Sum
 		ReliefWithCurrentEligibilityChoices: utilities.AddMaps(runSummary.ReliefWithCurrentEligibilityChoices, fileSummary.ReliefWithCurrentEligibilityChoices),
 		ReliefWithDismissAllProp64:          utilities.AddMaps(runSummary.ReliefWithDismissAllProp64, fileSummary.ReliefWithDismissAllProp64),
 		Prop64ConvictionsCountInCountyByCodeSection: utilities.AddMaps(runSummary.Prop64ConvictionsCountInCountyByCodeSection, fileSummary.Prop64ConvictionsCountInCountyByCodeSection),
-		Prop64FelonyConvictionsCountInCounty:        0,
-		Prop64MisdemeanorConvictionsCountInCounty:   0,
-		SubjectsWithSomeReliefCount:                 0,
+		Prop64FelonyConvictionsCountInCounty:        runSummary.Prop64FelonyConvictionsCountInCounty + fileSummary.Prop64FelonyConvictionsCountInCounty,
+		Prop64MisdemeanorConvictionsCountInCounty:   runSummary.Prop64MisdemeanorConvictionsCountInCounty + fileSummary.Prop64MisdemeanorConvictionsCountInCounty,
+		SubjectsWithSomeReliefCount:                 runSummary.SubjectsWithSomeReliefCount + fileSummary.SubjectsWithSomeReliefCount,
 		ConvictionDismissalCountByAdditionalRelief:  utilities.AddMaps(runSummary.ConvictionDismissalCountByAdditionalRelief, fileSummary.ConvictionDismissalCountByAdditionalRelief),
 		ConvictionDismissalCountByCodeSection:       utilities.AddMaps(runSummary.ConvictionDismissalCountByCodeSection, fileSummary.ConvictionDismissalCountByCodeSection),
 		ConvictionReductionCountByCodeSection:       utilities.AddMaps(runSummary.ConvictionReductionCountByCodeSection, fileSummary.ConvictionReductionCountByCodeSection),
@@ -232,6 +232,7 @@ func (d *DataExporter) NewSummary(county string, configurableEligibilityFlow dat
 		ConvictionDismissalCountByCodeSection:       d.getDismissalsByCodeSection(county, configurableEligibilityFlow),
 		ConvictionReductionCountByCodeSection:       d.getReductionsByCodeSection(county, configurableEligibilityFlow),
 		ConvictionDismissalCountByAdditionalRelief:  d.getDismissalsByAdditionalRelief(county, configurableEligibilityFlow),
+		SubjectsWithSomeReliefCount: d.dojInformation.CountIndividualsWithSomeRelief(d.normalFlowEligibilities),
 	}
 }
 

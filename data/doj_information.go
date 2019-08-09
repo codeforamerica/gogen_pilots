@@ -132,6 +132,22 @@ func (i *DOJInformation) CountIndividualsWithConviction() int {
 	return i.countIndividualsFilteredByConviction(hasConvictionFilter)
 }
 
+func (i *DOJInformation) CountIndividualsWithSomeRelief(eligibilities map[int]*EligibilityInfo) int {
+	countIndividuals := 0
+OuterLoop:
+	for _, subject := range i.Subjects {
+		for _, conviction := range subject.Convictions {
+			if eligibilities[conviction.Index] != nil {
+				if reducedOrDismissedFilter(eligibilities[conviction.Index]) {
+					countIndividuals++
+					continue OuterLoop
+				}
+			}
+		}
+	}
+	return countIndividuals
+}
+
 func (i *DOJInformation) CountIndividualsWithConvictionInLast7Years() int {
 	return i.countIndividualsFilteredByConviction(occurredInLast7YearsFilter)
 }
@@ -234,6 +250,7 @@ OuterLoop:
 	}
 	return countIndividuals
 }
+
 
 func (i *DOJInformation) countIndividualsFilteredByFullRelief(
 	eligibilities map[int]*EligibilityInfo,

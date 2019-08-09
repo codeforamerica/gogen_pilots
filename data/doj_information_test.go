@@ -96,15 +96,15 @@ var _ = Describe("DojInformation", func() {
 
 	Context("Computing Aggregate Statistics for convictions", func() {
 		It("Counts total number of rows in file", func() {
-			Expect(dojInformation.TotalRows()).To(Equal(36))
+			Expect(dojInformation.TotalRows()).To(Equal(37))
 		})
 
 		It("Counts total convictions", func() {
-			Expect(dojInformation.TotalConvictions()).To(Equal(28))
+			Expect(dojInformation.TotalConvictions()).To(Equal(29))
 		})
 
 		It("Counts total convictions in this county", func() {
-			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(25))
+			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(26))
 		})
 
 		It("Counts all Prop64 convictions sorted by code section", func() {
@@ -152,16 +152,16 @@ var _ = Describe("DojInformation", func() {
 
 		Context("Computing aggregate statistics for individuals", func() {
 			It("Counts total number of individuals in file", func() {
-				Expect(dojInformation.TotalIndividuals()).To(Equal(11))
+				Expect(dojInformation.TotalIndividuals()).To(Equal(12))
 			})
 
 			Context("Before eligibility is run", func() {
 				It("Calculates individuals with a felony", func() {
-					Expect(dojInformation.CountIndividualsWithFelony()).To(Equal(11))
+					Expect(dojInformation.CountIndividualsWithFelony()).To(Equal(12))
 				})
 
 				It("Calculates individuals with any conviction", func() {
-					Expect(dojInformation.CountIndividualsWithConviction()).To(Equal(11))
+					Expect(dojInformation.CountIndividualsWithConviction()).To(Equal(12))
 				})
 
 				It("Calculates individuals with any conviction in the last 7 years", func() {
@@ -180,6 +180,10 @@ var _ = Describe("DojInformation", func() {
 
 				It("Calculates individuals who no longer have any conviction in the last 7 years", func() {
 					Expect(dojInformation.CountIndividualsNoLongerHaveConvictionInLast7Years(dojEligibilities)).To(Equal(1))
+				})
+
+				It("Calculates individuals who will have some relief", func() {
+					Expect(dojInformation.CountIndividualsWithSomeRelief(dojEligibilities)).To(Equal(11))
 				})
 			})
 
