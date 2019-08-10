@@ -3,6 +3,7 @@ package exporter
 import (
 	"fmt"
 	"gogen/data"
+	"gogen/matchers"
 	"gogen/utilities"
 	"io"
 	"sort"
@@ -30,15 +31,13 @@ type Summary struct {
 	ReliefWithCurrentEligibilityChoices         map[string]int `json:"reliefWithCurrentEligibilityChoices"`
 	ReliefWithDismissAllProp64                  map[string]int `json:"reliefWithDismissAllProp64"`
 	Prop64ConvictionsCountInCountyByCodeSection map[string]int `json:"prop64ConvictionsCountInCountyByCodeSection"`
-
-	// TODO
-	SubjectsWithProp64ConvictionCountInCounty  int            `json:"subjectsWithProp64ConvictionCountInCounty"`
-	Prop64FelonyConvictionsCountInCounty       int            `json:"prop64FelonyConvictionsCountInCounty"`
-	Prop64MisdemeanorConvictionsCountInCounty  int            `json:"prop64MisdemeanorConvictionsCountInCounty"`
-	SubjectsWithSomeReliefCount                int            `json:"subjectsWithSomeReliefCount"`
-	ConvictionDismissalCountByCodeSection      map[string]int `json:"convictionDismissalCountByCodeSection"`
-	ConvictionReductionCountByCodeSection      map[string]int `json:"convictionReductionCountByCodeSection"`
-	ConvictionDismissalCountByAdditionalRelief map[string]int `json:"convictionDismissalCountByAdditionalRelief"`
+	SubjectsWithProp64ConvictionCountInCounty   int            `json:"subjectsWithProp64ConvictionCountInCounty"`
+	Prop64FelonyConvictionsCountInCounty        int            `json:"prop64FelonyConvictionsCountInCounty"`
+	Prop64NonFelonyConvictionsCountInCounty     int            `json:"prop64NonFelonyConvictionsCountInCounty"`
+	SubjectsWithSomeReliefCount                 int            `json:"subjectsWithSomeReliefCount"`
+	ConvictionDismissalCountByCodeSection       map[string]int `json:"convictionDismissalCountByCodeSection"`
+	ConvictionReductionCountByCodeSection       map[string]int `json:"convictionReductionCountByCodeSection"`
+	ConvictionDismissalCountByAdditionalRelief  map[string]int `json:"convictionDismissalCountByAdditionalRelief"`
 }
 
 func NewDataExporter(
@@ -205,7 +204,7 @@ func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Sum
 		ReliefWithDismissAllProp64:          utilities.AddMaps(runSummary.ReliefWithDismissAllProp64, fileSummary.ReliefWithDismissAllProp64),
 		Prop64ConvictionsCountInCountyByCodeSection: utilities.AddMaps(runSummary.Prop64ConvictionsCountInCountyByCodeSection, fileSummary.Prop64ConvictionsCountInCountyByCodeSection),
 		Prop64FelonyConvictionsCountInCounty:        runSummary.Prop64FelonyConvictionsCountInCounty + fileSummary.Prop64FelonyConvictionsCountInCounty,
-		Prop64MisdemeanorConvictionsCountInCounty:   runSummary.Prop64MisdemeanorConvictionsCountInCounty + fileSummary.Prop64MisdemeanorConvictionsCountInCounty,
+		Prop64NonFelonyConvictionsCountInCounty:     runSummary.Prop64NonFelonyConvictionsCountInCounty + fileSummary.Prop64NonFelonyConvictionsCountInCounty,
 		SubjectsWithSomeReliefCount:                 runSummary.SubjectsWithSomeReliefCount + fileSummary.SubjectsWithSomeReliefCount,
 		ConvictionDismissalCountByAdditionalRelief:  utilities.AddMaps(runSummary.ConvictionDismissalCountByAdditionalRelief, fileSummary.ConvictionDismissalCountByAdditionalRelief),
 		ConvictionDismissalCountByCodeSection:       utilities.AddMaps(runSummary.ConvictionDismissalCountByCodeSection, fileSummary.ConvictionDismissalCountByCodeSection),
@@ -233,6 +232,8 @@ func (d *DataExporter) NewSummary(county string, configurableEligibilityFlow dat
 		ConvictionReductionCountByCodeSection:       d.getReductionsByCodeSection(county, configurableEligibilityFlow),
 		ConvictionDismissalCountByAdditionalRelief:  d.getDismissalsByAdditionalRelief(county, configurableEligibilityFlow),
 		SubjectsWithSomeReliefCount: d.dojInformation.CountIndividualsWithSomeRelief(d.normalFlowEligibilities),
+		Prop64FelonyConvictionsCountInCounty: d.dojInformation.TotalConvictionsInCountyFiltered(county, data.IsFelonyFilter, matchers.IsProp64Charge),
+		Prop64NonFelonyConvictionsCountInCounty: d.dojInformation.TotalConvictionsInCountyFiltered(county, data.IsNotFelonyFilter, matchers.IsProp64Charge),
 	}
 }
 

@@ -317,8 +317,8 @@ var _ = Describe("gogen", func() {
 				"11359": Equal(7),
 			}),
 			"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
-			"Prop64FelonyConvictionsCountInCounty":      Equal(0),
-			"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
+			"Prop64FelonyConvictionsCountInCounty":      Equal(14),
+			"Prop64NonFelonyConvictionsCountInCounty": Equal(3),
 			"SubjectsWithSomeReliefCount":               Equal(11),
 			"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 				"11357(a)":              Equal(0),
@@ -506,8 +506,8 @@ var _ = Describe("gogen", func() {
 					"11359": Equal(14),
 				}),
 				"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
-				"Prop64FelonyConvictionsCountInCounty":      Equal(0),
-				"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
+				"Prop64FelonyConvictionsCountInCounty":      Equal(28),
+				"Prop64NonFelonyConvictionsCountInCounty": Equal(6),
 				"SubjectsWithSomeReliefCount":               Equal(22),
 				"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 					"11357(a)":              Equal(0),
