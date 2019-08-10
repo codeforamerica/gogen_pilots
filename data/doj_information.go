@@ -125,7 +125,7 @@ func (i *DOJInformation) EarliestProp64ConvictionDateInThisCounty(county string)
 }
 
 func (i *DOJInformation) CountIndividualsWithFelony() int {
-	return i.countIndividualsFilteredByConviction(isFelonyFilter)
+	return i.countIndividualsFilteredByConviction(IsFelonyFilter)
 }
 
 func (i *DOJInformation) CountIndividualsWithConviction() int {
@@ -153,7 +153,7 @@ func (i *DOJInformation) CountIndividualsWithConvictionInLast7Years() int {
 }
 
 func (i *DOJInformation) CountIndividualsNoLongerHaveFelony(eligibilities map[int]*EligibilityInfo) int {
-	return i.countIndividualsFilteredByFullRelief(eligibilities, isFelonyFilter, reducedOrDismissedFilter)
+	return i.countIndividualsFilteredByFullRelief(eligibilities, IsFelonyFilter, reducedOrDismissedFilter)
 }
 
 func (i *DOJInformation) CountIndividualsNoLongerHaveConviction(eligibilities map[int]*EligibilityInfo) int {
@@ -251,7 +251,6 @@ OuterLoop:
 	return countIndividuals
 }
 
-
 func (i *DOJInformation) countIndividualsFilteredByFullRelief(
 	eligibilities map[int]*EligibilityInfo,
 	convictionFilter func(conviction *DOJRow) bool,
@@ -304,6 +303,18 @@ func countByEligibilityDeterminationAndReason(
 	return convictionMap
 }
 
+func (i *DOJInformation) TotalConvictionsInCountyFiltered(county string, convictionFilter func(conviction *DOJRow) bool, matcher func(codeSection string) bool) int {
+	result := 0
+	for _, subject := range i.Subjects {
+		for _, conviction := range subject.Convictions {
+			if countyFilter(county, conviction) && convictionFilter(conviction) && matcher(conviction.CodeSection) {
+				result++
+			}
+		}
+	}
+	return result
+}
+
 func countyFilter(county string, conviction *DOJRow) bool {
 	return conviction.County == county
 }
@@ -316,8 +327,12 @@ func hasConvictionFilter(conviction *DOJRow) bool {
 	return conviction != nil
 }
 
-func isFelonyFilter(conviction *DOJRow) bool {
+func IsFelonyFilter(conviction *DOJRow) bool {
 	return conviction.IsFelony
+}
+
+func IsNotFelonyFilter(conviction *DOJRow) bool {
+	return !conviction.IsFelony
 }
 
 func occurredInLast7YearsFilter(conviction *DOJRow) bool {
