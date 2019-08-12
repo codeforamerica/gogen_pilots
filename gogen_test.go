@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"os/exec"
 	path "path/filepath"
-	"regexp"
 	"time"
 
 	. "gogen/test_fixtures"
@@ -312,25 +311,21 @@ var _ = Describe("gogen", func() {
 				"CountSubjectsNoConvictionLast7Years": Equal(1),
 			}),
 			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-				"11357": Equal(4),
+				"11357": Equal(3),
 				"11358": Equal(6),
-				"11359": Equal(7),
+				"11359": Equal(8),
 			}),
 			"SubjectsWithProp64ConvictionCountInCounty": Equal(11),
 			"Prop64FelonyConvictionsCountInCounty":      Equal(14),
-			"Prop64NonFelonyConvictionsCountInCounty": Equal(3),
+			"Prop64NonFelonyConvictionsCountInCounty":   Equal(3),
 			"SubjectsWithSomeReliefCount":               Equal(11),
 			"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-				"11357(a)":              Equal(0),
-				"11357(c)":              Equal(1),
-				"11357(d)":              Equal(0),
-				"11357(no-sub-section)": Equal(1),
-				"11358":                 Equal(5),
+				"11357": Equal(2),
+				"11358": Equal(5),
 			}),
 			"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-				"11357(b)": Equal(0),
-				"11359":    Equal(1),
-				"11360":    Equal(0),
+				"11359": Equal(1),
+				"11360": Equal(0),
 			}),
 			"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 				"21 years or younger":                      Equal(1),
@@ -350,21 +345,21 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Convictions Overall--------------------"))
 		Eventually(session).Should(gbytes.Say("Found 20 convictions total"))
-		Eventually(session).Should(gbytes.Say("Found 4 11357 convictions total"))
+		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions total"))
 		Eventually(session).Should(gbytes.Say("Found 8 11358 convictions total"))
-		Eventually(session).Should(gbytes.Say("Found 8 11359 convictions total"))
+		Eventually(session).Should(gbytes.Say("Found 9 11359 convictions total"))
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Convictions In This County --------------------"))
 		Eventually(session).Should(gbytes.Say("Found 17 convictions in this county"))
-		Eventually(session).Should(gbytes.Say("Found 4 11357 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 6 11358 convictions in this county"))
-		Eventually(session).Should(gbytes.Say("Found 7 11359 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Found 8 11359 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Date of earliest Prop 64 conviction: June 1979"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 4 11357 convictions that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions that are Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 6 11358 convictions that are Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 6 11359 convictions that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 7 11359 convictions that are Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 16 convictions total that are Eligible for Dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Reduction"))
@@ -377,8 +372,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason 21 years or younger"))
 		Eventually(session).Should(gbytes.Say("Found 2 convictions with eligibility reason 57 years or older"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Conviction occurred 10 or more years ago"))
-		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason Dismiss all HS 11357 convictions (when no sub-section is specified)")))
-		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason Dismiss all HS 11357(c) convictions")))
+		Eventually(session).Should(gbytes.Say("Found 2 convictions with eligibility reason Dismiss all HS 11357 convictions"))
 		Eventually(session).Should(gbytes.Say("Found 5 convictions with eligibility reason Dismiss all HS 11358 convictions"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Individual is deceased"))
 		Eventually(session).Should(gbytes.Say("Found 3 convictions with eligibility reason Misdemeanor or Infraction"))
@@ -501,23 +495,19 @@ var _ = Describe("gogen", func() {
 					"CountSubjectsNoConvictionLast7Years": Equal(2),
 				}),
 				"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-					"11357": Equal(8),
+					"11357": Equal(6),
 					"11358": Equal(12),
-					"11359": Equal(14),
+					"11359": Equal(16),
 				}),
 				"SubjectsWithProp64ConvictionCountInCounty": Equal(22),
 				"Prop64FelonyConvictionsCountInCounty":      Equal(28),
-				"Prop64NonFelonyConvictionsCountInCounty": Equal(6),
+				"Prop64NonFelonyConvictionsCountInCounty":   Equal(6),
 				"SubjectsWithSomeReliefCount":               Equal(22),
 				"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-					"11357(a)":              Equal(0),
-					"11357(c)":              Equal(2),
-					"11357(d)":              Equal(0),
-					"11357(no-sub-section)": Equal(2),
-					"11358":                 Equal(10),
+					"11357": Equal(4),
+					"11358": Equal(10),
 				}),
 				"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-					"11357(b)": Equal(0),
 					"11359":    Equal(2),
 					"11360":    Equal(0),
 				}),
