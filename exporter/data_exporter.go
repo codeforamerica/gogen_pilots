@@ -209,6 +209,7 @@ func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Sum
 		ConvictionDismissalCountByAdditionalRelief:  utilities.AddMaps(runSummary.ConvictionDismissalCountByAdditionalRelief, fileSummary.ConvictionDismissalCountByAdditionalRelief),
 		ConvictionDismissalCountByCodeSection:       utilities.AddMaps(runSummary.ConvictionDismissalCountByCodeSection, fileSummary.ConvictionDismissalCountByCodeSection),
 		ConvictionReductionCountByCodeSection:       utilities.AddMaps(runSummary.ConvictionReductionCountByCodeSection, fileSummary.ConvictionReductionCountByCodeSection),
+		SubjectsWithProp64ConvictionCountInCounty:   runSummary.SubjectsWithProp64ConvictionCountInCounty + fileSummary.SubjectsWithProp64ConvictionCountInCounty,
 	}
 }
 
@@ -231,9 +232,10 @@ func (d *DataExporter) NewSummary(county string, configurableEligibilityFlow dat
 		ConvictionDismissalCountByCodeSection:       d.getDismissalsByCodeSection(county, configurableEligibilityFlow),
 		ConvictionReductionCountByCodeSection:       d.getReductionsByCodeSection(county, configurableEligibilityFlow),
 		ConvictionDismissalCountByAdditionalRelief:  d.getDismissalsByAdditionalRelief(county, configurableEligibilityFlow),
-		SubjectsWithSomeReliefCount: d.dojInformation.CountIndividualsWithSomeRelief(d.normalFlowEligibilities),
-		Prop64FelonyConvictionsCountInCounty: d.dojInformation.TotalConvictionsInCountyFiltered(county, data.IsFelonyFilter, matchers.IsProp64Charge),
-		Prop64NonFelonyConvictionsCountInCounty: d.dojInformation.TotalConvictionsInCountyFiltered(county, data.IsNotFelonyFilter, matchers.IsProp64Charge),
+		SubjectsWithSomeReliefCount:                 d.dojInformation.CountIndividualsWithSomeRelief(d.normalFlowEligibilities),
+		Prop64FelonyConvictionsCountInCounty:        d.dojInformation.TotalConvictionsInCountyFiltered(county, data.IsFelonyFilter, matchers.IsProp64Charge),
+		Prop64NonFelonyConvictionsCountInCounty:     d.dojInformation.TotalConvictionsInCountyFiltered(county, data.IsNotFelonyFilter, matchers.IsProp64Charge),
+		SubjectsWithProp64ConvictionCountInCounty:   d.dojInformation.CountIndividualsWithProp64ConvictionInCounty(county),
 	}
 }
 

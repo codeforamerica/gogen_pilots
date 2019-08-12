@@ -124,6 +124,13 @@ func (i *DOJInformation) EarliestProp64ConvictionDateInThisCounty(county string)
 	return convictionDates[0]
 }
 
+func (i *DOJInformation) CountIndividualsWithProp64ConvictionInCounty(county string) int {
+	pro64AndCountyFilter := func(d *DOJRow) bool {
+		return d.County == county && matchers.IsProp64Charge(d.CodeSection)
+	}
+	return i.countIndividualsFilteredByConviction(pro64AndCountyFilter)
+}
+
 func (i *DOJInformation) CountIndividualsWithFelony() int {
 	return i.countIndividualsFilteredByConviction(IsFelonyFilter)
 }
