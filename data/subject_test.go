@@ -24,7 +24,6 @@ var _ = Describe("Subject", func() {
 	)
 
 	days := time.Duration(24) * (time.Hour)
-	sacramentoEligibilityFlow := data.EligibilityFlows["SACRAMENTO"]
 
 	BeforeEach(func() {
 		birthDate = time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
@@ -40,7 +39,7 @@ var _ = Describe("Subject", func() {
 		rows := []data.DOJRow{conviction1, nonConviction, conviction2, registration, conviction3, conviction4, conviction5, conviction5Prison}
 		subject = data.Subject{}
 		for _, row := range rows {
-			subject.PushRow(row, sacramentoEligibilityFlow)
+			subject.PushRow(row)
 		}
 	})
 
@@ -88,8 +87,8 @@ var _ = Describe("Subject", func() {
 				conviction6 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", OFN: "1119999", DOB: birthDate, CodeSection: "187 PC", WasConvicted: true, CountOrder: "102001003300", DispositionDate: time.Date(2016, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
 				conviction7 = data.DOJRow{SubjectID: "subj_id", Name: "SOUP,ZAK E", OFN: "1118888", DOB: birthDate, CodeSection: "191.5 PC", WasConvicted: true, CountOrder: "103001004300", DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC), County: "LOS ANGELES"}
 
-				subject.PushRow(conviction6, sacramentoEligibilityFlow)
-				subject.PushRow(conviction7, sacramentoEligibilityFlow)
+				subject.PushRow(conviction6)
+				subject.PushRow(conviction7)
 			})
 
 			It("returns the number of convictions that occurred in the last 7 years", func() {

@@ -19,7 +19,7 @@ type DOJInformation struct {
 	checksRelatedCharges bool
 }
 
-func (i *DOJInformation) aggregateSubjects(eligibilityFlow EligibilityFlow) {
+func (i *DOJInformation) aggregateSubjects() {
 	totalRows := len(i.Rows)
 
 	fmt.Println("Reading DOJ Data Into Memory")
@@ -32,7 +32,7 @@ func (i *DOJInformation) aggregateSubjects(eligibilityFlow EligibilityFlow) {
 		if i.Subjects[dojRow.SubjectID] == nil {
 			i.Subjects[dojRow.SubjectID] = new(Subject)
 		}
-		i.Subjects[dojRow.SubjectID].PushRow(dojRow, eligibilityFlow)
+		i.Subjects[dojRow.SubjectID].PushRow(dojRow)
 
 		totalTime += time.Since(startTime)
 
@@ -176,7 +176,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 		checksRelatedCharges: eligibilityFlow.ChecksRelatedCharges(),
 	}
 
-	info.aggregateSubjects(eligibilityFlow)
+	info.aggregateSubjects()
 
 	return &info, nil
 }

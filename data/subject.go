@@ -17,7 +17,7 @@ type Subject struct {
 	IsDeceased              bool
 }
 
-func (subject *Subject) PushRow(row DOJRow, eligibilityFlow EligibilityFlow) {
+func (subject *Subject) PushRow(row DOJRow) {
 	if subject.ID == "" {
 		subject.ID = row.SubjectID
 		subject.Name = row.Name

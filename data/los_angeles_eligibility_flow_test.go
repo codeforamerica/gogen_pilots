@@ -124,7 +124,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{nonConviction, registration, conviction1, conviction2, conviction3, conviction4, conviction5, convictionPrison}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 			})
 
@@ -221,7 +221,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{conviction1, conviction2, conviction3, conviction4, conviction5}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 			})
 
@@ -291,7 +291,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{conviction1, conviction2, conviction3}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 			})
 
@@ -361,7 +361,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{conviction1, conviction2, conviction3}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 			})
 
@@ -427,7 +427,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{conviction1, conviction2, conviction3}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 			})
 
@@ -493,7 +493,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{conviction1, conviction2, conviction3}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 				subject.IsDeceased = true
 			})
@@ -560,7 +560,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				rows := []DOJRow{conviction1, conviction2, conviction3}
 				subject = Subject{}
 				for _, row := range rows {
-					subject.PushRow(row, flow)
+					subject.PushRow(row)
 				}
 			})
 
