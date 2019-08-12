@@ -267,11 +267,7 @@ func (d *DataExporter) getDismissalsByCodeSection(county string, configurableEli
 	result := make(map[string]int)
 	var eligibilityReasonKey string
 	for _, codeSection := range configurableEligibilityFlow.DismissSections {
-		if codeSection == "11357(no-sub-section)" {
-			eligibilityReasonKey = "Dismiss all HS 11357 convictions (when no sub-section is specified)"
-		} else {
-			eligibilityReasonKey = fmt.Sprintf("Dismiss all HS %s convictions", codeSection)
-		}
+		eligibilityReasonKey = fmt.Sprintf("Dismiss all HS %s convictions", codeSection)
 		result[codeSection] = d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"][eligibilityReasonKey]
 	}
 	return result
@@ -281,11 +277,7 @@ func (d *DataExporter) getReductionsByCodeSection(county string, configurableEli
 	result := make(map[string]int)
 	var eligibilityReasonKey string
 	for _, codeSection := range configurableEligibilityFlow.ReduceSections {
-		if codeSection == "11357(no-sub-section)" {
-			eligibilityReasonKey = "Reduce all HS 11357 convictions (when no sub-section is specified)"
-		} else {
-			eligibilityReasonKey = fmt.Sprintf("Reduce all HS %s convictions", codeSection)
-		}
+		eligibilityReasonKey = fmt.Sprintf("Reduce all HS %s convictions", codeSection)
 		result[codeSection] = d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Reduction"][eligibilityReasonKey]
 	}
 	return result

@@ -139,8 +139,5 @@ func composeEligibilityReason(canonicalCodeSection string, isDismiss bool) strin
 	} else {
 		verb = "Reduce"
 	}
-	if canonicalCodeSection == "11357(no-sub-section)" {
-		return fmt.Sprintf("%s all HS 11357 convictions (when no sub-section is specified)", verb)
-	}
 	return fmt.Sprintf("%s all HS %s convictions", verb, canonicalCodeSection)
 }
