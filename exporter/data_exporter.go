@@ -286,7 +286,7 @@ func (d *DataExporter) getReductionsByCodeSection(county string, configurableEli
 func (d *DataExporter) getDismissalsByAdditionalRelief(county string, configurableEligibilityFlow data.ConfigurableEligibilityFlow) map[string]int {
 	result := make(map[string]int)
 	for key, value := range d.dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, d.normalFlowEligibilities)["Eligible for Dismissal"] {
-		if !strings.HasPrefix(key, "Dismiss all HS") {
+		if !strings.HasPrefix(key, "Dismiss all HS") && !strings.HasPrefix(key, "Misdemeanor or Infraction"){
 			result[key] = value
 		}
 	}
