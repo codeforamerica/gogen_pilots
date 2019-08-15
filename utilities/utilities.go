@@ -65,15 +65,15 @@ func ExitWithError(originalError error, exitCode int) {
 	os.Exit(exitCode)
 }
 
-func ExitWithErrors(originalErrors []error, exitCode int) {
+func ExitWithErrors(originalErrors map[string]error, exitCode int) {
 	errorFile, err := os.Create(errorFileName)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}
 
 	errorWriter := io.MultiWriter(os.Stderr, errorFile)
-	for _, errorMessage := range originalErrors {
-		fmt.Fprintln(errorWriter, errorMessage)
+	for fileName, errorMessage := range originalErrors {
+		fmt.Fprintf(errorWriter, "%s: %s\n", fileName, errorMessage)
 	}
 	os.Exit(exitCode)
 }

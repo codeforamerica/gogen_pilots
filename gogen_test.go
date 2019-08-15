@@ -507,8 +507,8 @@ var _ = Describe("gogen", func() {
 					"11358": Equal(10),
 				}),
 				"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-					"11359":    Equal(2),
-					"11360":    Equal(0),
+					"11359": Equal(2),
+					"11360": Equal(0),
 				}),
 				"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 					"21 years or younger":                      Equal(2),

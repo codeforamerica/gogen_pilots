@@ -89,7 +89,7 @@ func (r runOpts) Execute(args []string) error {
 		utilities.ExitWithError(err, utilities.INVALID_ELIGIBILITY_OPTION_ERROR)
 	}
 
-	var runErrors []error
+	runErrors := make(map[string]error)
 	var runSummary exporter.Summary
 	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.json", r.FileNameSuffix)
 
@@ -99,12 +99,12 @@ func (r runOpts) Execute(args []string) error {
 		fileOutputFolder := utilities.GenerateIndexedOutputFolder(r.OutputFolder, fileIndex, r.FileNameSuffix)
 		err := os.MkdirAll(fileOutputFolder, os.ModePerm)
 		if err != nil {
-			runErrors = append(runErrors, err)
+			runErrors[inputFile] = err
 			continue
 		}
 		dojInformation, err := data.NewDOJInformation(inputFile, computeAtDate, configurableEligibilityFlow)
 		if err != nil {
-			runErrors = append(runErrors, err)
+			runErrors[inputFile] = err
 			continue
 		}
 		countyEligibilities := dojInformation.DetermineEligibility(r.County, configurableEligibilityFlow)
@@ -119,17 +119,17 @@ func (r runOpts) Execute(args []string) error {
 
 		dojWriter, err := exporter.NewDOJWriter(dojFilePath)
 		if err != nil {
-			runErrors = append(runErrors, err)
+			runErrors[inputFile] = err
 			continue
 		}
 		condensedDojWriter, err := exporter.NewCondensedDOJWriter(condensedFilePath)
 		if err != nil {
-			runErrors = append(runErrors, err)
+			runErrors[inputFile] = err
 			continue
 		}
 		prop64ConvictionsDojWriter, err := exporter.NewDOJWriter(prop64ConvictionsFilePath)
 		if err != nil {
-			runErrors = append(runErrors, err)
+			runErrors[inputFile] = err
 			continue
 		}
 		aggregateFileStatsWriter := utilities.GetOutputWriter(outputFilePath)
@@ -148,12 +148,22 @@ func (r runOpts) Execute(args []string) error {
 		runSummary = dataExporter.AccumulateSummaryData(runSummary, fileSummary)
 	}
 
-	if len(runErrors) > 0 {
+	if encounteredErrors(runErrors) {
 		utilities.ExitWithErrors(runErrors, utilities.FILE_PROCESSING_ERROR)
 	}
 
 	ExportSummary(runSummary, processingStartTime, outputJsonFilePath)
 	return nil
+}
+
+func encounteredErrors(runErrors map[string]error) bool {
+	for _, value := range runErrors {
+		if value != nil {
+			return true
+		}
+	}
+	return false
+
 }
 
 func ExportSummary(summary exporter.Summary, startTime time.Time, filePath string) {
