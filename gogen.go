@@ -89,7 +89,7 @@ func (r runOpts) Execute(args []string) error {
 		utilities.ExitWithError(err, utilities.INVALID_ELIGIBILITY_OPTION_ERROR)
 	}
 
-	runErrors := make(map[string]error)
+	runErrors := make(map[string]utilities.GogenError)
 	var runSummary exporter.Summary
 	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.json", r.FileNameSuffix)
 
@@ -99,12 +99,12 @@ func (r runOpts) Execute(args []string) error {
 		fileOutputFolder := utilities.GenerateIndexedOutputFolder(r.OutputFolder, fileIndex, r.FileNameSuffix)
 		err := os.MkdirAll(fileOutputFolder, os.ModePerm)
 		if err != nil {
-			runErrors[inputFile] = err
+			runErrors[inputFile] = utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 			continue
 		}
-		dojInformation, err := data.NewDOJInformation(inputFile, computeAtDate, configurableEligibilityFlow)
-		if err != nil {
-			runErrors[inputFile] = err
+		dojInformation, gogenErr := data.NewDOJInformation(inputFile, computeAtDate, configurableEligibilityFlow)
+		if gogenErr.ExitCode != 0 {
+			runErrors[inputFile] = gogenErr
 			continue
 		}
 		countyEligibilities := dojInformation.DetermineEligibility(r.County, configurableEligibilityFlow)
@@ -119,17 +119,17 @@ func (r runOpts) Execute(args []string) error {
 
 		dojWriter, err := exporter.NewDOJWriter(dojFilePath)
 		if err != nil {
-			runErrors[inputFile] = err
+			runErrors[inputFile] = utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 			continue
 		}
 		condensedDojWriter, err := exporter.NewCondensedDOJWriter(condensedFilePath)
 		if err != nil {
-			runErrors[inputFile] = err
+			runErrors[inputFile] = utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 			continue
 		}
 		prop64ConvictionsDojWriter, err := exporter.NewDOJWriter(prop64ConvictionsFilePath)
 		if err != nil {
-			runErrors[inputFile] = err
+			runErrors[inputFile] = utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 			continue
 		}
 		aggregateFileStatsWriter := utilities.GetOutputWriter(outputFilePath)
@@ -149,16 +149,16 @@ func (r runOpts) Execute(args []string) error {
 	}
 
 	if encounteredErrors(runErrors) {
-		utilities.ExitWithErrors(runErrors, utilities.FILE_PROCESSING_ERROR)
+		utilities.ExitWithErrors(runErrors)
 	}
 
 	ExportSummary(runSummary, processingStartTime, outputJsonFilePath)
 	return nil
 }
 
-func encounteredErrors(runErrors map[string]error) bool {
+func encounteredErrors(runErrors map[string]utilities.GogenError) bool {
 	for _, value := range runErrors {
-		if value != nil {
+		if value.ExitCode != 0 {
 			return true
 		}
 	}

@@ -1,21 +1,33 @@
 package utilities
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
 
 const (
 	OTHER_ERROR                      = 1
-	FILE_PROCESSING_ERROR            = 2
+	FILE_PARSING_ERROR               = 2
 	INVALID_RUN_OPTION_ERROR         = 3
 	INVALID_ELIGIBILITY_OPTION_ERROR = 4
 )
+
+type GogenError struct {
+	ExitCode     int
+	ErrorMessage string
+}
+
+func (g *GogenError) Error() string {
+	return g.ErrorMessage
+}
 
 var errorFileName string
 
@@ -55,26 +67,43 @@ func SetErrorFileName(filename string) {
 }
 
 func ExitWithError(originalError error, exitCode int) {
-	errorFile, err := os.Create(errorFileName)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	errorMap := map[string]GogenError{
+		"": {ExitCode: exitCode, ErrorMessage: originalError.Error()},
 	}
-
-	errorWriter := io.MultiWriter(os.Stderr, errorFile)
-	fmt.Fprintln(errorWriter, originalError)
-	os.Exit(exitCode)
+	ExitWithErrors(errorMap)
 }
 
-func ExitWithErrors(originalErrors map[string]error, exitCode int) {
-	errorFile, err := os.Create(errorFileName)
+func ExitWithErrors(originalErrors map[string]GogenError) {
+	s, err := json.Marshal(originalErrors)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(OTHER_ERROR)
 	}
 
-	errorWriter := io.MultiWriter(os.Stderr, errorFile)
-	for fileName, errorMessage := range originalErrors {
-		fmt.Fprintf(errorWriter, "%s: %s\n", fileName, errorMessage)
+	err = ioutil.WriteFile(errorFileName, s, 0644)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(OTHER_ERROR)
 	}
+
+	var exitCode int
+
+	for _, gogenError := range originalErrors {
+		if exitCode == 0 || gogenError.ExitCode == OTHER_ERROR{
+			exitCode = gogenError.ExitCode
+		}
+	}
+
+	fileNames := make([]string, 0, len(originalErrors))
+	for key := range originalErrors {
+		fileNames = append(fileNames, key)
+	}
+	sort.Strings(fileNames)
+
+	for _, fileName := range fileNames {
+		fmt.Fprintf(os.Stderr, "%s: %s\n", fileName, originalErrors[fileName].ErrorMessage)
+	}
+
 	os.Exit(exitCode)
 }
 

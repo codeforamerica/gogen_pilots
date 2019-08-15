@@ -175,10 +175,10 @@ func (i *DOJInformation) CountIndividualsNoLongerHaveConvictionInLast7Years(elig
 	return i.countIndividualsFilteredByFullRelief(eligibilities, occurredInLast7YearsFilter, dismissedFilter)
 }
 
-func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibilityFlow EligibilityFlow) (*DOJInformation, error) {
+func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibilityFlow EligibilityFlow) (*DOJInformation, utilities.GogenError) {
 	dojFile, err := os.Open(dojFileName)
 	if err != nil {
-		return nil, err
+		return nil, utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 	}
 
 	bufferedReader := bufio.NewReader(dojFile)
@@ -186,7 +186,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 
 	hasHeaders, err := includesHeaders(bufferedReader)
 	if err != nil {
-		return nil, err
+		return nil, utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 	}
 	if hasHeaders {
 		bufferedReader.ReadLine() // read and discard header row
@@ -194,7 +194,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 
 	rows, err := sourceCSV.ReadAll()
 	if err != nil {
-		return nil, err
+		return nil, utilities.GogenError{ExitCode: utilities.FILE_PARSING_ERROR, ErrorMessage: err.Error()}
 	}
 	info := DOJInformation{
 		Rows:                 rows,
@@ -205,7 +205,7 @@ func NewDOJInformation(dojFileName string, comparisonTime time.Time, eligibility
 
 	info.aggregateSubjects(eligibilityFlow)
 
-	return &info, nil
+	return &info, utilities.GogenError{}
 }
 
 func (i *DOJInformation) countByCodeSectionFilteredMatchedConvictions(

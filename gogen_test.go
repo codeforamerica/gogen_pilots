@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/onsi/gomega/gstruct"
 	"gogen/exporter"
+	"gogen/utilities"
 	"io/ioutil"
 	"os/exec"
 	path "path/filepath"
@@ -23,6 +24,13 @@ func GetOutputSummary(filePath string) exporter.Summary {
 	var summary exporter.Summary
 	json.Unmarshal(bytes, &summary)
 	return summary
+}
+
+func GetErrors(filePath string) map[string]utilities.GogenError {
+	bytes, _ := ioutil.ReadFile(filePath)
+	var errors map[string]utilities.GogenError
+	json.Unmarshal(bytes, &errors)
+	return errors
 }
 
 var _ = Describe("gogen", func() {
@@ -186,14 +194,19 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit(3))
+		Eventually(session).Should(gexec.Exit(utilities.INVALID_RUN_OPTION_ERROR))
 		Eventually(session.Err).Should(gbytes.Say("missing required field: Run gogen --help for more info"))
 
 		expectedErrorFileName := fmt.Sprintf("%v/gogen%s.err", outputDir, "")
 
 		Ω(expectedErrorFileName).Should(BeAnExistingFile())
-		data, _ := ioutil.ReadFile(expectedErrorFileName)
-		Expect(string(data)).To(Equal("missing required field: Run gogen --help for more info\n"))
+		errors := GetErrors(expectedErrorFileName)
+		Expect(errors).To(gstruct.MatchAllKeys(gstruct.Keys{
+			"": gstruct.MatchAllFields(gstruct.Fields{
+				"ExitCode":     Equal(utilities.INVALID_RUN_OPTION_ERROR),
+				"ErrorMessage": Equal("missing required field: Run gogen --help for more info"),
+			}),
+		}))
 	})
 
 	It("fails and reports errors for missing input files", func() {
@@ -222,14 +235,19 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit(2))
+		Eventually(session).Should(gexec.Exit(utilities.OTHER_ERROR))
 		Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
 
 		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
 
 		Ω(expectedErrorFileName).Should(BeAnExistingFile())
-		data, _ := ioutil.ReadFile(expectedErrorFileName)
-		Expect(string(data)).To(MatchRegexp("open .*missing.csv: no such file or directory"))
+		errors := GetErrors(expectedErrorFileName)
+		Expect(errors).To(gstruct.MatchAllKeys(gstruct.Keys{
+			pathToDOJ: gstruct.MatchAllFields(gstruct.Fields{
+				"ExitCode":     Equal(utilities.OTHER_ERROR),
+				"ErrorMessage": Equal(fmt.Sprintf("open %s: no such file or directory", pathToDOJ)),
+			}),
+		}))
 	})
 
 	It("fails and reports errors for invalid input files", func() {
@@ -258,14 +276,19 @@ var _ = Describe("gogen", func() {
 		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 		Expect(err).ToNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit(2))
+		Eventually(session).Should(gexec.Exit(utilities.FILE_PARSING_ERROR))
 		Eventually(session.Err).Should(gbytes.Say("record on line 2: wrong number of fields"))
 
 		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
 
 		Ω(expectedErrorFileName).Should(BeAnExistingFile())
-		data, _ := ioutil.ReadFile(expectedErrorFileName)
-		Expect(string(data)).To(MatchRegexp("record on line 2: wrong number of fields"))
+		errors := GetErrors(expectedErrorFileName)
+		Expect(errors).To(gstruct.MatchAllKeys(gstruct.Keys{
+			pathToDOJ: gstruct.MatchAllFields(gstruct.Fields{
+				"ExitCode":     Equal(utilities.FILE_PARSING_ERROR),
+				"ErrorMessage": Equal("record on line 2: wrong number of fields"),
+			}),
+		}))
 	})
 
 	It("can accept path to eligibility options file", func() {
@@ -548,16 +571,24 @@ var _ = Describe("gogen", func() {
 			session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 			Expect(err).ToNot(HaveOccurred())
 
-			Eventually(session).Should(gexec.Exit(2))
+			Eventually(session).Should(gexec.Exit(utilities.OTHER_ERROR))
 			Eventually(session.Err).Should(gbytes.Say("record on line 2: wrong number of fields"))
 			Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
 
 			expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
 
 			Ω(expectedErrorFileName).Should(BeAnExistingFile())
-			data, _ := ioutil.ReadFile(expectedErrorFileName)
-			Expect(string(data)).To(MatchRegexp("open .*missing.csv: no such file or directory"))
-			Expect(string(data)).To(MatchRegexp("record on line 2: wrong number of fields"))
+			errors := GetErrors(expectedErrorFileName)
+			Expect(errors).To(gstruct.MatchAllKeys(gstruct.Keys{
+				pathToMissingDOJ: gstruct.MatchAllFields(gstruct.Fields{
+					"ExitCode":     Equal(utilities.OTHER_ERROR),
+					"ErrorMessage": Equal(fmt.Sprintf("open %s: no such file or directory", pathToMissingDOJ)),
+				}),
+				pathToBadDOJ: gstruct.MatchAllFields(gstruct.Fields{
+					"ExitCode":     Equal(utilities.FILE_PARSING_ERROR),
+					"ErrorMessage": Equal("record on line 2: wrong number of fields"),
+				}),
+			}))
 		})
 	})
 })
