@@ -332,7 +332,6 @@ var _ = Describe("gogen", func() {
 				"57 years or older":                        Equal(2),
 				"Conviction occurred 10 or more years ago": Equal(1),
 				"Individual is deceased":                   Equal(1),
-				"Misdemeanor or Infraction":                Equal(3),
 				"Only has 11357-60 charges":                Equal(1),
 			}),
 		}))
@@ -516,7 +515,6 @@ var _ = Describe("gogen", func() {
 					"57 years or older":                        Equal(4),
 					"Conviction occurred 10 or more years ago": Equal(2),
 					"Individual is deceased":                   Equal(2),
-					"Misdemeanor or Infraction":                Equal(6),
 					"Only has 11357-60 charges":                Equal(2),
 				}),
 			}))
