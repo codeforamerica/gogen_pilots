@@ -121,7 +121,11 @@ func (i *DOJInformation) EarliestProp64ConvictionDateInThisCounty(county string)
 		}
 	}
 	sort.Sort(convictionDates)
-	return convictionDates[0]
+	if len(convictionDates) > 0 {
+		return convictionDates[0]
+	} else {
+		return time.Now()
+	}
 }
 
 func (i *DOJInformation) CountIndividualsWithProp64ConvictionInCounty(county string) int {
