@@ -74,6 +74,10 @@ workflows:
           type: approval
           requires:
             - test-and-build
+          filters:
+            branches:
+              only:
+                - master
       - deploy:
           requires:
             - hold
