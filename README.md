@@ -26,10 +26,18 @@ We recommend you add `../go/bin` to your path so you can run certain go tools fr
 
 This tool requires input files in the CA DOJ research file format. These files are tightly controlled for security and confidentiality purposes. 
 We have created test fixture files that mimic the structure of the DOJ files, and you can use these to run the code on your local machine.
- - Step 1: Build to executable with `go build .` from the project root
- - Step 2: Run the CLI command: `./gogen --input-doj=/Users/[username]/go/src/gogen/test_fixtures/contra_costa/cadoj_contra_costa.csv --county="CONTRA COSTA" --outputs=[path_to_desired_output_location]`
- 
- You can choose any of the three counties we have test fixtures for. Be sure to choose the fixture file that is a csv and begins with `cadoj`, and does NOT include `_results` or `_condensed` in the file name.
+
+To compile and run gogen, run:
+```
+$ go run gogen run --input-doj=/Users/[username]/go/src/gogen/test_fixtures/no_headers.csv --county="SAN JOAQUIN" --outputs=[path_to_desired_output_location]
+```
+
+If you would like to create a compiled artifact of gogen and install it (e.g. for use with BEAR), run the following commands from project root:
+```
+$ go build .
+$ go install -i gogen
+$ gogen run --input-doj=/Users/[username]/go/src/gogen/test_fixtures/no_headers.csv --county="SAN JOAQUIN" --outputs=[path_to_desired_output_location]`
+```
  
 ## License
 
