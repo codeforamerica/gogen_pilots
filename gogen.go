@@ -115,7 +115,6 @@ func (r runOpts) Execute(args []string) error {
 		dojFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_%d%s.csv", fileIndex, r.FileNameSuffix)
 		condensedFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_condensed_%d%s.csv", fileIndex, r.FileNameSuffix)
 		prop64ConvictionsFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_convictions_%d%s.csv", fileIndex, r.FileNameSuffix)
-		outputFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "gogen_%d%s.out", fileIndex, r.FileNameSuffix)
 
 		dojWriter, err := exporter.NewDOJWriter(dojFilePath)
 		if err != nil {
@@ -132,7 +131,6 @@ func (r runOpts) Execute(args []string) error {
 			runErrors[inputFile] = utilities.GogenError{ExitCode: utilities.OTHER_ERROR, ErrorMessage: err.Error()}
 			continue
 		}
-		aggregateFileStatsWriter := utilities.GetOutputWriter(outputFilePath)
 
 		dataExporter := exporter.NewDataExporter(
 			dojInformation,
@@ -141,8 +139,7 @@ func (r runOpts) Execute(args []string) error {
 			dismissAllProp64AndRelatedEligibilities,
 			dojWriter,
 			condensedDojWriter,
-			prop64ConvictionsDojWriter,
-			aggregateFileStatsWriter)
+			prop64ConvictionsDojWriter)
 
 		fileSummary := dataExporter.Export(r.County, configurableEligibilityFlow)
 		runSummary = dataExporter.AccumulateSummaryData(runSummary, fileSummary)

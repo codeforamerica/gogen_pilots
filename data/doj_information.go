@@ -52,10 +52,6 @@ func (i *DOJInformation) DetermineEligibility(county string, eligibilityFlow Eli
 	return eligibilities
 }
 
-func (i *DOJInformation) TotalIndividuals() int {
-	return len(i.Subjects)
-}
-
 func (i *DOJInformation) TotalRows() int {
 	return len(i.Rows)
 }
@@ -68,40 +64,8 @@ func (i *DOJInformation) TotalConvictions() int {
 	return totalConvictions
 }
 
-func (i *DOJInformation) TotalConvictionsInCounty(county string) int {
-	totalConvictionsInCounty := 0
-	for _, subject := range i.Subjects {
-		for _, conviction := range subject.Convictions {
-			if conviction.County == county {
-				totalConvictionsInCounty++
-			}
-		}
-	}
-	return totalConvictionsInCounty
-}
-
-func (i *DOJInformation) OverallProp64ConvictionsByCodeSection() map[string]int {
-	return i.countByCodeSectionFilteredMatchedConvictions("", emptyFilter, matchers.ExtractProp64Section)
-}
-
-func (i *DOJInformation) OverallRelatedConvictionsByCodeSection() map[string]int {
-	return i.countByCodeSectionFilteredMatchedConvictions("", emptyFilter, matchers.ExtractRelatedChargeSection)
-}
-
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSection(county string) map[string]int {
 	return i.countByCodeSectionFilteredMatchedConvictions(county, countyFilter, matchers.ExtractProp64Section)
-}
-
-func (i *DOJInformation) Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
-	return i.countByCodeSectionAndEligibilityFilteredMatchedConvictions(county, eligibilities, countyFilter, matchers.ExtractProp64Section, countByCodeSectionAndEligibilityDetermination)
-}
-
-func (i *DOJInformation) RelatedConvictionsInThisCountyByCodeSectionByEligibility(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
-	if !i.checksRelatedCharges {
-		emptyMap := make(map[string]map[string]int)
-		return emptyMap
-	}
-	return i.countByCodeSectionAndEligibilityFilteredMatchedConvictions(county, eligibilities, countyFilter, matchers.ExtractRelatedChargeSection, countByCodeSectionAndEligibilityDetermination)
 }
 
 func (i *DOJInformation) Prop64ConvictionsInThisCountyByEligibilityByReason(county string, eligibilities map[int]*EligibilityInfo) map[string]map[string]int {
@@ -135,14 +99,6 @@ func (i *DOJInformation) CountIndividualsWithProp64ConvictionInCounty(county str
 	return i.countIndividualsFilteredByConviction(pro64AndCountyFilter)
 }
 
-func (i *DOJInformation) CountIndividualsWithFelony() int {
-	return i.countIndividualsFilteredByConviction(IsFelonyFilter)
-}
-
-func (i *DOJInformation) CountIndividualsWithConviction() int {
-	return i.countIndividualsFilteredByConviction(hasConvictionFilter)
-}
-
 func (i *DOJInformation) CountIndividualsWithSomeRelief(eligibilities map[int]*EligibilityInfo) int {
 	countIndividuals := 0
 OuterLoop:
@@ -157,10 +113,6 @@ OuterLoop:
 		}
 	}
 	return countIndividuals
-}
-
-func (i *DOJInformation) CountIndividualsWithConvictionInLast7Years() int {
-	return i.countIndividualsFilteredByConviction(occurredInLast7YearsFilter)
 }
 
 func (i *DOJInformation) CountIndividualsNoLongerHaveFelony(eligibilities map[int]*EligibilityInfo) int {
