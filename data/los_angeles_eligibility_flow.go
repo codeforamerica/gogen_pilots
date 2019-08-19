@@ -60,6 +60,14 @@ func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *
 	if info.hasSuperstrikes() {
 		info.SetNotEligible("PC 667(e)(2)(c)(iv)")
 	} else {
+		ef.HasPC290(info, row, subject)
+	}
+}
+
+func (ef losAngelesEligibilityFlow) HasPC290(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if info.hasPC290() {
+		info.SetNotEligible("PC 290")
+	} else {
 		ef.TwoPriors(info, row, subject)
 	}
 }

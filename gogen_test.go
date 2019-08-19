@@ -322,7 +322,7 @@ var _ = Describe("gogen", func() {
 			}),
 			"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 				"21 years or younger": Equal(1),
-				"50 years or older":   Equal(5),
+				"50 years or older":   Equal(4),
 				"Only has 11357-60 charges and completed sentence": Equal(1),
 				"11357(a) or 11357(b)": Equal(1),
 			}),
@@ -349,9 +349,9 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 1 11357 convictions that are Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 5 11358 convictions that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 4 11358 convictions that are Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 8 convictions total that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 7 convictions total that are Eligible for Dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Hand Review"))
 		Eventually(session).Should(gbytes.Say("Found 1 11358 convictions that are Hand Review"))
@@ -362,15 +362,15 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gbytes.Say("Found 2 convictions total that are Maybe Eligible - Flag for Review"))
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
-		Eventually(session).Should(gbytes.Say("Found 2 11358 convictions that are Not eligible"))
+		Eventually(session).Should(gbytes.Say("Found 3 11358 convictions that are Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are Not eligible"))
-		Eventually(session).Should(gbytes.Say("Found 4 convictions total that are Not eligible"))
+		Eventually(session).Should(gbytes.Say("Found 5 convictions total that are Not eligible"))
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason 11357(a) or 11357(b)")))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason 21 years or younger"))
-		Eventually(session).Should(gbytes.Say("Found 5 convictions with eligibility reason 50 years or older"))
+		Eventually(session).Should(gbytes.Say("Found 4 convictions with eligibility reason 50 years or older"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Only has 11357-60 charges and completed sentence"))
 
 		Eventually(session).Should(gbytes.Say("Hand Review"))
@@ -381,6 +381,7 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Occurred after 11/09/2016"))
+		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason PC 290")))
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 2 convictions with eligibility reason PC 667(e)(2)(c)(iv)")))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Two priors"))
 
