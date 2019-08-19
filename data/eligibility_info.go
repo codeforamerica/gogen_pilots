@@ -85,6 +85,10 @@ func (info *EligibilityInfo) hasSuperstrikes() bool {
 	return info.Superstrikes != "-"
 }
 
+func (info *EligibilityInfo) hasPC290() bool {
+	return info.PC290CodeSections != "-" || info.PC290Registration != "-"
+}
+
 func (info *EligibilityInfo) hasTwoPriors(row *DOJRow, subject *Subject) bool {
 	priorConvictionsOfSameCodeSectionPrefix := 0
 	codeSectionRune := []rune(row.CodeSection)

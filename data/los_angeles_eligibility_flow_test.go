@@ -21,17 +21,16 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		days := time.Duration(24) * (time.Hour)
 		comparisonTime := time.Date(2020, 7, 1, 0, 0, 0, 0, time.UTC)
 
-		Context("Steps 1-4", func() {
+		Context("Steps 1, 2, and 3", func() {
 			var (
-				subject          Subject
-				conviction1      DOJRow
-				conviction2      DOJRow
-				conviction3      DOJRow
-				conviction4      DOJRow
-				conviction5      DOJRow
-				convictionPrison DOJRow
-				nonConviction    DOJRow
-				registration     DOJRow
+				subject       Subject
+				conviction1   DOJRow
+				conviction2   DOJRow
+				superstrike   DOJRow
+				conviction4   DOJRow
+				conviction5   DOJRow
+				conviction6   DOJRow
+				nonConviction DOJRow
 			)
 
 			BeforeEach(func() {
@@ -49,14 +48,14 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				conviction2 = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
-					CodeSection:     "602 PC",
-					DispositionDate: time.Date(2009, time.May, 4, 0, 0, 0, 0, time.UTC),
+					CodeSection:     "11358 PC",
+					DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC),
 					OFN:             "1119999",
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
 				}
-				conviction3 = DOJRow{
+				superstrike = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
 					CodeSection:     "187 PC",
@@ -69,7 +68,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				conviction4 = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
-					CodeSection:     "11360 HS",
+					CodeSection:     "11358 HS",
 					DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC),
 					OFN:             "1236 12345678-00",
 					County:          COUNTY,
@@ -80,7 +79,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				conviction5 = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
-					CodeSection:     "266J PC",
+					CodeSection:     "1234 PC",
 					DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
 					OFN:             "1236 334455-00",
 					County:          COUNTY,
@@ -88,7 +87,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					Index:           5,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
 				}
-				convictionPrison = DOJRow{
+				conviction6 = DOJRow{
 					DOB:                  birthDate,
 					WasConvicted:         true,
 					CodeSection:          "11360 HS",
@@ -100,16 +99,126 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					SentencePartDuration: time.Duration(30 * days),
 					IsFelony:             true,
 				}
-				registration = DOJRow{
-					DOB:                 birthDate,
-					WasConvicted:        false,
-					CodeSection:         "290 PC",
-					DispositionDate:     time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC),
-					OFN:                 "1236 12345678-00",
-					IsPC290Registration: true,
-					County:              "",
-					CountOrder:          "105001007000",
-					Index:               7,
+				nonConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    false,
+					CodeSection:     "11357 HS",
+					DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC),
+					OFN:             "1235",
+					County:          COUNTY,
+					CountOrder:      "101001002000",
+					Index:           1,
+				}
+				rows := []DOJRow{nonConviction, conviction1, conviction2, superstrike, conviction4, conviction5, conviction6}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row)
+				}
+			})
+
+			It("returns a map of eligibility infos", func() {
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				_, ok := infos[0]
+				Expect(ok).To(Equal(true))
+				_, ok = infos[2]
+				Expect(ok).To(Equal(true))
+				_, ok = infos[4]
+				Expect(ok).To(Equal(true))
+				_, ok = infos[6]
+				Expect(ok).To(Equal(true))
+				Expect(len(infos)).To(Equal(4))
+			})
+
+			It("returns the correct eligibility determination for each conviction", func() {
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
+				Expect(infos[4].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[4].EligibilityReason).To(Equal("PC 667(e)(2)(c)(iv)"))
+				Expect(infos[6].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[6].EligibilityReason).To(Equal("PC 667(e)(2)(c)(iv)"))
+			})
+		})
+
+		Context("Steps 1, 2, and 4 - PC290 Convictions", func() {
+			var (
+				subject         Subject
+				conviction1     DOJRow
+				conviction2     DOJRow
+				pc290Conviction DOJRow
+				conviction4     DOJRow
+				conviction5     DOJRow
+				conviction6     DOJRow
+				nonConviction   DOJRow
+			)
+
+			BeforeEach(func() {
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357 HS",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        false,
+				}
+				conviction2 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11358 PC",
+					DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+				}
+				pc290Conviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "266J PC",
+					DispositionDate: time.Date(2001, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1118888",
+					County:          COUNTY,
+					CountOrder:      "103001004000",
+					Index:           3,
+				}
+				conviction4 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11358 HS",
+					DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC),
+					OFN:             "1236 12345678-00",
+					County:          COUNTY,
+					CountOrder:      "104001005000",
+					Index:           4,
+					IsFelony:        true,
+				}
+				conviction5 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "1234 PC",
+					DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
+					OFN:             "1236 334455-00",
+					County:          COUNTY,
+					CountOrder:      "104001006000",
+					Index:           5,
+					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+				}
+				conviction6 = DOJRow{
+					DOB:                  birthDate,
+					WasConvicted:         true,
+					CodeSection:          "11360 HS",
+					DispositionDate:      time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
+					OFN:                  "1236 334455-00",
+					County:               COUNTY,
+					CountOrder:           "104001006000",
+					Index:                6,
+					SentencePartDuration: time.Duration(30 * days),
+					IsFelony:             true,
 				}
 				nonConviction = DOJRow{
 					DOB:             birthDate,
@@ -121,33 +230,132 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "101001002000",
 					Index:           1,
 				}
-				rows := []DOJRow{nonConviction, registration, conviction1, conviction2, conviction3, conviction4, conviction5, convictionPrison}
+				rows := []DOJRow{nonConviction, conviction1, conviction2, pc290Conviction, conviction4, conviction5, conviction6}
 				subject = Subject{}
 				for _, row := range rows {
 					subject.PushRow(row)
 				}
 			})
 
-			It("returns a map of eligibility infos", func() {
+			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				_, ok := infos[0]
-				Expect(ok).To(Equal(true))
-				_, ok = infos[4]
-				Expect(ok).To(Equal(true))
-				_, ok = infos[6]
-				Expect(ok).To(Equal(true))
-				Expect(len(infos)).To(Equal(3))
+				Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
+				Expect(infos[4].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[4].EligibilityReason).To(Equal("PC 290"))
+				Expect(infos[6].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[6].EligibilityReason).To(Equal("PC 290"))
+			})
+		})
+
+		Context("Steps 1, 2, and 4 - PC290 Registrations", func() {
+			var (
+				subject           Subject
+				conviction1       DOJRow
+				conviction2       DOJRow
+				pc290Registration DOJRow
+				conviction4       DOJRow
+				conviction5       DOJRow
+				conviction6       DOJRow
+				nonConviction     DOJRow
+			)
+
+			BeforeEach(func() {
+				conviction1 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11357 HS",
+					DispositionDate: time.Date(1999, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1234",
+					County:          COUNTY,
+					CountOrder:      "101001001000",
+					Index:           0,
+					IsFelony:        false,
+				}
+				conviction2 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11358 PC",
+					DispositionDate: time.Date(2017, time.May, 4, 0, 0, 0, 0, time.UTC),
+					OFN:             "1119999",
+					County:          COUNTY,
+					CountOrder:      "102001003000",
+					Index:           2,
+				}
+				pc290Registration = DOJRow{
+					DOB:                 birthDate,
+					WasConvicted:        false,
+					CodeSection:         "290 PC",
+					DispositionDate:     time.Date(2008, time.June, 19, 0, 0, 0, 0, time.UTC),
+					OFN:                 "1236 12345678-00",
+					IsPC290Registration: true,
+					County:              "",
+					CountOrder:          "105001007000",
+					Index:               3,
+				}
+				conviction4 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "11358 HS",
+					DispositionDate: time.Date(2011, time.May, 12, 0, 0, 0, 0, time.UTC),
+					OFN:             "1236 12345678-00",
+					County:          COUNTY,
+					CountOrder:      "104001005000",
+					Index:           4,
+					IsFelony:        true,
+				}
+				conviction5 = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    true,
+					CodeSection:     "1234 PC",
+					DispositionDate: time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
+					OFN:             "1236 334455-00",
+					County:          COUNTY,
+					CountOrder:      "104001006000",
+					Index:           5,
+					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+				}
+				conviction6 = DOJRow{
+					DOB:                  birthDate,
+					WasConvicted:         true,
+					CodeSection:          "11360 HS",
+					DispositionDate:      time.Date(2009, time.December, 5, 0, 0, 0, 0, time.UTC),
+					OFN:                  "1236 334455-00",
+					County:               COUNTY,
+					CountOrder:           "104001006000",
+					Index:                6,
+					SentencePartDuration: time.Duration(30 * days),
+					IsFelony:             true,
+				}
+				nonConviction = DOJRow{
+					DOB:             birthDate,
+					WasConvicted:    false,
+					CodeSection:     "11357 HS",
+					DispositionDate: time.Date(2008, time.April, 14, 0, 0, 0, 0, time.UTC),
+					OFN:             "1235",
+					County:          COUNTY,
+					CountOrder:      "101001002000",
+					Index:           1,
+				}
+				rows := []DOJRow{nonConviction, conviction1, conviction2, pc290Registration, conviction4, conviction5, conviction6}
+				subject = Subject{}
+				for _, row := range rows {
+					subject.PushRow(row)
+				}
 			})
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				//Expect(len(infos)).To(Equal(3))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
 				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
+				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
 				Expect(infos[4].EligibilityDetermination).To(Equal("Not eligible"))
-				Expect(infos[4].EligibilityReason).To(Equal("PC 667(e)(2)(c)(iv)"))
+				Expect(infos[4].EligibilityReason).To(Equal("PC 290"))
 				Expect(infos[6].EligibilityDetermination).To(Equal("Not eligible"))
-				Expect(infos[6].EligibilityReason).To(Equal("PC 667(e)(2)(c)(iv)"))
+				Expect(infos[6].EligibilityReason).To(Equal("PC 290"))
 			})
 		})
 
