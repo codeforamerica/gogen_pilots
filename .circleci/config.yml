@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: circleci/golang:1.12
 
-    working_directory: /go/src/gogen
+    working_directory: /go/src/gogen_pilots
     steps:
       - checkout
 
@@ -22,17 +22,17 @@ jobs:
       - run:
           name: Build mac executable
           command: |
-            GOOS="darwin" GOARCH="amd64" go build -o gogen_mac
+            GOOS="darwin" GOARCH="amd64" go build -o gogen_pilots_mac
 
       - run:
           name: Build windows executable
           command: |
-            GOOS="windows" GOARCH="amd64" go build -o gogen_win.exe
+            GOOS="windows" GOARCH="amd64" go build -o gogen_pilots_win.exe
 
       - run:
           name: Build Linux executable
           command: |
-            GOOS="linux" GOARCH="amd64" go build -o gogen_linux
+            GOOS="linux" GOARCH="amd64" go build -o gogen_pilots_linux
 
       - run:
           name: Build test data generator
@@ -42,15 +42,15 @@ jobs:
       - run:
           name: Copy build artifacts to subdirectory
           command: |
-            mkdir artifacts && cp gogen_mac gogen_win.exe gogen_linux generate_test_data/generate_test_data ./artifacts
+            mkdir artifacts && cp gogen_pilots_mac gogen_pilots_win.exe gogen_pilots_linux generate_test_data/generate_test_data ./artifacts
 
 
       - persist_to_workspace:
           root: './artifacts'
           paths:
-            - gogen_mac
-            - gogen_linux
-            - gogen_win.exe
+            - gogen_pilots_mac
+            - gogen_pilots_linux
+            - gogen_pilots_win.exe
             - generate_test_data
 
   deploy:
@@ -62,7 +62,7 @@ jobs:
           at: ./artifacts
 
       - run: |
-          VERSION=$(./artifacts/gogen_linux version)
+          VERSION=$(./artifacts/gogen_pilots_linux version)
           ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 workflows:
