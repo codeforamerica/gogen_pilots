@@ -131,7 +131,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
 				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
 				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
@@ -239,7 +239,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
 				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
 				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
@@ -348,7 +348,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				Expect(infos[0].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
 				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
 				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
@@ -517,7 +517,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				Expect(len(infos)).To(Equal(2))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Only has 11357-60 charges and completed sentence"))
-				Expect(infos[2].EligibilityDetermination).To(Equal("Maybe Eligible - Flag for Review"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Hand Review"))
 				Expect(infos[2].EligibilityReason).To(Equal("Other 11357"))
 			})
 		})

@@ -352,12 +352,9 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gbytes.Say("Found 7 convictions total that are Eligible for Dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Hand Review"))
+		Eventually(session).Should(gbytes.Say("Found 2 11357 convictions that are Hand Review"))
 		Eventually(session).Should(gbytes.Say("Found 1 11358 convictions that are Hand Review"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions total that are Hand Review"))
-
-		Eventually(session).Should(gbytes.Say("Maybe Eligible - Flag for Review"))
-		Eventually(session).Should(gbytes.Say("Found 2 11357 convictions that are Maybe Eligible - Flag for Review"))
-		Eventually(session).Should(gbytes.Say("Found 2 convictions total that are Maybe Eligible - Flag for Review"))
+		Eventually(session).Should(gbytes.Say("Found 3 convictions total that are Hand Review"))
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 3 11358 convictions that are Not eligible"))
@@ -373,9 +370,6 @@ var _ = Describe("gogen_pilots", func() {
 
 		Eventually(session).Should(gbytes.Say("Hand Review"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Currently serving sentence"))
-
-		Eventually(session).Should(gbytes.Say("Maybe Eligible - Flag for Review"))
-		Eventually(session).Should(gbytes.Say("Found 2 convictions with eligibility reason Other 11357"))
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Occurred after 11/09/2016"))

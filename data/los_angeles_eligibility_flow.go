@@ -49,7 +49,7 @@ func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row
 		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
 			info.SetEligibleForDismissal("11357(a) or 11357(b)")
 		} else {
-			info.SetMaybeEligible("Other 11357")
+			info.SetHandReview("Other 11357")
 		}
 	} else {
 		ef.HasSuperstrikes(info, row, subject)
