@@ -31,7 +31,15 @@ func (ef losAngelesEligibilityFlow) checkRelevancy(codeSection string, county st
 
 func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if matchers.IsProp64Charge(row.CodeSection) {
+		ef.ConvictionIsMisdemeanorOrInfraction(info, row, subject)
+	}
+}
+
+func (ef losAngelesEligibilityFlow) ConvictionIsMisdemeanorOrInfraction(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if row.IsFelony {
 		ef.ConvictionBeforeNovNine2016(info, row, subject)
+	} else {
+		info.SetCityAttorneyReview("Misdemeanor or Infraction")
 	}
 }
 
@@ -42,6 +50,7 @@ func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 		info.SetNotEligible("Occurred after 11/09/2016")
 	}
 }
+
 
 func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	ok, codeSection := matchers.ExtractProp64Section(row.CodeSection)

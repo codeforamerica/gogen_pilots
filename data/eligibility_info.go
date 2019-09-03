@@ -168,3 +168,8 @@ func (info *EligibilityInfo) SetHandReview(reason string) {
 	info.EligibilityDetermination = "Hand Review"
 	info.EligibilityReason = strings.TrimSpace(reason)
 }
+
+func (info *EligibilityInfo) SetCityAttorneyReview(reason string) {
+	info.EligibilityDetermination = "To be reviewed by City Attorneys"
+	info.EligibilityReason = strings.TrimSpace(reason)
+}
