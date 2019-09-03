@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gstruct"
-	"gogen/utilities"
+	"gogen_pilots/utilities"
 )
 
 var _ = Describe("Utilities", func() {

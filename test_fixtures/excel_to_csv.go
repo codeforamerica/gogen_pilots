@@ -3,7 +3,7 @@ package test_fixtures
 import (
 	"encoding/csv"
 	"fmt"
-	"gogen/exporter"
+	"gogen_pilots/exporter"
 	"io/ioutil"
 	"os"
 	path "path/filepath"

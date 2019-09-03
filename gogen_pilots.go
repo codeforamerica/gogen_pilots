@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gogen/data"
-	"gogen/exporter"
-	"gogen/test_fixtures"
-	"gogen/utilities"
+	"gogen_pilots/data"
+	"gogen_pilots/exporter"
+	"gogen_pilots/test_fixtures"
+	"gogen_pilots/utilities"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -48,10 +48,10 @@ func (r runOpts) Execute(args []string) error {
 	var processingStartTime time.Time
 	processingStartTime = time.Now()
 
-	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen%s.err", r.FileNameSuffix))
+	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen_pilots%s.err", r.FileNameSuffix))
 
 	if r.OutputFolder == "" || r.DOJFiles == "" || r.County == "" {
-		utilities.ExitWithError(errors.New("missing required field: Run gogen --help for more info"), utilities.INVALID_RUN_OPTION_ERROR)
+		utilities.ExitWithError(errors.New("missing required field: Run gogen_pilots --help for more info"), utilities.INVALID_RUN_OPTION_ERROR)
 	}
 
 	inputFiles := strings.Split(r.DOJFiles, ",")
@@ -96,7 +96,7 @@ func (r runOpts) Execute(args []string) error {
 
 	var runErrors []error
 	var runSummary exporter.Summary
-	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen%s.json", r.FileNameSuffix)
+	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen_pilots%s.json", r.FileNameSuffix)
 
 	for fileIndex, inputFile := range inputFiles {
 		fileIndex = fileIndex + 1
@@ -119,7 +119,7 @@ func (r runOpts) Execute(args []string) error {
 		dojFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_%d%s.csv", fileIndex, r.FileNameSuffix)
 		condensedFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_condensed_%d%s.csv", fileIndex, r.FileNameSuffix)
 		prop64ConvictionsFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_convictions_%d%s.csv", fileIndex, r.FileNameSuffix)
-		outputFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "gogen_%d%s.out", fileIndex, r.FileNameSuffix)
+		outputFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "gogen_pilots_%d%s.out", fileIndex, r.FileNameSuffix)
 
 		dojWriter, err := exporter.NewDOJWriter(dojFilePath)
 		if err != nil {

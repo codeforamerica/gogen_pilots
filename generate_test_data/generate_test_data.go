@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/jessevdk/go-flags"
-	. "gogen/data"
-	. "gogen/exporter"
+	. "gogen_pilots/data"
+	. "gogen_pilots/exporter"
 	"math"
 	"math/rand"
 	"path/filepath"

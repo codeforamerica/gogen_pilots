@@ -3,7 +3,7 @@ package exporter
 import (
 	"encoding/csv"
 	"fmt"
-	"gogen/data"
+	"gogen_pilots/data"
 	"os"
 	"time"
 )

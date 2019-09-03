@@ -2,8 +2,8 @@ package exporter
 
 import (
 	"fmt"
-	"gogen/data"
-	"gogen/utilities"
+	"gogen_pilots/data"
+	"gogen_pilots/utilities"
 	"io"
 	"sort"
 	"strings"

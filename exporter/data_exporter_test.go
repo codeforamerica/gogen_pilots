@@ -7,10 +7,10 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/gstruct"
-	"gogen/data"
-	. "gogen/exporter"
-	. "gogen/test_fixtures"
-	"gogen/utilities"
+	"gogen_pilots/data"
+	. "gogen_pilots/exporter"
+	. "gogen_pilots/test_fixtures"
+	"gogen_pilots/utilities"
 	"io/ioutil"
 	"os"
 	path "path/filepath"
@@ -28,7 +28,7 @@ var _ = Describe("DataExporter", func() {
 
 	Describe("Los Angeles", func() {
 		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			inputPath := path.Join("..", "test_fixtures", "los_angeles.xlsx")
@@ -45,7 +45,7 @@ var _ = Describe("DataExporter", func() {
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-			outputWriter := utilities.GetOutputWriter("gogen.out")
+			outputWriter := utilities.GetOutputWriter("gogen_pilots.out")
 
 
 			dataExporter = NewDataExporter(
@@ -82,7 +82,7 @@ var _ = Describe("DataExporter", func() {
 	Describe("Condensed columns output file", func() {
 		COUNTY := "SACRAMENTO"
 		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			inputPath := path.Join("..", "test_fixtures", "configurable_flow.xlsx")
@@ -106,7 +106,7 @@ var _ = Describe("DataExporter", func() {
 			dojWriter, _ := NewDOJWriter(dojResultsPath)
 			dojCondensedWriter, _ := NewCondensedDOJWriter(dojCondensedResultsPath)
 			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-			outputWriter := utilities.GetOutputWriter("gogen.out")
+			outputWriter := utilities.GetOutputWriter("gogen_pilots.out")
 
 			dataExporter = NewDataExporter(
 				dojInformation,
@@ -142,7 +142,7 @@ var _ = Describe("DataExporter", func() {
 
 	Describe("Prop 64 convictions output file", func() {
 		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			inputPath := path.Join("..", "test_fixtures", "los_angeles.xlsx")
@@ -159,7 +159,7 @@ var _ = Describe("DataExporter", func() {
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-			outputWriter := utilities.GetOutputWriter("gogen.out")
+			outputWriter := utilities.GetOutputWriter("gogen_pilots.out")
 
 			dataExporter = NewDataExporter(
 				dojInformation,
@@ -197,7 +197,7 @@ var _ = Describe("DataExporter", func() {
 	Describe("Configurable eligibility flow", func() {
 		var COUNTY = "SACRAMENTO"
 		BeforeEach(func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			inputPath := path.Join("..", "test_fixtures", "configurable_flow.xlsx")
@@ -218,7 +218,7 @@ var _ = Describe("DataExporter", func() {
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
-			outputWriter := utilities.GetOutputWriter("gogen.out")
+			outputWriter := utilities.GetOutputWriter("gogen_pilots.out")
 
 			dataExporter = NewDataExporter(
 				dojInformation,
