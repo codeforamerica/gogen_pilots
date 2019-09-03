@@ -54,6 +54,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
+					IsFelony:        true,
 				}
 				superstrike = DOJRow{
 					DOB:             birthDate,
@@ -131,8 +132,8 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
-				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
+				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
 				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
 				Expect(infos[4].EligibilityDetermination).To(Equal("Not eligible"))
@@ -175,6 +176,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
+					IsFelony:        true,
 				}
 				pc290Conviction = DOJRow{
 					DOB:             birthDate,
@@ -239,8 +241,8 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
-				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
+				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
 				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
 				Expect(infos[4].EligibilityDetermination).To(Equal("Not eligible"))
@@ -283,6 +285,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					County:          COUNTY,
 					CountOrder:      "102001003000",
 					Index:           2,
+					IsFelony:        true,
 				}
 				pc290Registration = DOJRow{
 					DOB:                 birthDate,
@@ -348,8 +351,8 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 
 			It("returns the correct eligibility determination for each conviction", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
-				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
-				Expect(infos[0].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
+				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
 				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
 				Expect(infos[4].EligibilityDetermination).To(Equal("Not eligible"))
@@ -380,6 +383,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "104001007000",
 					Index:           0,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
@@ -471,6 +475,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "104001007000",
 					Index:           0,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
@@ -541,6 +546,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "104001007000",
 					Index:           0,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
@@ -607,6 +613,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "104001007000",
 					Index:           0,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
@@ -673,6 +680,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "104001007000",
 					Index:           0,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
@@ -740,6 +748,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 					CountOrder:      "104001007000",
 					Index:           0,
 					SentenceEndDate: time.Date(2012, 03, 04, 0, 0, 0, 0, time.UTC),
+					IsFelony:        true,
 				}
 				conviction2 = DOJRow{
 					DOB:             birthDate,
