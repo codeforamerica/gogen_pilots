@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/onsi/gomega/gstruct"
-	"gogen/exporter"
+	"gogen_pilots/exporter"
 	"io/ioutil"
 	"os/exec"
 	path "path/filepath"
 	"regexp"
 	"time"
 
-	. "gogen/test_fixtures"
+	. "gogen_pilots/test_fixtures"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -26,7 +26,7 @@ func GetOutputSummary(filePath string) exporter.Summary {
 	return summary
 }
 
-var _ = Describe("gogen", func() {
+var _ = Describe("gogen_pilots", func() {
 	var (
 		outputDir string
 		pathToDOJ string
@@ -34,13 +34,13 @@ var _ = Describe("gogen", func() {
 	)
 	It("can handle a csv with extra comma at the end of headers", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -59,19 +59,19 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 
-		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary.LineCount).To(Equal(38))
 	})
 
 	It("can handle an input file without headers", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "no_headers.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -88,19 +88,19 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit(0))
-		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary.LineCount).To(Equal(38))
 	})
 
 	It("can accept a compute-at option for determining eligibility", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -118,19 +118,19 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
-		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary.LineCount).To(Equal(36))
 	})
 
 	It("can accept a suffix for the output file names", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 		dateSuffix := "Feb_8_2019_3.32.43.PM"
 
@@ -154,8 +154,8 @@ var _ = Describe("gogen", func() {
 		expectedDojResultsFileName := fmt.Sprintf("%v/doj_results_1_%s.csv", fileResultsOutputDir, dateSuffix)
 		expectedCondensedFileName := fmt.Sprintf("%v/doj_results_condensed_1_%s.csv", fileResultsOutputDir, dateSuffix)
 		expectedConvictionsFileName := fmt.Sprintf("%v/doj_results_convictions_1_%s.csv", fileResultsOutputDir, dateSuffix)
-		expectedOutputFileName := fmt.Sprintf("%v/gogen_1_%s.out", fileResultsOutputDir, dateSuffix)
-		expectedJsonOutputFileName := fmt.Sprintf("%v/gogen_%s.json", outputDir, dateSuffix)
+		expectedOutputFileName := fmt.Sprintf("%v/gogen_pilots_1_%s.out", fileResultsOutputDir, dateSuffix)
+		expectedJsonOutputFileName := fmt.Sprintf("%v/gogen_pilots_%s.json", outputDir, dateSuffix)
 
 		Ω(expectedDojResultsFileName).Should(BeAnExistingFile())
 		Ω(expectedCondensedFileName).Should(BeAnExistingFile())
@@ -166,13 +166,13 @@ var _ = Describe("gogen", func() {
 
 	It("validates required options", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "extra_comma.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -188,24 +188,24 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit(3))
-		Eventually(session.Err).Should(gbytes.Say("missing required field: Run gogen --help for more info"))
+		Eventually(session.Err).Should(gbytes.Say("missing required field: Run gogen_pilots --help for more info"))
 
-		expectedErrorFileName := fmt.Sprintf("%v/gogen%s.err", outputDir, "")
+		expectedErrorFileName := fmt.Sprintf("%v/gogen_pilots%s.err", outputDir, "")
 
 		Ω(expectedErrorFileName).Should(BeAnExistingFile())
 		data, _ := ioutil.ReadFile(expectedErrorFileName)
-		Expect(string(data)).To(Equal("missing required field: Run gogen --help for more info\n"))
+		Expect(string(data)).To(Equal("missing required field: Run gogen_pilots --help for more info\n"))
 	})
 
 	It("fails and reports errors for missing input files", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "missing.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 		filenameSuffix := "a_suffix"
 
@@ -226,7 +226,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gexec.Exit(2))
 		Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
 
-		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
+		expectedErrorFileName := fmt.Sprintf("%v/gogen_pilots_%s.err", outputDir, filenameSuffix)
 
 		Ω(expectedErrorFileName).Should(BeAnExistingFile())
 		data, _ := ioutil.ReadFile(expectedErrorFileName)
@@ -235,13 +235,13 @@ var _ = Describe("gogen", func() {
 
 	It("fails and reports errors for invalid input files", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToDOJ, err = path.Abs(path.Join("test_fixtures", "bad.csv"))
 		Expect(err).ToNot(HaveOccurred())
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 		filenameSuffix := "a_suffix"
 
@@ -262,7 +262,7 @@ var _ = Describe("gogen", func() {
 		Eventually(session).Should(gexec.Exit(2))
 		Eventually(session.Err).Should(gbytes.Say("record on line 2: wrong number of fields"))
 
-		expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
+		expectedErrorFileName := fmt.Sprintf("%v/gogen_pilots_%s.err", outputDir, filenameSuffix)
 
 		Ω(expectedErrorFileName).Should(BeAnExistingFile())
 		data, _ := ioutil.ReadFile(expectedErrorFileName)
@@ -271,13 +271,13 @@ var _ = Describe("gogen", func() {
 
 	It("runs and has output for Los Angeles", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToInputExcel := path.Join("test_fixtures", "los_angeles.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		runCommand := "run"
@@ -291,7 +291,7 @@ var _ = Describe("gogen", func() {
 		Expect(err).ToNot(HaveOccurred())
 
 		Eventually(session).Should(gexec.Exit())
-		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
 			"LineCount":               Equal(32),
@@ -316,15 +316,13 @@ var _ = Describe("gogen", func() {
 			"Prop64FelonyConvictionsCountInCounty":      Equal(0),
 			"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
 			"SubjectsWithSomeReliefCount":               Equal(0),
-			"ConvictionDismissalCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-			}),
-			"ConvictionReductionCountByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
-			}),
+			"ConvictionDismissalCountByCodeSection":     gstruct.MatchAllKeys(gstruct.Keys{}),
+			"ConvictionReductionCountByCodeSection":     gstruct.MatchAllKeys(gstruct.Keys{}),
 			"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
 				"21 years or younger": Equal(1),
 				"50 years or older":   Equal(4),
 				"Only has 11357-60 charges and completed sentence": Equal(1),
-				"11357(a) or 11357(b)": Equal(1),
+				"11357(a) or 11357(b)":                             Equal(1),
 			}),
 		}))
 
@@ -412,13 +410,13 @@ var _ = Describe("gogen", func() {
 
 	It("can accept path to eligibility options file", func() {
 
-		outputDir, err = ioutil.TempDir("/tmp", "gogen")
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
 		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
-		pathToGogen, err := gexec.Build("gogen")
+		pathToGogen, err := gexec.Build("gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -436,7 +434,7 @@ var _ = Describe("gogen", func() {
 
 		Eventually(session).Should(gexec.Exit(0))
 
-		summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("SACRAMENTO"),
 			"LineCount":               Equal(36),
@@ -550,13 +548,13 @@ var _ = Describe("gogen", func() {
 
 	Describe("Processing multiple input files", func() {
 		It("nests and indexes the names of the results files for each input file", func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
 			inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
-			pathToGogen, err := gexec.Build("gogen")
+			pathToGogen, err := gexec.Build("gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -581,9 +579,9 @@ var _ = Describe("gogen", func() {
 			expectedCondensedFile2Name := fmt.Sprintf("%v/doj_results_condensed_2.csv", file2OutputDir)
 			expectedConvictionsFile1Name := fmt.Sprintf("%v/doj_results_convictions_1.csv", file1OutputDir)
 			expectedConvictionsFile2Name := fmt.Sprintf("%v/doj_results_convictions_2.csv", file2OutputDir)
-			expectedOutputFile1Name := fmt.Sprintf("%v/gogen_1.out", file1OutputDir)
-			expectedOutputFile2Name := fmt.Sprintf("%v/gogen_2.out", file2OutputDir)
-			expectedJsonOutputFileName := fmt.Sprintf("%v/gogen.json", outputDir)
+			expectedOutputFile1Name := fmt.Sprintf("%v/gogen_pilots_1.out", file1OutputDir)
+			expectedOutputFile2Name := fmt.Sprintf("%v/gogen_pilots_2.out", file2OutputDir)
+			expectedJsonOutputFileName := fmt.Sprintf("%v/gogen_pilots.json", outputDir)
 
 			Ω(expectedDojResultsFile1Name).Should(BeAnExistingFile())
 			Ω(expectedDojResultsFile2Name).Should(BeAnExistingFile())
@@ -597,13 +595,13 @@ var _ = Describe("gogen", func() {
 		})
 
 		It("can aggregate statistics for multiple input files", func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
 			inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
 
-			pathToGogen, err := gexec.Build("gogen")
+			pathToGogen, err := gexec.Build("gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathToEligibilityOptions := path.Join("test_fixtures", "eligibility_options.json")
@@ -621,11 +619,11 @@ var _ = Describe("gogen", func() {
 
 			Eventually(session).Should(gexec.Exit(0))
 
-			summary := GetOutputSummary(path.Join(outputDir, "gogen.json"))
+			summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 			Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
-				"County":             Equal("SACRAMENTO"),
-				"LineCount":          Equal(72),
-				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+				"County":                  Equal("SACRAMENTO"),
+				"LineCount":               Equal(72),
+				"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ProcessingTimeInSeconds": BeNumerically(">", 0),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
 					"CountSubjectsNoFelony":               Equal(8),
@@ -666,7 +664,7 @@ var _ = Describe("gogen", func() {
 		})
 
 		It("can return errors for multiple input files", func() {
-			outputDir, err = ioutil.TempDir("/tmp", "gogen")
+			outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 
 			pathToInputExcel := path.Join("test_fixtures", "configurable_flow.xlsx")
@@ -674,7 +672,7 @@ var _ = Describe("gogen", func() {
 			pathToBadDOJ, err := path.Abs(path.Join("test_fixtures", "bad.csv"))
 			pathToMissingDOJ, err := path.Abs(path.Join("test_fixtures", "missing.csv"))
 
-			pathToGogen, err := gexec.Build("gogen")
+			pathToGogen, err := gexec.Build("gogen_pilots")
 			Expect(err).ToNot(HaveOccurred())
 			filenameSuffix := "a_suffix"
 
@@ -697,7 +695,7 @@ var _ = Describe("gogen", func() {
 			Eventually(session.Err).Should(gbytes.Say("record on line 2: wrong number of fields"))
 			Eventually(session.Err).Should(gbytes.Say("open .*missing.csv: no such file or directory"))
 
-			expectedErrorFileName := fmt.Sprintf("%v/gogen_%s.err", outputDir, filenameSuffix)
+			expectedErrorFileName := fmt.Sprintf("%v/gogen_pilots_%s.err", outputDir, filenameSuffix)
 
 			Ω(expectedErrorFileName).Should(BeAnExistingFile())
 			data, _ := ioutil.ReadFile(expectedErrorFileName)

@@ -3,7 +3,7 @@ package matchers_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gogen/matchers"
+	"gogen_pilots/matchers"
 	"testing"
 )
 

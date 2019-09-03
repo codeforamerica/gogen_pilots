@@ -3,9 +3,9 @@ package data_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "gogen/data"
-	"gogen/matchers"
-	. "gogen/test_fixtures"
+	. "gogen_pilots/data"
+	"gogen_pilots/matchers"
+	. "gogen_pilots/test_fixtures"
 
 	"io/ioutil"
 	"path"
@@ -56,7 +56,7 @@ var _ = Describe("DojInformation", func() {
 	)
 
 	BeforeEach(func() {
-		_, err = ioutil.TempDir("/tmp", "gogen")
+		_, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
 
 		inputPath := path.Join("..", "test_fixtures", "configurable_flow.xlsx")

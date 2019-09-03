@@ -1,7 +1,7 @@
 package data
 
 import (
-	"gogen/matchers"
+	"gogen_pilots/matchers"
 	"strings"
 	"time"
 )

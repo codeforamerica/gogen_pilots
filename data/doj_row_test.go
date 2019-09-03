@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "gogen/data"
+	. "gogen_pilots/data"
 )
 
 var _ = Describe("DojRow", func() {

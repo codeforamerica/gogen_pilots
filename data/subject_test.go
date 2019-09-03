@@ -1,7 +1,7 @@
 package data_test
 
 import (
-	"gogen/data"
+	"gogen_pilots/data"
 	"time"
 
 	. "github.com/onsi/ginkgo"
