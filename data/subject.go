@@ -73,10 +73,36 @@ func (subject *Subject) MostRecentConvictionDate() time.Time {
 
 func (subject *Subject) SuperstrikeCodeSections() []string {
 	var result []string
+	gangEnhancementByCase := make(map[string]string)
+	enhanceableOffenseByCase := make(map[string][]string)
 	for _, row := range subject.Convictions {
 		if IsSuperstrike(row.CodeSection) {
 			result = append(result, row.CodeSection)
 		}
+		if IsGangEnhancement(row.CodeSection) {
+			gangEnhancementByCase[row.CountOrder[0:6]] = row.CodeSection
+		}
+		if IsEnhanceableOffense(row.CodeSection) {
+			enhanceableOffenseByCase[row.CountOrder[0:6]] = append(enhanceableOffenseByCase[row.CountOrder[0:6]], row.CodeSection)
+		}
+	}
+	for caseFromCountOrder, gangEnhancementCodeSection := range gangEnhancementByCase {
+		for _, enhanceableOffenseCodeSection := range enhanceableOffenseByCase[caseFromCountOrder] {
+			result = append(result, enhanceableOffenseCodeSection + " + " + gangEnhancementCodeSection)
+		}
+	}
+	result = eliminateDups(result)
+	return result
+}
+
+func eliminateDups(source []string) []string {
+	stringMap := make(map[string] bool)
+	for _, value := range source {
+		stringMap[value] = true
+	}
+	result := make([]string, 0, len(stringMap))
+	for key := range stringMap {
+		result = append(result, key)
 	}
 	return result
 }

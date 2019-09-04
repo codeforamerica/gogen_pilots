@@ -294,7 +294,7 @@ var _ = Describe("gogen_pilots", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
-			"LineCount":               Equal(32),
+			"LineCount":               Equal(35),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
@@ -309,7 +309,7 @@ var _ = Describe("gogen_pilots", func() {
 			}),
 			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 				"11357": Equal(3),
-				"11358": Equal(8),
+				"11358": Equal(9),
 				"11359": Equal(4),
 			}),
 			"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
@@ -327,22 +327,22 @@ var _ = Describe("gogen_pilots", func() {
 		}))
 
 		Eventually(session).Should(gbytes.Say("----------- Overall summary of DOJ file --------------------"))
-		Eventually(session).Should(gbytes.Say("Found 32 Total rows in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 35 Total rows in DOJ file"))
 		Eventually(session).Should(gbytes.Say("Based on your office’s eligibility choices, this application processed the data in .* seconds"))
-		Eventually(session).Should(gbytes.Say("Found 9 Total individuals in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 25 Total convictions in DOJ file"))
-		Eventually(session).Should(gbytes.Say("Found 22 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Found 10 Total individuals in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 28 Total convictions in DOJ file"))
+		Eventually(session).Should(gbytes.Say("Found 25 convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Convictions Overall--------------------"))
-		Eventually(session).Should(gbytes.Say("Found 18 convictions total"))
+		Eventually(session).Should(gbytes.Say("Found 19 convictions total"))
 		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions total"))
-		Eventually(session).Should(gbytes.Say("Found 10 11358 convictions total"))
+		Eventually(session).Should(gbytes.Say("Found 11 11358 convictions total"))
 		Eventually(session).Should(gbytes.Say("Found 5 11359 convictions total"))
 
 		Eventually(session).Should(gbytes.Say("----------- Prop64 Convictions In This County --------------------"))
-		Eventually(session).Should(gbytes.Say("Found 15 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Found 16 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 3 11357 convictions in this county"))
-		Eventually(session).Should(gbytes.Say("Found 8 11358 convictions in this county"))
+		Eventually(session).Should(gbytes.Say("Found 9 11358 convictions in this county"))
 		Eventually(session).Should(gbytes.Say("Found 4 11359 convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
@@ -357,9 +357,9 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gbytes.Say("Found 2 convictions total that are Hand Review"))
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
-		Eventually(session).Should(gbytes.Say("Found 2 11358 convictions that are Not eligible"))
+		Eventually(session).Should(gbytes.Say("Found 3 11358 convictions that are Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 1 11359 convictions that are Not eligible"))
-		Eventually(session).Should(gbytes.Say("Found 3 convictions total that are Not eligible"))
+		Eventually(session).Should(gbytes.Say("Found 4 convictions total that are Not eligible"))
 
 		Eventually(session).Should(gbytes.Say("To be reviewed by City Attorneys"))
 		Eventually(session).Should(gbytes.Say("Found 1 11357 convictions that are To be reviewed by City Attorney"))
@@ -380,7 +380,7 @@ var _ = Describe("gogen_pilots", func() {
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason PC 290")))
-		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 2 convictions with eligibility reason PC 667(e)(2)(c)(iv)")))
+		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 3 convictions with eligibility reason PC 667(e)(2)(c)(iv)")))
 
 		Eventually(session).Should(gbytes.Say("To be reviewed by City Attorneys"))
 		Eventually(session).Should(gbytes.Say("Found 3 convictions with eligibility reason Misdemeanor or Infraction"))
@@ -391,9 +391,9 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gbytes.Say("Found 1 466 PC convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("----------- Impact to individuals --------------------"))
-		Eventually(session).Should(gbytes.Say("9 individuals currently have a felony on their record"))
-		Eventually(session).Should(gbytes.Say("9 individuals currently have convictions on their record"))
-		Eventually(session).Should(gbytes.Say("4 individuals currently have convictions on their record in the last 7 years"))
+		Eventually(session).Should(gbytes.Say("10 individuals currently have a felony on their record"))
+		Eventually(session).Should(gbytes.Say("10 individuals currently have convictions on their record"))
+		Eventually(session).Should(gbytes.Say("5 individuals currently have convictions on their record in the last 7 years"))
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility is run as specified for Prop 64 and Related Charges --------------------"))
 		Eventually(session).Should(gbytes.Say("1 individuals who had a felony will no longer have a felony on their record"))
