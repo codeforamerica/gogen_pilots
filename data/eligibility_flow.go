@@ -5,7 +5,7 @@ import (
 )
 
 type EligibilityFlow interface {
-	ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo
+	ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string, age float64) map[int]*EligibilityInfo
 	ChecksRelatedCharges() (result bool)
 }
 

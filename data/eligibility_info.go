@@ -106,9 +106,9 @@ func (info *EligibilityInfo) hasTwoPriors(row *DOJRow, subject *Subject) bool {
 	return priorConvictionsOfSameCodeSectionPrefix >= 2
 }
 
-func (info *EligibilityInfo) olderThanFifty(row *DOJRow, subject *Subject) bool {
+func (info *EligibilityInfo) olderThanFifty(row *DOJRow, subject *Subject, minimumAge float64) bool {
 	age := info.yearsSinceEvent(subject.DOB)
-	if age >= 50 {
+	if age >= minimumAge {
 		return true
 	}
 	return false

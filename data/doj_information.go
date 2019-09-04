@@ -41,10 +41,10 @@ func (i *DOJInformation) aggregateSubjects() {
 	fmt.Println("\nComplete...")
 }
 
-func (i *DOJInformation) DetermineEligibility(county string, eligibilityFlow EligibilityFlow) map[int]*EligibilityInfo {
+func (i *DOJInformation) DetermineEligibility(county string, eligibilityFlow EligibilityFlow, age float64) map[int]*EligibilityInfo {
 	eligibilities := make(map[int]*EligibilityInfo)
 	for _, subject := range i.Subjects {
-		infos := eligibilityFlow.ProcessSubject(subject, i.comparisonTime, county)
+		infos := eligibilityFlow.ProcessSubject(subject, i.comparisonTime, county, age)
 		for index, info := range infos {
 			eligibilities[index] = info
 		}

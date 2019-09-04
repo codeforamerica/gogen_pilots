@@ -147,6 +147,65 @@ var _ = Describe("gogen_pilots", func() {
 		Ω(expectedOutputFileName).Should(BeAnExistingFile())
 		Ω(expectedJsonOutputFileName).Should(BeAnExistingFile())
 	})
+	It("can accept an age for a participant to determine eligibility", func(){
+
+		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
+		Expect(err).ToNot(HaveOccurred())
+
+		pathToInputExcel := path.Join("test_fixtures", "los_angeles.xlsx")
+		inputCSV, _, _ := ExtractFullCSVFixtures(pathToInputExcel)
+
+		pathToGogen, err := gexec.Build("gogen_pilots")
+		Expect(err).ToNot(HaveOccurred())
+
+		runCommand := "run"
+		outputsFlag := fmt.Sprintf("--outputs=%s", outputDir)
+		dojFlag := fmt.Sprintf("--input-doj=%s", inputCSV)
+		var age float64
+		age = 40
+		ageFlag := fmt.Sprintf("--individual-age=%v", age)
+		computeAtFlag := "--compute-at=2019-11-11"
+
+		command := exec.Command(pathToGogen, runCommand, outputsFlag, dojFlag, computeAtFlag, ageFlag)
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).ToNot(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit())
+		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
+		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
+			"County":                  Equal("LOS ANGELES"),
+			"LineCount":               Equal(32),
+			"ProcessingTimeInSeconds": BeNumerically(">", 0),
+			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
+				"CountSubjectsNoFelony":               Equal(1),
+				"CountSubjectsNoConviction":           Equal(1),
+				"CountSubjectsNoConvictionLast7Years": Equal(0),
+			}),
+			"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
+				"CountSubjectsNoFelony":               Equal(2),
+				"CountSubjectsNoConviction":           Equal(2),
+				"CountSubjectsNoConvictionLast7Years": Equal(3),
+			}),
+			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
+				"11357": Equal(3),
+				"11358": Equal(8),
+				"11359": Equal(4),
+			}),
+			"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
+			"Prop64FelonyConvictionsCountInCounty":      Equal(0),
+			"Prop64MisdemeanorConvictionsCountInCounty": Equal(0),
+			"SubjectsWithSomeReliefCount":               Equal(0),
+			"ConvictionDismissalCountByCodeSection":     gstruct.MatchAllKeys(gstruct.Keys{}),
+			"ConvictionReductionCountByCodeSection":     gstruct.MatchAllKeys(gstruct.Keys{}),
+			"ConvictionDismissalCountByAdditionalRelief": gstruct.MatchAllKeys(gstruct.Keys{
+				"21 years or younger": Equal(1),
+				"40 years or older":   Equal(4),
+				"Only has 11357-60 charges and completed sentence": Equal(1),
+				"11357(a) or 11357(b)":                             Equal(1),
+			}),
+		}))
+	})
 
 	It("validates required options", func() {
 

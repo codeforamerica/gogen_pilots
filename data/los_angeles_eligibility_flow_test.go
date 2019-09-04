@@ -20,6 +20,8 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		birthDate := time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
 		days := time.Duration(24) * (time.Hour)
 		comparisonTime := time.Date(2020, 7, 1, 0, 0, 0, 0, time.UTC)
+		var age float64
+		age = 50
 
 		Context("Steps 1, 2, and 3", func() {
 			var (
@@ -118,7 +120,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
 				_, ok = infos[2]
@@ -131,7 +133,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns the correct eligibility determination for each conviction", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
 				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
@@ -240,7 +242,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns the correct eligibility determination for each conviction", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
 				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
@@ -350,7 +352,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns the correct eligibility determination for each conviction", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
 				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
 				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
@@ -438,7 +440,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
 				_, ok = infos[2]
@@ -447,7 +449,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("Returns the correct eligibility determination", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(2))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("No convictions in past 10 years"))
@@ -509,7 +511,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(2))
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
@@ -518,7 +520,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("Returns the correct eligibility determination", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(2))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Only has 11357-60 charges and completed sentence"))
@@ -580,14 +582,14 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
 			})
 
 			It("Returns the correct eligbility determination", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("No convictions in past 10 years"))
@@ -647,14 +649,14 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
 			})
 
 			It("Returns the correct eligibility determination", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
 				Expect(infos[0].EligibilityReason).To(Equal("Currently serving sentence"))
@@ -715,14 +717,14 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
 			})
 
 			It("Returns the correct eligibility determination", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Deceased"))
@@ -782,14 +784,14 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 			})
 
 			It("returns a map of eligibility infos", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				_, ok := infos[0]
 				Expect(ok).To(Equal(true))
 			})
 
 			It("Returns the correct eligibility determination", func() {
-				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY)
+				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age)
 				Expect(len(infos)).To(Equal(1))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
 				Expect(infos[0].EligibilityReason).To(Equal("????"))
