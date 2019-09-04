@@ -24,9 +24,7 @@ var defaultOpts struct{}
 type runOpts struct {
 	OutputFolder       string `long:"outputs" description:"The folder in which to place result files"`
 	DOJFiles           string `long:"input-doj" description:"The files containing criminal histories from CA DOJ"`
-	County             string `long:"county" short:"c" description:"The county for which eligibility will be computed"`
 	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
-	EligibilityOptions string `long:"eligibility-options" description:"File containing options for which eligibility logic to apply"`
 	FileNameSuffix     string `long:"file-name-suffix" hidden:"true" description:"string to append to file names"`
 }
 
@@ -50,7 +48,7 @@ func (r runOpts) Execute(args []string) error {
 
 	utilities.SetErrorFileName(utilities.GenerateFileName(r.OutputFolder, "gogen_pilots%s.err", r.FileNameSuffix))
 
-	if r.OutputFolder == "" || r.DOJFiles == "" || r.County == "" {
+	if r.OutputFolder == "" || r.DOJFiles == "" {
 		utilities.ExitWithError(errors.New("missing required field: Run gogen_pilots --help for more info"), utilities.INVALID_RUN_OPTION_ERROR)
 	}
 
@@ -69,30 +67,7 @@ func (r runOpts) Execute(args []string) error {
 
 	var countyEligibilityFlow data.EligibilityFlow
 
-	if r.EligibilityOptions != "" {
-		var options data.EligibilityOptions
-		optionsFile, err := os.Open(r.EligibilityOptions)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
-		}
-		defer optionsFile.Close()
-
-		optionsBytes, err := ioutil.ReadAll(optionsFile)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
-		}
-
-		err = json.Unmarshal(optionsBytes, &options)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_RUN_OPTION_ERROR)
-		}
-		countyEligibilityFlow, err = data.NewConfigurableEligibilityFlow(options, r.County)
-		if err != nil {
-			utilities.ExitWithError(err, utilities.INVALID_ELIGIBILITY_OPTION_ERROR)
-		}
-	} else {
-		countyEligibilityFlow = data.EligibilityFlows[r.County]
-	}
+		countyEligibilityFlow = data.EligibilityFlows["LOS ANGELES"]
 
 	var runErrors []error
 	var runSummary exporter.Summary
@@ -111,10 +86,10 @@ func (r runOpts) Execute(args []string) error {
 			runErrors = append(runErrors, err)
 			continue
 		}
-		countyEligibilities := dojInformation.DetermineEligibility(r.County, countyEligibilityFlow)
+		countyEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", countyEligibilityFlow)
 
-		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64"])
-		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(r.County, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
+		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
 
 		dojFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_%d%s.csv", fileIndex, r.FileNameSuffix)
 		condensedFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_condensed_%d%s.csv", fileIndex, r.FileNameSuffix)
@@ -148,7 +123,7 @@ func (r runOpts) Execute(args []string) error {
 			prop64ConvictionsDojWriter,
 			aggregateFileStatsWriter)
 
-		fileSummary := dataExporter.Export(r.County, processingStartTime)
+		fileSummary := dataExporter.Export("LOS ANGELES", processingStartTime)
 		runSummary = dataExporter.AccumulateSummaryData(runSummary, fileSummary)
 	}
 
