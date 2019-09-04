@@ -22,10 +22,11 @@ const VERSION = "0.2.3"
 var defaultOpts struct{}
 
 type runOpts struct {
-	OutputFolder       string `long:"outputs" description:"The folder in which to place result files"`
-	DOJFiles           string `long:"input-doj" description:"The files containing criminal histories from CA DOJ"`
-	ComputeAt          string `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
-	FileNameSuffix     string `long:"file-name-suffix" hidden:"true" description:"string to append to file names"`
+	OutputFolder   string  `long:"outputs" description:"The folder in which to place result files"`
+	DOJFiles       string  `long:"input-doj" description:"The files containing criminal histories from CA DOJ"`
+	ComputeAt      string  `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
+	FileNameSuffix string  `long:"file-name-suffix" hidden:"true" description:"string to append to file names"`
+	IndividualAge  float64 `long:"individual-age" hidden:"true" description:"minimum age of individual for record clearance"`
 }
 
 type exportTestCSVOpts struct {
@@ -64,10 +65,15 @@ func (r runOpts) Execute(args []string) error {
 			computeAtDate = computeAtOption
 		}
 	}
-
+	var age float64
+	if r.IndividualAge != 0 {
+		age = r.IndividualAge
+	} else {
+		age = 50
+	}
 	var countyEligibilityFlow data.EligibilityFlow
 
-		countyEligibilityFlow = data.EligibilityFlows["LOS ANGELES"]
+	countyEligibilityFlow = data.EligibilityFlows["LOS ANGELES"]
 
 	var runErrors []error
 	var runSummary exporter.Summary
@@ -86,10 +92,10 @@ func (r runOpts) Execute(args []string) error {
 			runErrors = append(runErrors, err)
 			continue
 		}
-		countyEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", countyEligibilityFlow)
+		countyEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", countyEligibilityFlow, age)
 
-		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
-		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age)
+		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
 
 		dojFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_%d%s.csv", fileIndex, r.FileNameSuffix)
 		condensedFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_condensed_%d%s.csv", fileIndex, r.FileNameSuffix)

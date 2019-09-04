@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"gogen_pilots/matchers"
 	"strings"
 	"time"
@@ -9,12 +10,12 @@ import (
 type losAngelesEligibilityFlow struct {
 }
 
-func (ef losAngelesEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string) map[int]*EligibilityInfo {
+func (ef losAngelesEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, flowCounty string, age float64) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
 			info := NewEligibilityInfo(conviction, subject, comparisonTime, "LOS ANGELES")
-			ef.BeginEligibilityFlow(info, conviction, subject)
+			ef.BeginEligibilityFlow(info, conviction, subject, age)
 			infos[conviction.Index] = info
 		}
 	}
@@ -29,30 +30,30 @@ func (ef losAngelesEligibilityFlow) checkRelevancy(codeSection string, county st
 	return county == "LOS ANGELES" && matchers.IsProp64Charge(codeSection)
 }
 
-func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	if matchers.IsProp64Charge(row.CodeSection) {
-		ef.ConvictionIsMisdemeanorOrInfraction(info, row, subject)
+		ef.ConvictionIsMisdemeanorOrInfraction(info, row, subject, age)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) ConvictionIsMisdemeanorOrInfraction(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) ConvictionIsMisdemeanorOrInfraction(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	if row.IsFelony {
-		ef.ConvictionBeforeNovNine2016(info, row, subject)
+		ef.ConvictionBeforeNovNine2016(info, row, subject, age)
 	} else {
 		info.SetCityAttorneyReview("Misdemeanor or Infraction")
 	}
 }
 
-func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
-		ef.ConvictionIs11357(info, row, subject)
+		ef.ConvictionIs11357(info, row, subject, age)
 	} else {
 		info.SetNotEligible("Occurred after 11/09/2016")
 	}
 }
 
 
-func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	ok, codeSection := matchers.ExtractProp64Section(row.CodeSection)
 	if ok && codeSection == "11357" {
 		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
@@ -61,37 +62,37 @@ func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row
 			info.SetHandReview("Other 11357")
 		}
 	} else {
-		ef.HasSuperstrikes(info, row, subject)
+		ef.HasSuperstrikes(info, row, subject, age)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) HasSuperstrikes(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	if info.hasSuperstrikes() {
 		info.SetNotEligible("PC 667(e)(2)(c)(iv)")
 	} else {
-		ef.HasPC290(info, row, subject)
+		ef.HasPC290(info, row, subject, age)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) HasPC290(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) HasPC290(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	if info.hasPC290() {
 		info.SetNotEligible("PC 290")
 	} else {
-		ef.TwoPriors(info, row, subject)
+		ef.TwoPriors(info, row, subject, age)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
 	if info.hasTwoPriors(row, subject) {
 		info.SetNotEligible("Two priors")
 	} else {
-		ef.OlderThanFifty(info, row, subject)
+		ef.OlderThanFifty(info, row, subject, age)
 	}
 }
 
-func (ef losAngelesEligibilityFlow) OlderThanFifty(info *EligibilityInfo, row *DOJRow, subject *Subject) {
-	if info.olderThanFifty(row, subject) {
-		info.SetEligibleForDismissal("50 years or older")
+func (ef losAngelesEligibilityFlow) OlderThanFifty(info *EligibilityInfo, row *DOJRow, subject *Subject, age float64) {
+	if info.olderThanFifty(row, subject, age) {
+		info.SetEligibleForDismissal(fmt.Sprintf("%v years or older", age))
 	} else {
 		ef.YoungerThanTwentyOne(info, row, subject)
 	}

@@ -36,17 +36,17 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-
+			var age float64
+			age = 50
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
-			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"], age)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age)
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
 
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
 			dojProp64ConvictionsWriter, _ := NewDOJWriter(path.Join(outputDir, "convictions.csv"))
 			outputWriter := utilities.GetOutputWriter("gogen_pilots.out")
-
 
 			dataExporter = NewDataExporter(
 				dojInformation,
@@ -92,11 +92,13 @@ var _ = Describe("DataExporter", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			flow := createFlow()
+			var age float64
+			age = 50
 
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
-			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow)
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow, age)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"], age)
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
 
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
@@ -148,11 +150,13 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+			var age float64
+			age = 50
 
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
-			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"])
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"])
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"])
+			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"], age)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age)
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
 
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
@@ -195,8 +199,8 @@ var _ = Describe("DataExporter", func() {
 	Describe("AccumulateSummaryData", func() {
 		It("adds new stats to stats already accumulated", func() {
 			existingStats := Summary{
-				County: "SANTA CARLA",
-				LineCount: 21,
+				County:             "SANTA CARLA",
+				LineCount:          21,
 				EarliestConviction: time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC),
 				ReliefWithCurrentEligibilityChoices: map[string]int{
 					"CountSubjectsNoFelony":               2,
@@ -216,8 +220,8 @@ var _ = Describe("DataExporter", func() {
 			}
 
 			newStats := Summary{
-				County: "SANTA CARLA",
-				LineCount: 25,
+				County:             "SANTA CARLA",
+				LineCount:          25,
 				EarliestConviction: time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
 				ReliefWithCurrentEligibilityChoices: map[string]int{
 					"CountSubjectsNoFelony":               1,
@@ -239,18 +243,18 @@ var _ = Describe("DataExporter", func() {
 			cumulativeStats := dataExporter.AccumulateSummaryData(existingStats, newStats)
 
 			Expect(cumulativeStats).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
-				"County": Equal("SANTA CARLA"),
-				"LineCount": Equal(46),
+				"County":             Equal("SANTA CARLA"),
+				"LineCount":          Equal(46),
 				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
-					"CountSubjectsNoFelony": Equal(3),
+					"CountSubjectsNoFelony":               Equal(3),
 					"CountSubjectsNoConvictionLast7Years": Equal(8),
-					"CountSubjectsNoConviction": Equal(3),
+					"CountSubjectsNoConviction":           Equal(3),
 				}),
 				"ReliefWithDismissAllProp64": gstruct.MatchAllKeys(gstruct.Keys{
-					"CountSubjectsNoFelony": Equal(9),
+					"CountSubjectsNoFelony":               Equal(9),
 					"CountSubjectsNoConvictionLast7Years": Equal(13),
-					"CountSubjectsNoConviction": Equal(7),
+					"CountSubjectsNoConviction":           Equal(7),
 				}),
 				"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 					"11357": Equal(9),
@@ -264,8 +268,8 @@ var _ = Describe("DataExporter", func() {
 			existingStats := Summary{}
 
 			newStats := Summary{
-				County: "SANTA CARLA",
-				LineCount: 25,
+				County:             "SANTA CARLA",
+				LineCount:          25,
 				EarliestConviction: time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
 				ReliefWithCurrentEligibilityChoices: map[string]int{
 					"CountSubjectsNoFelony":               1,
