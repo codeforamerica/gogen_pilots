@@ -24,6 +24,8 @@ func IsPC290(codeSection string) bool {
 }
 
 var gangEnhancement = `186\.22\(B\)\(4\)`
+var gangEnhancementPattern = regexp.MustCompile(gangEnhancement + ` PC`)
+
 var superstrikesWithGangEnhancement = []string{
 	`136\.1`,
 	`215`,
@@ -33,7 +35,10 @@ var superstrikesWithGangEnhancement = []string{
 	`12022\.55`,
 }
 
+
 var enhanceableOffenses = `((` + strings.Join(superstrikesWithGangEnhancement, `)|(`) + `))`
+var enhanceableOffensesPattern = regexp.MustCompile(enhanceableOffenses  + ` PC`)
+
 var superstrikesPatterns = []*regexp.Regexp{
 	regexp.MustCompile(`37 PC`),
 	regexp.MustCompile(`128 PC`),
@@ -106,4 +111,12 @@ var pc290Patterns = []*regexp.Regexp{
 	regexp.MustCompile(`647\.6(.*) PC`),
 	regexp.MustCompile(`647A(.*) PC`),
 	regexp.MustCompile(`653F\([BC]\) PC`),
+}
+
+func IsGangEnhancement(codeSection string) bool {
+	return gangEnhancementPattern.MatchString(codeSection)
+}
+
+func IsEnhanceableOffense(codeSection string) bool {
+	return enhanceableOffensesPattern.MatchString(codeSection)
 }
