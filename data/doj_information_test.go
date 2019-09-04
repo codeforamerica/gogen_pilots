@@ -25,7 +25,7 @@ func (ef testEligibilityFlow) EligibleDismissal(info *EligibilityInfo, reason st
 	info.EligibilityReason = reason
 }
 
-func (ef testEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string, age float64) map[int]*EligibilityInfo {
+func (ef testEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string, age float64, yearsConvictionFree int) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County) {
@@ -70,9 +70,11 @@ var _ = Describe("DojInformation", func() {
 		dojInformation, _ = NewDOJInformation(pathToDOJ, comparisonTime, losAngelesFlow)
 		var age float64
 		age = 50
+		var yearsConvictionFree int
+		yearsConvictionFree = 10
 
-		testEligibilities = dojInformation.DetermineEligibility(county, testFlow, age)
-		dojEligibilities = dojInformation.DetermineEligibility(county, losAngelesFlow, age)
+		testEligibilities = dojInformation.DetermineEligibility(county, testFlow, age, yearsConvictionFree)
+		dojEligibilities = dojInformation.DetermineEligibility(county, losAngelesFlow, age, yearsConvictionFree)
 
 	})
 

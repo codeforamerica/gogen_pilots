@@ -135,9 +135,9 @@ func (info *EligibilityInfo) allSentencesCompleted(row *DOJRow, subject *Subject
 	return true
 }
 
-func (info *EligibilityInfo) noConvictionsPastTenYears(row *DOJRow, subject *Subject) bool {
+func (info *EligibilityInfo) noConvictionsPastTenYears(row *DOJRow, subject *Subject, timeSinceConviction int) bool {
 	for _, conviction := range subject.Convictions {
-		if conviction.DispositionDate.After(info.comparisonTime.AddDate(-10, 0, 0)) {
+		if conviction.DispositionDate.After(info.comparisonTime.AddDate(-timeSinceConviction, 0, 0)) {
 			return false
 		}
 	}

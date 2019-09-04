@@ -36,12 +36,17 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
+
 			var age float64
 			age = 50
+
+			var yearsConvictionFree int
+			yearsConvictionFree = 10
+
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
-			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"], age)
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age)
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
+			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"], age, yearsConvictionFree)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age, yearsConvictionFree)
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age, yearsConvictionFree)
 
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
@@ -95,10 +100,13 @@ var _ = Describe("DataExporter", func() {
 			var age float64
 			age = 50
 
+			var yearsConvictionFree int
+			yearsConvictionFree = 10
+
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, flow)
-			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow, age)
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"], age)
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
+			dojEligibilities := dojInformation.DetermineEligibility(COUNTY, flow, age, yearsConvictionFree)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64"], age, yearsConvictionFree)
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility(COUNTY, data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age, yearsConvictionFree)
 
 			dojResultsPath := path.Join(outputDir, "results.csv")
 			dojCondensedResultsPath := path.Join(outputDir, "condensed.csv")
@@ -153,10 +161,13 @@ var _ = Describe("DataExporter", func() {
 			var age float64
 			age = 50
 
+			var yearsConvictionFree int
+			yearsConvictionFree = 10
+
 			dojInformation, _ := data.NewDOJInformation(pathToDOJ, comparisonTime, data.EligibilityFlows["LOS ANGELES"])
-			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"], age)
-			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age)
-			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
+			dojEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["LOS ANGELES"], age, yearsConvictionFree)
+			dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age, yearsConvictionFree)
+			dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age, yearsConvictionFree)
 
 			dojWriter, _ := NewDOJWriter(path.Join(outputDir, "results.csv"))
 			dojCondensedWriter, _ := NewDOJWriter(path.Join(outputDir, "condensed.csv"))
