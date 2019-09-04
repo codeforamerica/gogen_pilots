@@ -27,6 +27,7 @@ type runOpts struct {
 	ComputeAt      string  `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 	FileNameSuffix string  `long:"file-name-suffix" hidden:"true" description:"string to append to file names"`
 	IndividualAge  float64 `long:"individual-age" hidden:"true" description:"minimum age of individual for record clearance"`
+	YearsConvictionFree  int `long:"years-conviction-free" hidden:"true" description:"years (as a number) since last conviction"`
 }
 
 type exportTestCSVOpts struct {
@@ -66,11 +67,19 @@ func (r runOpts) Execute(args []string) error {
 		}
 	}
 	var age float64
+
 	if r.IndividualAge != 0 {
 		age = r.IndividualAge
 	} else {
 		age = 50
 	}
+	var yearsConvictionFree int
+	if r.YearsConvictionFree != 0 {
+		yearsConvictionFree = r.YearsConvictionFree
+	} else {
+		yearsConvictionFree = 10
+	}
+
 	var countyEligibilityFlow data.EligibilityFlow
 
 	countyEligibilityFlow = data.EligibilityFlows["LOS ANGELES"]
@@ -92,10 +101,10 @@ func (r runOpts) Execute(args []string) error {
 			runErrors = append(runErrors, err)
 			continue
 		}
-		countyEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", countyEligibilityFlow, age)
+		countyEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", countyEligibilityFlow, age, yearsConvictionFree)
 
-		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age)
-		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age)
+		dismissAllProp64Eligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64"], age, yearsConvictionFree)
+		dismissAllProp64AndRelatedEligibilities := dojInformation.DetermineEligibility("LOS ANGELES", data.EligibilityFlows["DISMISS ALL PROP 64 AND RELATED"], age, yearsConvictionFree)
 
 		dojFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_%d%s.csv", fileIndex, r.FileNameSuffix)
 		condensedFilePath := utilities.GenerateIndexedFileName(fileOutputFolder, "doj_results_condensed_%d%s.csv", fileIndex, r.FileNameSuffix)
