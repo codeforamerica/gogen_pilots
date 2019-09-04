@@ -207,7 +207,7 @@ var _ = Describe("gogen_pilots", func() {
 		}))
 	})
 
-	FIt("can accept a number of years conviction free as a parameter to determine eligibility", func() {
+	It("can accept a number of years conviction free as a parameter to determine eligibility", func() {
 
 		outputDir, err = ioutil.TempDir("/tmp", "gogen_pilots")
 		Expect(err).ToNot(HaveOccurred())
