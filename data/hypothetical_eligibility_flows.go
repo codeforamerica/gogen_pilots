@@ -8,7 +8,7 @@ import (
 type dismissAllProp64EligibilityFlow struct {
 }
 
-func (ef dismissAllProp64EligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string, age float64, yearsConvictionFree int) map[int]*EligibilityInfo {
+func (ef dismissAllProp64EligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string, age int, yearsConvictionFree int) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County, county) {
@@ -37,7 +37,7 @@ func (ef dismissAllProp64EligibilityFlow) checkRelevancy(codeSection string, con
 type dismissAllProp64AndRelatedEligibilityFlow struct {
 }
 
-func (ef dismissAllProp64AndRelatedEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string, age float64, yearsConvictionFree int) map[int]*EligibilityInfo {
+func (ef dismissAllProp64AndRelatedEligibilityFlow) ProcessSubject(subject *Subject, comparisonTime time.Time, county string, age int, yearsConvictionFree int) map[int]*EligibilityInfo {
 	infos := make(map[int]*EligibilityInfo)
 	for _, conviction := range subject.Convictions {
 		if ef.checkRelevancy(conviction.CodeSection, conviction.County, county) {

@@ -26,7 +26,7 @@ type runOpts struct {
 	DOJFiles       string  `long:"input-doj" description:"The files containing criminal histories from CA DOJ"`
 	ComputeAt      string  `long:"compute-at" description:"The date for which eligibility will be evaluated, ex: 2020-10-31"`
 	FileNameSuffix string  `long:"file-name-suffix" hidden:"true" description:"string to append to file names"`
-	IndividualAge  float64 `long:"individual-age" hidden:"true" description:"minimum age of individual for record clearance"`
+	IndividualAge  int `long:"individual-age" hidden:"true" description:"minimum age of individual for record clearance"`
 	YearsConvictionFree  int `long:"years-conviction-free" hidden:"true" description:"years (as a number) since last conviction"`
 }
 
@@ -66,7 +66,7 @@ func (r runOpts) Execute(args []string) error {
 			computeAtDate = computeAtOption
 		}
 	}
-	var age float64
+	var age int
 
 	if r.IndividualAge != 0 {
 		age = r.IndividualAge
