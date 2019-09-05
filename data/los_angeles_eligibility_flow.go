@@ -91,7 +91,7 @@ func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow
 }
 
 func (ef losAngelesEligibilityFlow) OlderThanGivenAge(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
-	if info.olderThanGivenAge(row, subject, age, comparisonTime) {
+	if subject.olderThan(age, comparisonTime) {
 		info.SetEligibleForDismissal(fmt.Sprintf("%v years or older", age))
 	} else {
 		ef.YoungerThanTwentyOne(info, row, subject, yearsConvictionFree)
