@@ -106,11 +106,14 @@ func (info *EligibilityInfo) hasTwoPriors(row *DOJRow, subject *Subject) bool {
 	return priorConvictionsOfSameCodeSectionPrefix >= 2
 }
 
-func (info *EligibilityInfo) olderThanFifty(row *DOJRow, subject *Subject, minimumAge float64) bool {
-	age := info.yearsSinceEvent(subject.DOB)
-	if age >= minimumAge {
+func (info *EligibilityInfo) olderThanGivenAge(row *DOJRow, subject *Subject, minimumAge int, comparisonTime time.Time) bool {
+	if subject.olderThan(minimumAge, comparisonTime) {
 		return true
 	}
+	//age := info.yearsSinceEvent(subject.DOB)
+	//if age >= minimumAge {
+	//	return true
+	//}
 	return false
 }
 
@@ -135,7 +138,7 @@ func (info *EligibilityInfo) allSentencesCompleted(row *DOJRow, subject *Subject
 	return true
 }
 
-func (info *EligibilityInfo) noConvictionsPastTenYears(row *DOJRow, subject *Subject, timeSinceConviction int) bool {
+func (info *EligibilityInfo) noConvictionsInGivenTimePeriod(row *DOJRow, subject *Subject, timeSinceConviction int) bool {
 	for _, conviction := range subject.Convictions {
 		if conviction.DispositionDate.After(info.comparisonTime.AddDate(-timeSinceConviction, 0, 0)) {
 			return false

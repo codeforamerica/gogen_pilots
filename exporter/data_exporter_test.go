@@ -37,8 +37,7 @@ var _ = Describe("DataExporter", func() {
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
-			var age float64
-			age = 50
+			age := 50
 
 			var yearsConvictionFree int
 			yearsConvictionFree = 10
@@ -97,8 +96,7 @@ var _ = Describe("DataExporter", func() {
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
 
 			flow := createFlow()
-			var age float64
-			age = 50
+			age := 50
 
 			var yearsConvictionFree int
 			yearsConvictionFree = 10
@@ -158,8 +156,7 @@ var _ = Describe("DataExporter", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			comparisonTime := time.Date(2019, time.November, 11, 0, 0, 0, 0, time.UTC)
-			var age float64
-			age = 50
+			age := 50
 
 			var yearsConvictionFree int
 			yearsConvictionFree = 10

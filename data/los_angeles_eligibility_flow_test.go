@@ -20,8 +20,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		birthDate := time.Date(1994, time.April, 10, 0, 0, 0, 0, time.UTC)
 		days := time.Duration(24) * (time.Hour)
 		comparisonTime := time.Date(2020, 7, 1, 0, 0, 0, 0, time.UTC)
-		var age float64
-		age = 50
+		age := 50
 
 		var yearsConvictionFree int
 		yearsConvictionFree = 10
