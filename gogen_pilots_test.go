@@ -107,7 +107,7 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gexec.Exit(0))
 		Expect(session.Err).ToNot(gbytes.Say("required"))
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
-		Expect(summary.LineCount).To(Equal(32))
+		Expect(summary.LineCount).To(Equal(35))
 	})
 
 	It("can accept a suffix for the output file names", func() {
@@ -174,7 +174,7 @@ var _ = Describe("gogen_pilots", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
-			"LineCount":               Equal(32),
+			"LineCount":               Equal(35),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
@@ -189,7 +189,7 @@ var _ = Describe("gogen_pilots", func() {
 			}),
 			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 				"11357": Equal(3),
-				"11358": Equal(8),
+				"11358": Equal(9),
 				"11359": Equal(4),
 			}),
 			"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
@@ -234,7 +234,7 @@ var _ = Describe("gogen_pilots", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
-			"LineCount":               Equal(32),
+			"LineCount":               Equal(35),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 			"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
@@ -249,7 +249,7 @@ var _ = Describe("gogen_pilots", func() {
 			}),
 			"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 				"11357": Equal(3),
-				"11358": Equal(8),
+				"11358": Equal(9),
 				"11359": Equal(4),
 			}),
 			"SubjectsWithProp64ConvictionCountInCounty": Equal(0),
@@ -570,7 +570,7 @@ var _ = Describe("gogen_pilots", func() {
 
 			Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 				"County":                  Equal("LOS ANGELES"),
-				"LineCount":               Equal(64),
+				"LineCount":               Equal(70),
 				"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ProcessingTimeInSeconds": BeNumerically(">", 0),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
@@ -585,7 +585,7 @@ var _ = Describe("gogen_pilots", func() {
 				}),
 				"Prop64ConvictionsCountInCountyByCodeSection": gstruct.MatchAllKeys(gstruct.Keys{
 					"11357": Equal(6),
-					"11358": Equal(16),
+					"11358": Equal(18),
 					"11359": Equal(8),
 				}),
 				"SubjectsWithProp64ConvictionCountInCounty": Equal(0),

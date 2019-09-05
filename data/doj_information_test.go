@@ -88,23 +88,23 @@ var _ = Describe("DojInformation", func() {
 
 	Context("Computing Aggregate Statistics for convictions", func() {
 		It("Counts total number of rows in file", func() {
-			Expect(dojInformation.TotalRows()).To(Equal(32))
+			Expect(dojInformation.TotalRows()).To(Equal(35))
 		})
 
 		It("Counts total convictions", func() {
-			Expect(dojInformation.TotalConvictions()).To(Equal(25))
+			Expect(dojInformation.TotalConvictions()).To(Equal(28))
 		})
 
 		It("Counts total convictions in this county", func() {
-			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(22))
+			Expect(dojInformation.TotalConvictionsInCounty(county)).To(Equal(25))
 		})
 
 		It("Counts all Prop64 convictions sorted by code section", func() {
-			Expect(dojInformation.OverallProp64ConvictionsByCodeSection()).To(Equal(map[string]int{"11357": 3, "11358": 10, "11359": 5}))
+			Expect(dojInformation.OverallProp64ConvictionsByCodeSection()).To(Equal(map[string]int{"11357": 3, "11358": 11, "11359": 5}))
 		})
 
 		It("Counts Prop64 convictions in this county sorted by code section", func() {
-			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 3, "11358": 8, "11359": 4}))
+			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSection(county)).To(Equal(map[string]int{"11357": 3, "11358": 9, "11359": 4}))
 		})
 
 		It("Finds the date of the earliest Prop64 conviction in the county", func() {
@@ -117,7 +117,7 @@ var _ = Describe("DojInformation", func() {
 				map[string]map[string]int{
 					"Eligible for Dismissal": {"11357": 1, "11359": 2, "11358": 4},
 					"Hand Review": {"11358": 1, "11357": 1},
-					"Not eligible": {"11358": 2, "11359": 1},
+					"Not eligible": {"11358": 3, "11359": 1},
 					"To be reviewed by City Attorneys": {"11358": 1, "11357": 1, "11359": 1}}))
 		})
 
@@ -125,7 +125,7 @@ var _ = Describe("DojInformation", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
 					"Not eligible": {
-						"PC 667(e)(2)(c)(iv)": 2,
+						"PC 667(e)(2)(c)(iv)": 3,
 						"PC 290": 1,
 					},
 					"To be reviewed by City Attorneys": {
@@ -151,20 +151,20 @@ var _ = Describe("DojInformation", func() {
 
 		Context("Computing aggregate statistics for individuals", func() {
 			It("Counts total number of individuals in file", func() {
-				Expect(dojInformation.TotalIndividuals()).To(Equal(9))
+				Expect(dojInformation.TotalIndividuals()).To(Equal(10))
 			})
 
 			Context("Before eligibility is run", func() {
 				It("Calculates individuals with a felony", func() {
-					Expect(dojInformation.CountIndividualsWithFelony()).To(Equal(9))
+					Expect(dojInformation.CountIndividualsWithFelony()).To(Equal(10))
 				})
 
 				It("Calculates individuals with any conviction", func() {
-					Expect(dojInformation.CountIndividualsWithConviction()).To(Equal(9))
+					Expect(dojInformation.CountIndividualsWithConviction()).To(Equal(10))
 				})
 
 				It("Calculates individuals with any conviction in the last 7 years", func() {
-					Expect(dojInformation.CountIndividualsWithConvictionInLast7Years()).To(Equal(4))
+					Expect(dojInformation.CountIndividualsWithConvictionInLast7Years()).To(Equal(5))
 				})
 			})
 
