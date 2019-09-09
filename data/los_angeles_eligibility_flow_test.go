@@ -796,7 +796,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age, yearsConvictionFree)
 				Expect(len(infos)).To(Equal(1))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Hand Review"))
-				Expect(infos[0].EligibilityReason).To(Equal("????"))
+				Expect(infos[0].EligibilityReason).To(Equal("No applicable eligibility criteria"))
 			})
 		})
 

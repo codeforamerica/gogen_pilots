@@ -134,6 +134,6 @@ func (ef losAngelesEligibilityFlow) IsDeceased(info *EligibilityInfo, row *DOJRo
 	if subject.IsDeceased {
 		info.SetEligibleForDismissal("Deceased")
 	} else {
-		info.SetHandReview("????")
+		info.SetHandReview("No applicable eligibility criteria")
 	}
 }
