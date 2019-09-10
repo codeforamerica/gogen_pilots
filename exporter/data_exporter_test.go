@@ -303,6 +303,32 @@ var _ = Describe("DataExporter", func() {
 	})
 })
 
+var _ = Describe("PossibleP64ChargeOnlyInComment", func() {
+	It("returns the comment text if the comment text has a Prop64 charge and the offense description doesn't", func() {
+		Expect(PossibleP64ChargeOnlyInComment("912", "11357(A)")).To(Equal("11357(A)"))
+		Expect(PossibleP64ChargeOnlyInComment("11350", "11357(A)")).To(Equal("11357(A)"))
+	})
+
+	It("returns empty string if the comment text is expected to override the offense description", func() {
+		Expect(PossibleP64ChargeOnlyInComment("", "11357(A)")).To(Equal(""))
+		Expect(PossibleP64ChargeOnlyInComment("SEE COMMENT FOR CHARGE", "11357(A)")).To(Equal(""))
+	})
+	It("returns the comment text if offense description and comment text have different Prop64 charges that are not both 11357 subsections", func() {
+		Expect(PossibleP64ChargeOnlyInComment("11358", "11359")).To(Equal("11359"))
+		Expect(PossibleP64ChargeOnlyInComment("11357(A)", "11358")).To(Equal("11358"))
+		Expect(PossibleP64ChargeOnlyInComment("11358", "11357(C)")).To(Equal("11357(C)"))
+	})
+	It("returns the comment text if offense description and comment text have different 11357 subsections, one from the (A,B) group and the other from the (C,D) group", func() {
+		Expect(PossibleP64ChargeOnlyInComment("11357(A)", "11357(C)")).To(Equal("11357(C)"))
+		Expect(PossibleP64ChargeOnlyInComment("11357(D)", "11357(B)")).To(Equal("11357(B)"))
+	})
+	It("returns the empty string if offense description and comment text have different 11357 subsections, but from the same group (A,B) or (C,D)", func() {
+		Expect(PossibleP64ChargeOnlyInComment("11357(A)", "11357(B)")).To(Equal(""))
+		Expect(PossibleP64ChargeOnlyInComment("11357(D)", "11357(C)")).To(Equal(""))
+	})
+
+})
+
 func expectCSVsToBeEqual(expectedCSV [][]string, actualCSV [][]string) {
 	for i, row := range actualCSV {
 		for j, item := range row {
