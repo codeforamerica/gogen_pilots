@@ -16,6 +16,7 @@ var Prop64MatchersByCodeSection = map[string]*regexp.Regexp{
 	"11359":                 regexp.MustCompile(`11359.*`),
 	"11360":                 regexp.MustCompile(`11360.*`),
 }
+var Section11357SubSectionMatcher = regexp.MustCompile(`11357\(([A-D])\)`)
 
 func ExtractProp64Section(codeSection string) (bool, string) {
 	if IsProp64Charge(codeSection) {
@@ -39,4 +40,13 @@ func IsProp64Charge(codeSection string) bool {
 
 func IsRelatedCharge(codeSection string) bool {
 	return relatedChargeMatcher.Match([]byte(codeSection))
+}
+
+func Extract11357SubSection(codeSection string) (bool, string) {
+	result := Section11357SubSectionMatcher.FindStringSubmatch(codeSection)
+	if result != nil {
+		return true, result[1]
+	} else {
+		return false, ""
+	}
 }

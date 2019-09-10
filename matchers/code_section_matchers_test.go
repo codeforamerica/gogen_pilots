@@ -22,6 +22,11 @@ func getMatchedRelatedChargeCodeSection(codeSection string) string {
 	return section
 }
 
+func getMatched11357SubSection(codeSection string) string {
+	_, section := matchers.Extract11357SubSection(codeSection)
+	return section
+}
+
 var _ = Describe("MatchedCodeSection", func() {
 	It("returns the matched substring for a given Prop 64 code section", func() {
 		Expect(getMatchedCodeSection("11358(c) HS")).To(Equal("11358"))
@@ -71,5 +76,18 @@ var _ = Describe("MatchedRelatedCodeSection", func() {
 	It("returns empty string if the code section is for a Prop 64 charge", func() {
 		Expect(getMatchedRelatedChargeCodeSection("11358(c) HS")).To(Equal(""))
 		Expect(getMatchedRelatedChargeCodeSection("/11357 HS")).To(Equal(""))
+	})
+})
+
+var _ = Describe("Matched11357SubSection", func() {
+	It("returns the matched subsection for a given 11357 code section", func() {
+		Expect(getMatched11357SubSection("11357(A)")).To(Equal("A"))
+		Expect(getMatched11357SubSection("11357(C)")).To(Equal("C"))
+		Expect(getMatched11357SubSection("Some Prefix 11357(C) Some Suffix")).To(Equal("C"))
+	})
+
+	It("returns empty string if there is no match", func() {
+		Expect(getMatched11357SubSection("11357")).To(Equal(""))
+		Expect(getMatched11357SubSection("647(f) HS")).To(Equal(""))
 	})
 })

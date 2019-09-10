@@ -78,12 +78,16 @@ func getSentencePartDuration(rawRow []string) time.Duration {
 }
 
 func findCodeSection(rawRow []string) string {
-	switch offenseDescription := rawRow[OFFENSE_DESCR]; strings.TrimSpace(offenseDescription) {
-	case "SEE COMMENT FOR CHARGE", "":
+	if IsCodeSectionInComment(rawRow[OFFENSE_DESCR]) {
 		return strings.Split(rawRow[COMMENT_TEXT], "-")[0]
-	default:
+	} else {
 		return strings.Split(rawRow[OFFENSE_DESCR], "-")[0]
 	}
+}
+
+func IsCodeSectionInComment(offenseDescription string) bool {
+	trimmedOffenseDescription := strings.TrimSpace(offenseDescription)
+	return trimmedOffenseDescription == "" || trimmedOffenseDescription == "SEE COMMENT FOR CHARGE"
 }
 
 func (row *DOJRow) OccurredInLast7Years() bool {
