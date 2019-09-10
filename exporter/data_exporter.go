@@ -3,6 +3,7 @@ package exporter
 import (
 	"fmt"
 	"gogen_pilots/data"
+	"gogen_pilots/matchers"
 	"gogen_pilots/utilities"
 	"io"
 	"sort"
@@ -66,10 +67,11 @@ func NewDataExporter(
 
 func (d *DataExporter) Export(county string, startTime time.Time) Summary {
 	for i, row := range d.dojInformation.Rows {
-		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
-		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
+		possibleOtherP64Charges := possibleP64ChargeOnlyInComment(row, d.normalFlowEligibilities[i])
+		d.outputDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i], possibleOtherP64Charges)
+		d.outputCondensedDOJWriter.WriteCondensedEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i], possibleOtherP64Charges)
 		if d.normalFlowEligibilities[i] != nil {
-			d.outputProp64ConvictionsDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i])
+			d.outputProp64ConvictionsDOJWriter.WriteEntryWithEligibilityInfo(row, d.normalFlowEligibilities[i], possibleOtherP64Charges)
 		}
 	}
 
@@ -79,6 +81,16 @@ func (d *DataExporter) Export(county string, startTime time.Time) Summary {
 	d.PrintAggregateStatistics(county, startTime)
 	return d.NewSummary(county)
 }
+
+func possibleP64ChargeOnlyInComment(row []string, info *data.EligibilityInfo) string {
+	if info == nil && matchers.IsProp64Charge(row[data.COMMENT_TEXT]) {
+		return row[data.COMMENT_TEXT]
+	} else {
+		return ""
+	}
+
+}
+
 
 func (d *DataExporter) PrintAggregateStatistics(county string, startTime time.Time) {
 	fmt.Fprintf(d.aggregateStatsWriter, "----------- Overall summary of DOJ file --------------------\n")
