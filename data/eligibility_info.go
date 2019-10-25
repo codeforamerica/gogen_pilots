@@ -19,6 +19,8 @@ type EligibilityInfo struct {
 	comparisonTime                 time.Time
 	Superstrikes                   string
 	PC290CodeSections              string
+	EarliestPC290                  time.Time
+	EarliestSuperstrike            time.Time
 	PC290Registration              string
 	EligibilityDetermination       string
 	EligibilityReason              string
@@ -44,18 +46,21 @@ func NewEligibilityInfo(row *DOJRow, subject *Subject, comparisonTime time.Time,
 
 	if subject.PC290Registration {
 		info.PC290Registration = "Yes"
+		info.EarliestPC290 = subject.EarliestPC290()
 	} else {
 		info.PC290Registration = "-"
 	}
 
 	if len(subject.PC290CodeSections()) > 0 {
 		info.PC290CodeSections = strings.Join(subject.PC290CodeSections(), ";")
+		info.EarliestPC290 = subject.EarliestPC290()
 	} else {
 		info.PC290CodeSections = "-"
 	}
 
 	if len(subject.SuperstrikeCodeSections()) > 0 {
 		info.Superstrikes = strings.Join(subject.SuperstrikeCodeSections(), ";")
+		info.EarliestSuperstrike = subject.EarliestSuperstrike()
 	} else {
 		info.Superstrikes = "-"
 	}

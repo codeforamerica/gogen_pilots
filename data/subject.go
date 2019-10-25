@@ -118,6 +118,34 @@ func (subject *Subject) PC290CodeSections() []string {
 	return result
 }
 
+func (subject *Subject) EarliestPC290() time.Time {
+var earliestPC290Date time.Time
+	for _, row := range subject.Convictions {
+		if IsPC290(row.CodeSection) || row.IsPC290Registration {
+			if earliestPC290Date.IsZero() {
+				earliestPC290Date = row.DispositionDate
+			} else if row.DispositionDate.Before(earliestPC290Date){
+				earliestPC290Date = row.DispositionDate
+			}
+		}
+	}
+	return earliestPC290Date
+}
+
+func (subject *Subject) EarliestSuperstrike() time.Time {
+	var earliestSuperstrikeDate time.Time
+	for _, row := range subject.Convictions {
+		if IsSuperstrike(row.CodeSection) {
+			if earliestSuperstrikeDate.IsZero() {
+				earliestSuperstrikeDate = row.DispositionDate
+			} else if row.DispositionDate.Before(earliestSuperstrikeDate){
+				earliestSuperstrikeDate = row.DispositionDate
+			}
+		}
+	}
+	return earliestSuperstrikeDate
+}
+
 func (subject *Subject) Prop64ConvictionsBySection() (int, int, int, int, int) {
 	convictionCountBySection := make(map[string]int)
 
