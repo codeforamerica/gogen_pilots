@@ -174,6 +174,7 @@ var _ = Describe("gogen_pilots", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
+			"IndividualDismissAge":    Equal(40),
 			"LineCount":               Equal(35),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
@@ -234,6 +235,7 @@ var _ = Describe("gogen_pilots", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
+			"IndividualDismissAge":    Equal(50),
 			"LineCount":               Equal(35),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
@@ -385,6 +387,7 @@ var _ = Describe("gogen_pilots", func() {
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 			"County":                  Equal("LOS ANGELES"),
+			"IndividualDismissAge":    Equal(50),
 			"LineCount":               Equal(35),
 			"ProcessingTimeInSeconds": BeNumerically(">", 0),
 			"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
@@ -570,6 +573,7 @@ var _ = Describe("gogen_pilots", func() {
 
 			Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
 				"County":                  Equal("LOS ANGELES"),
+				"IndividualDismissAge":    Equal(50),
 				"LineCount":               Equal(70),
 				"EarliestConviction":      Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ProcessingTimeInSeconds": BeNumerically(">", 0),
