@@ -24,6 +24,7 @@ type DataExporter struct {
 }
 
 type Summary struct {
+	GitRef                                      string         `json:"gitRef"`
 	County                                      string         `json:"county"`
 	IndividualDismissAge                        int            `json:"individualDismissAge"`
 	YearsConvictionFree                         int            `json:"yearsConvictionFree"`
