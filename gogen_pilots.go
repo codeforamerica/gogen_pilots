@@ -85,7 +85,9 @@ func (r runOpts) Execute(args []string) error {
 	countyEligibilityFlow = data.EligibilityFlows["LOS ANGELES"]
 
 	var runErrors []error
-	var runSummary exporter.Summary
+	runSummary := exporter.Summary{
+		IndividualDismissAge:age,
+	}
 	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen_pilots%s.json", r.FileNameSuffix)
 
 	for fileIndex, inputFile := range inputFiles {

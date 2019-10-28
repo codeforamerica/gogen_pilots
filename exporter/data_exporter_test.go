@@ -207,9 +207,10 @@ var _ = Describe("DataExporter", func() {
 	Describe("AccumulateSummaryData", func() {
 		It("adds new stats to stats already accumulated", func() {
 			existingStats := Summary{
-				County:             "SANTA CARLA",
-				LineCount:          21,
-				EarliestConviction: time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC),
+				County:               "SANTA CARLA",
+				IndividualDismissAge: 50,
+				LineCount:            21,
+				EarliestConviction:   time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC),
 				ReliefWithCurrentEligibilityChoices: map[string]int{
 					"CountSubjectsNoFelony":               2,
 					"CountSubjectsNoConvictionLast7Years": 3,
@@ -228,9 +229,9 @@ var _ = Describe("DataExporter", func() {
 			}
 
 			newStats := Summary{
-				County:             "SANTA CARLA",
-				LineCount:          25,
-				EarliestConviction: time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
+				County:               "SANTA CARLA",
+				LineCount:            25,
+				EarliestConviction:   time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
 				ReliefWithCurrentEligibilityChoices: map[string]int{
 					"CountSubjectsNoFelony":               1,
 					"CountSubjectsNoConvictionLast7Years": 5,
@@ -251,9 +252,10 @@ var _ = Describe("DataExporter", func() {
 			cumulativeStats := dataExporter.AccumulateSummaryData(existingStats, newStats)
 
 			Expect(cumulativeStats).To(gstruct.MatchFields(gstruct.IgnoreExtras, gstruct.Fields{
-				"County":             Equal("SANTA CARLA"),
-				"LineCount":          Equal(46),
-				"EarliestConviction": Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
+				"County":               Equal("SANTA CARLA"),
+				"IndividualDismissAge": Equal(50),
+				"LineCount":            Equal(46),
+				"EarliestConviction":   Equal(time.Date(1979, 6, 1, 0, 0, 0, 0, time.UTC)),
 				"ReliefWithCurrentEligibilityChoices": gstruct.MatchAllKeys(gstruct.Keys{
 					"CountSubjectsNoFelony":               Equal(3),
 					"CountSubjectsNoConvictionLast7Years": Equal(8),
