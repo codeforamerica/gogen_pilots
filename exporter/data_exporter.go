@@ -25,7 +25,8 @@ type DataExporter struct {
 
 type Summary struct {
 	County                                      string         `json:"county"`
-	IndividualDismissAge                        int            `json: individualDismissAge`
+	IndividualDismissAge                        int            `json:"individualDismissAge"`
+	YearsConvictionFree                         int            `json:"yearsConvictionFree"`
 	EarliestConviction                          time.Time      `json:"earliestConviction"`
 	LineCount                                   int            `json:"lineCount"`
 	ProcessingTimeInSeconds                     float64        `json:"processingTimeInSeconds"`
@@ -235,6 +236,7 @@ func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Sum
 	return Summary{
 		County:                              runSummary.County,
 		IndividualDismissAge:                runSummary.IndividualDismissAge,
+		YearsConvictionFree:                 runSummary.YearsConvictionFree,
 		LineCount:                           runSummary.LineCount + fileSummary.LineCount,
 		EarliestConviction:                  findEarliest(runSummary.EarliestConviction, fileSummary.EarliestConviction),
 		ReliefWithCurrentEligibilityChoices: utilities.AddMaps(runSummary.ReliefWithCurrentEligibilityChoices, fileSummary.ReliefWithCurrentEligibilityChoices),
