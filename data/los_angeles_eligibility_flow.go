@@ -3,7 +3,6 @@ package data
 import (
 	"fmt"
 	"gogen_pilots/matchers"
-	"strings"
 	"time"
 )
 
@@ -52,15 +51,10 @@ func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 	}
 }
 
-
 func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
 	ok, codeSection := matchers.ExtractProp64Section(row.CodeSection)
 	if ok && codeSection == "11357" {
-		if strings.HasPrefix(row.CodeSection, "11357(A)") || strings.HasPrefix(row.CodeSection, "11357(B)") {
-			info.SetEligibleForDismissal("11357(a) or 11357(b)")
-		} else {
-			info.SetHandReview("Other 11357")
-		}
+		info.SetEligibleForDismissal("11357")
 	} else {
 		ef.HasPrecedingSuperstrike(info, row, subject, age, yearsConvictionFree, comparisonTime)
 	}
@@ -110,7 +104,7 @@ func (ef losAngelesEligibilityFlow) Prop64OnlyWithCompletedSentences(info *Eligi
 	if info.onlyProp64Convictions(row, subject) && info.allSentencesCompleted(row, subject) {
 		info.SetEligibleForDismissal("Only has 11357-60 charges and completed sentence")
 	} else {
-		ef.NoConvictionsInGivenTimePeriod(info, row, subject,yearsConvictionFree)
+		ef.NoConvictionsInGivenTimePeriod(info, row, subject, yearsConvictionFree)
 	}
 }
 

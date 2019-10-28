@@ -434,7 +434,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				conviction3 = DOJRow{
 					DOB:             birthDate,
 					WasConvicted:    true,
-					CodeSection:     "11357 HS",
+					CodeSection:     "11358 HS",
 					DispositionDate: time.Date(2006, time.December, 5, 0, 0, 0, 0, time.UTC),
 					OFN:             "1236 334455-00",
 					County:          COUNTY,
@@ -465,8 +465,8 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				Expect(len(infos)).To(Equal(2))
 				Expect(infos[0].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
 				Expect(infos[0].EligibilityReason).To(Equal("Only has 11357-60 charges and completed sentence"))
-				Expect(infos[2].EligibilityDetermination).To(Equal("Hand Review"))
-				Expect(infos[2].EligibilityReason).To(Equal("Other 11357"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Eligible for Dismissal"))
+				Expect(infos[2].EligibilityReason).To(Equal("Only has 11357-60 charges and completed sentence"))
 			})
 		})
 

@@ -205,7 +205,7 @@ var _ = Describe("gogen_pilots", func() {
 				"21 years or younger": Equal(1),
 				"40 years or older":   Equal(6),
 				"Only has 11357-60 charges and completed sentence": Equal(1),
-				"11357(a) or 11357(b)":                             Equal(1),
+				"11357": Equal(2),
 			}),
 		}))
 	})
@@ -268,8 +268,8 @@ var _ = Describe("gogen_pilots", func() {
 				"21 years or younger": Equal(1),
 				"50 years or older":   Equal(5),
 				"Only has 11357-60 charges and completed sentence": Equal(1),
-				"11357(a) or 11357(b)":                             Equal(1),
-				"No convictions in past 2 years":                   Equal(2),
+				"11357":                          Equal(2),
+				"No convictions in past 2 years": Equal(2),
 			}),
 		}))
 	})
@@ -422,7 +422,7 @@ var _ = Describe("gogen_pilots", func() {
 				"21 years or younger": Equal(1),
 				"50 years or older":   Equal(5),
 				"Only has 11357-60 charges and completed sentence": Equal(1),
-				"11357(a) or 11357(b)":                             Equal(1),
+				"11357": Equal(2),
 			}),
 		}))
 
@@ -446,15 +446,14 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gbytes.Say("Found 4 11359 convictions in this county"))
 
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 1 11357 convictions that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 2 11357 convictions that are Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 5 11358 convictions that are Eligible for Dismissal"))
 		Eventually(session).Should(gbytes.Say("Found 2 11359 convictions that are Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say("Found 8 convictions total that are Eligible for Dismissal"))
+		Eventually(session).Should(gbytes.Say("Found 9 convictions total that are Eligible for Dismissal"))
 
 		Eventually(session).Should(gbytes.Say("Hand Review"))
-		Eventually(session).Should(gbytes.Say("Found 1 11357 convictions that are Hand Review"))
 		Eventually(session).Should(gbytes.Say("Found 2 11358 convictions that are Hand Review"))
-		Eventually(session).Should(gbytes.Say("Found 3 convictions total that are Hand Review"))
+		Eventually(session).Should(gbytes.Say("Found 2 convictions total that are Hand Review"))
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say("Found 1 11358 convictions that are Not eligible"))
@@ -469,7 +468,7 @@ var _ = Describe("gogen_pilots", func() {
 
 		Eventually(session).Should(gbytes.Say("----------- Eligibility Reasons --------------------"))
 		Eventually(session).Should(gbytes.Say("Eligible for Dismissal"))
-		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 1 convictions with eligibility reason 11357(a) or 11357(b)")))
+		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 2 convictions with eligibility reason 11357")))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason 21 years or younger"))
 		Eventually(session).Should(gbytes.Say("Found 5 convictions with eligibility reason 50 years or older"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Only has 11357-60 charges and completed sentence"))
@@ -477,7 +476,6 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gbytes.Say("Hand Review"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Currently serving sentence"))
 		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason No applicable eligibility criteria"))
-		Eventually(session).Should(gbytes.Say("Found 1 convictions with eligibility reason Other 11357"))
 
 		Eventually(session).Should(gbytes.Say("Not eligible"))
 		Eventually(session).Should(gbytes.Say(regexp.QuoteMeta("Found 2 convictions with eligibility reason PC 667(e)(2)(c)(iv)")))
@@ -610,7 +608,7 @@ var _ = Describe("gogen_pilots", func() {
 					"21 years or younger": Equal(2),
 					"50 years or older":   Equal(10),
 					"Only has 11357-60 charges and completed sentence": Equal(2),
-					"11357(a) or 11357(b)":                             Equal(2),
+					"11357": Equal(4),
 				}),
 			}))
 		})
