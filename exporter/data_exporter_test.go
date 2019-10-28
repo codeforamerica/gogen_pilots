@@ -229,7 +229,6 @@ var _ = Describe("DataExporter", func() {
 			}
 
 			newStats := Summary{
-				County:               "SANTA CARLA",
 				LineCount:            25,
 				EarliestConviction:   time.Date(1983, 6, 1, 0, 0, 0, 0, time.UTC),
 				ReliefWithCurrentEligibilityChoices: map[string]int{
