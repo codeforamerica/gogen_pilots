@@ -80,7 +80,7 @@ func (d *DataExporter) Export(county string, startTime time.Time) Summary {
 	d.outputCondensedDOJWriter.Flush()
 	d.outputProp64ConvictionsDOJWriter.Flush()
 	d.PrintAggregateStatistics(county, startTime)
-	return d.NewSummary(county)
+	return d.NewFileSummary(county)
 }
 
 func PossibleP64ChargeOnlyInComment(offenseDescription, commentText string) string {
@@ -233,7 +233,7 @@ func (d *DataExporter) printMap(formatString string, values map[string]int) {
 
 func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Summary) Summary {
 	return Summary{
-		County:                              fileSummary.County,
+		County:                              runSummary.County,
 		IndividualDismissAge:                runSummary.IndividualDismissAge,
 		LineCount:                           runSummary.LineCount + fileSummary.LineCount,
 		EarliestConviction:                  findEarliest(runSummary.EarliestConviction, fileSummary.EarliestConviction),
@@ -249,9 +249,8 @@ func (d *DataExporter) AccumulateSummaryData(runSummary Summary, fileSummary Sum
 	}
 }
 
-func (d *DataExporter) NewSummary(county string) Summary {
+func (d *DataExporter) NewFileSummary(county string) Summary {
 	return Summary{
-		County:             county,
 		LineCount:          d.dojInformation.TotalRows(),
 		EarliestConviction: d.dojInformation.EarliestProp64ConvictionDateInThisCounty(county),
 		ReliefWithCurrentEligibilityChoices: map[string]int{
