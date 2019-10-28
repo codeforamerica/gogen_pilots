@@ -52,7 +52,6 @@ func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *Eligibilit
 	}
 }
 
-
 func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
 	ok, codeSection := matchers.ExtractProp64Section(row.CodeSection)
 	if ok && codeSection == "11357" {
@@ -78,14 +77,6 @@ func (ef losAngelesEligibilityFlow) HasPrecedingPC290(info *EligibilityInfo, row
 	if info.hasPC290() && info.EarliestPC290.Before(row.DispositionDate) {
 		info.SetNotEligible("PC 290")
 	} else {
-		ef.TwoPriors(info, row, subject, age, yearsConvictionFree, comparisonTime)
-	}
-}
-
-func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
-	if info.hasTwoPriors(row, subject) {
-		info.SetNotEligible("Two priors")
-	} else {
 		ef.OlderThanGivenAge(info, row, subject, age, yearsConvictionFree, comparisonTime)
 	}
 }
@@ -110,7 +101,7 @@ func (ef losAngelesEligibilityFlow) Prop64OnlyWithCompletedSentences(info *Eligi
 	if info.onlyProp64Convictions(row, subject) && info.allSentencesCompleted(row, subject) {
 		info.SetEligibleForDismissal("Only has 11357-60 charges and completed sentence")
 	} else {
-		ef.NoConvictionsInGivenTimePeriod(info, row, subject,yearsConvictionFree)
+		ef.NoConvictionsInGivenTimePeriod(info, row, subject, yearsConvictionFree)
 	}
 }
 
@@ -133,6 +124,14 @@ func (ef losAngelesEligibilityFlow) ServingSentence(info *EligibilityInfo, row *
 func (ef losAngelesEligibilityFlow) IsDeceased(info *EligibilityInfo, row *DOJRow, subject *Subject) {
 	if subject.IsDeceased {
 		info.SetEligibleForDismissal("Deceased")
+	} else {
+		ef.TwoPriors(info, row, subject)
+	}
+}
+
+func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow, subject *Subject) {
+	if info.hasTwoPriors(row, subject) {
+		info.SetNotEligible("Two priors")
 	} else {
 		info.SetHandReview("No applicable eligibility criteria")
 	}
