@@ -173,6 +173,7 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gexec.Exit())
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
+			"GitRef":                  Equal("all_11357s"),
 			"County":                  Equal("LOS ANGELES"),
 			"IndividualDismissAge":    Equal(40),
 			"YearsConvictionFree":     Equal(10),
@@ -235,6 +236,7 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gexec.Exit())
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
+			"GitRef":                  Equal("all_11357s"),
 			"County":                  Equal("LOS ANGELES"),
 			"IndividualDismissAge":    Equal(50),
 			"YearsConvictionFree":     Equal(2),
@@ -388,6 +390,7 @@ var _ = Describe("gogen_pilots", func() {
 		Eventually(session).Should(gexec.Exit())
 		summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 		Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
+			"GitRef":                  Equal("all_11357s"),
 			"County":                  Equal("LOS ANGELES"),
 			"IndividualDismissAge":    Equal(50),
 			"YearsConvictionFree":     Equal(10),
@@ -575,6 +578,7 @@ var _ = Describe("gogen_pilots", func() {
 			summary := GetOutputSummary(path.Join(outputDir, "gogen_pilots.json"))
 
 			Expect(summary).To(gstruct.MatchAllFields(gstruct.Fields{
+				"GitRef":                  Equal("all_11357s"),
 				"County":                  Equal("LOS ANGELES"),
 				"IndividualDismissAge":    Equal(50),
 				"YearsConvictionFree":     Equal(10),
