@@ -157,6 +157,7 @@ func (r runOpts) Execute(args []string) error {
 func ExportSummary(summary exporter.Summary, startTime time.Time, filePath string) {
 	summary.ProcessingTimeInSeconds = time.Since(startTime).Seconds()
 
+	summary.GitRef = "no_290s"
 	s, err := json.Marshal(summary)
 	if err != nil {
 		panic("Cannot marshal JSON") // TODO replace panic
