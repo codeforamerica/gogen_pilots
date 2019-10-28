@@ -88,6 +88,7 @@ func (r runOpts) Execute(args []string) error {
 	runSummary := exporter.Summary{
 		County: "LOS ANGELES",
 		IndividualDismissAge:age,
+		YearsConvictionFree: yearsConvictionFree,
 	}
 	outputJsonFilePath := utilities.GenerateFileName(r.OutputFolder, "gogen_pilots%s.json", r.FileNameSuffix)
 
