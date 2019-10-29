@@ -62,22 +62,6 @@ func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row
 			info.SetHandReview("Other 11357")
 		}
 	} else {
-		ef.HasPrecedingSuperstrike(info, row, subject, age, yearsConvictionFree, comparisonTime)
-	}
-}
-
-func (ef losAngelesEligibilityFlow) HasPrecedingSuperstrike(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
-	if info.hasSuperstrikes() && info.EarliestSuperstrike.Before(row.DispositionDate) {
-		info.SetNotEligible("PC 667(e)(2)(c)(iv)")
-	} else {
-		ef.HasPrecedingPC290(info, row, subject, age, yearsConvictionFree, comparisonTime)
-	}
-}
-
-func (ef losAngelesEligibilityFlow) HasPrecedingPC290(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
-	if info.hasPC290() && info.EarliestPC290.Before(row.DispositionDate) {
-		info.SetNotEligible("PC 290")
-	} else {
 		ef.TwoPriors(info, row, subject, age, yearsConvictionFree, comparisonTime)
 	}
 }
