@@ -38,20 +38,11 @@ func (ef losAngelesEligibilityFlow) BeginEligibilityFlow(info *EligibilityInfo, 
 
 func (ef losAngelesEligibilityFlow) ConvictionIsMisdemeanorOrInfraction(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
 	if row.IsFelony {
-		ef.ConvictionBeforeNovNine2016(info, row, subject, age, yearsConvictionFree, comparisonTime)
+		ef.ConvictionIs11357(info, row, subject, age, yearsConvictionFree, comparisonTime)
 	} else {
 		info.SetCityAttorneyReview("Misdemeanor or Infraction")
 	}
 }
-
-func (ef losAngelesEligibilityFlow) ConvictionBeforeNovNine2016(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
-	if info.DateOfConviction.Before(time.Date(2016, 11, 9, 0, 0, 0, 0, time.UTC)) {
-		ef.ConvictionIs11357(info, row, subject, age, yearsConvictionFree, comparisonTime)
-	} else {
-		info.SetNotEligible("Occurred after 11/09/2016")
-	}
-}
-
 
 func (ef losAngelesEligibilityFlow) ConvictionIs11357(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
 	ok, codeSection := matchers.ExtractProp64Section(row.CodeSection)

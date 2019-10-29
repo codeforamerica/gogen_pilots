@@ -25,7 +25,7 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 		var yearsConvictionFree int
 		yearsConvictionFree = 10
 
-		Context("Steps 1, and 2", func() {
+		Context("Step 1", func() {
 			var (
 				subject       Subject
 				conviction1   DOJRow
@@ -98,8 +98,8 @@ var _ = Describe("losAngelesEligibilityFlow", func() {
 				infos := flow.ProcessSubject(&subject, comparisonTime, COUNTY, age, yearsConvictionFree)
 				Expect(infos[0].EligibilityDetermination).To(Equal("To be reviewed by City Attorneys"))
 				Expect(infos[0].EligibilityReason).To(Equal("Misdemeanor or Infraction"))
-				Expect(infos[2].EligibilityDetermination).To(Equal("Not eligible"))
-				Expect(infos[2].EligibilityReason).To(Equal("Occurred after 11/09/2016"))
+				Expect(infos[2].EligibilityDetermination).To(Equal("Hand Review"))
+				Expect(infos[2].EligibilityReason).To(Equal("No applicable eligibility criteria"))
 			})
 		})
 
