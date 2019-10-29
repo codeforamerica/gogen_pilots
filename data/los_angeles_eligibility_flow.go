@@ -78,14 +78,6 @@ func (ef losAngelesEligibilityFlow) HasPrecedingPC290(info *EligibilityInfo, row
 	if info.hasPC290() && info.EarliestPC290.Before(row.DispositionDate) {
 		info.SetNotEligible("PC 290")
 	} else {
-		ef.TwoPriors(info, row, subject, age, yearsConvictionFree, comparisonTime)
-	}
-}
-
-func (ef losAngelesEligibilityFlow) TwoPriors(info *EligibilityInfo, row *DOJRow, subject *Subject, age int, yearsConvictionFree int, comparisonTime time.Time) {
-	if info.hasTwoPriors(row, subject) {
-		info.SetNotEligible("Two priors")
-	} else {
 		ef.OlderThanGivenAge(info, row, subject, age, yearsConvictionFree, comparisonTime)
 	}
 }
