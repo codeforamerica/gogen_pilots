@@ -116,24 +116,20 @@ var _ = Describe("DojInformation", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByCodeSectionByEligibility(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
 					"Eligible for Dismissal": {"11357": 1, "11359": 2, "11358": 5},
-					"Hand Review": {"11358": 2, "11357": 1},
-					"Not eligible": {"11358": 1, "11359": 1},
+					"Hand Review": {"11358": 3, "11357": 1, "11359": 1},
 					"To be reviewed by City Attorneys": {"11358": 1, "11357": 1, "11359": 1}}))
 		})
 
 		It("Prop64 convictions in this county by eligibility determination and reason", func() {
 			Expect(dojInformation.Prop64ConvictionsInThisCountyByEligibilityByReason(county, dojEligibilities)).To(Equal(
 				map[string]map[string]int{
-					"Not eligible": {
-						"PC 667(e)(2)(c)(iv)": 2,
-					},
 					"To be reviewed by City Attorneys": {
 						"Misdemeanor or Infraction": 3,
 					},
 					"Hand Review": {
 						"Other 11357": 1,
 						"Currently serving sentence": 1,
-						"No applicable eligibility criteria": 1,
+						"No applicable eligibility criteria": 3,
 					},
 					"Eligible for Dismissal": {
 						"11357(a) or 11357(b)": 1,
