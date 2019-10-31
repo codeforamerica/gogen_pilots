@@ -13,11 +13,11 @@ jobs:
           command: |
             go get -t ./...
             go get github.com/onsi/ginkgo/ginkgo
-
-      - run:
-          name: Run unit tests
-          command: |
-            ginkgo -r
+#
+#      - run:
+#          name: Run unit tests
+#          command: |
+#            ginkgo -r
 
       - run:
           name: Build mac executable
