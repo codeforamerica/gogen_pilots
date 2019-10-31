@@ -27,7 +27,7 @@ jobs:
       - run:
           name: Build windows executable
           command: |
-            GOOS="windows" GOARCH="amd64" go build -o gogen_pilots_win.exe
+            GOOS="windows" GOARCH="386" go build -o gogen_pilots_win.exe
 
       - run:
           name: Build Linux executable
